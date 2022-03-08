@@ -20,6 +20,6 @@ TODO: _**Insert useful image here**_
 2. Remove the non-residential GNAF points in the removed areas. Do this for the current GNAF and the February 2017 release of GNAF (Feb 2017 is used as it most likely represents the closest number of addresses surveyed on Census night in August 2016)
 3. Determine the change in residential GNAF address counts since the last ABS Census (2016) to estimate population & dwelling growth in developing suburbs
 4. Using population & dwelling density (e.g. pop. per square km) - create current pop. and dwelling estimates for each boundary
-5. Validate the above using annual ABS pop.estimates and the SA2 and LGA level
+5. Validate the above using annual ABS pop.estimates at the SA2 and LGA level
 
 ### Step 2 - Apportion Pop. & Dwelling Counts Between Boundaries
