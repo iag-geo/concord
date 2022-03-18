@@ -13,7 +13,7 @@
 
 
 
--- get all combinations of PSMA and ABS 2016 LGAs
+-- get all combinations of PSMA and ABS 2016 LGAs -- 562 rows affected in 3 m 0 s 850 ms
 drop table if exists customer_growth.lga_ids;
 create table customer_growth.lga_ids as
 with psma_lga as (
@@ -72,7 +72,14 @@ analyse customer_growth.lga_ids;
 
 
 
-
+-- different names -- 54 rows
 select *
-from census_2016_bdys.lga_2016_aust;
+from customer_growth.lga_ids
+where psma_name <> lga_ids.lga_name16
+;
 
+-- only a one-way match -- 33 rows
+select *
+from customer_growth.lga_ids
+where match_count < 2
+;
