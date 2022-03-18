@@ -10,6 +10,12 @@
 -- ;
 -- vacuum analyse census_2016_bdys.poa_2016_aust;
 
+
+
+
+-- get all combinations of PSMA and ABS 2016 LGAs
+drop table if exists customer_growth.lga_ids;
+create table customer_growth.lga_ids as
 with psma_lga as (
     select lga_pid,
            name as psma_name,
@@ -20,38 +26,49 @@ with psma_lga as (
 ), psma_lga_pnt as (
     select lga_pid,
            psma_name,
-           st_centroid(geom) as geom
+           ST_PointOnSurface(geom) as geom  -- use point on surface to ensure point is within polygon
     from psma_lga
 ), abs_lga_pnt as (
     select lga_code16,
-           lga_name16 as abs_name,
-           st_centroid(geom) as geom
+           split_part(lga_name16, ' (', 1) as lga_name16,
+           ST_PointOnSurface(geom) as geom
     from census_2016_bdys.lga_2016_aust
 ), merge1 as (
-    select 'ABS pnt in PSMA bdy'::text as match_type,
-           lga_pid,
+--     select 'ABS pnt in PSMA bdy'::text as match_type,
+    select lga_pid,
            psma_name,
            lga_code16,
-           abs_name,
-           abs_lga_pnt.geom
-    from psma_lga
-             inner join abs_lga_pnt on st_intersects(abs_lga_pnt.geom, psma_lga.geom)
--- ), merge2 as (
---     select 'PSMA pnt in ABS bdy'::text as match_type,
---            lga_pid,
---            psma_name,
---            lga_code16,
---            abs_name,
+           lga_name16
 --            abs_lga_pnt.geom
---     from psma_lga
---              inner join abs_lga_pnt on st_intersection(abs_lga_pnt.geom, psma_lga.geom)
+    from psma_lga
+    inner join abs_lga_pnt on st_intersects(abs_lga_pnt.geom, psma_lga.geom)
+), merge2 as (
+--     select 'PSMA pnt in ABS bdy'::text as match_type,
+    select lga_pid,
+           psma_name,
+           lga_code16,
+           split_part(lga_name16, ' (', 1) as lga_name16
+--            abs_lga_pnt.geom
+    from psma_lga_pnt
+    inner join census_2016_bdys.lga_2016_aust as abs_lga on st_intersects(psma_lga_pnt.geom, abs_lga.geom)
+), uni as (
+    select * from merge1
+    union all
+    select * from merge2
 )
-select *
-from merge1
+select lga_pid,
+       psma_name,
+       lga_code16,
+       lga_name16,
+       count(*) as match_count
+from uni
+group by lga_pid,
+         psma_name,
+         lga_code16,
+         lga_name16
 ;
+analyse customer_growth.lga_ids;
 
-
-;
 
 
 
