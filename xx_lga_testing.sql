@@ -1,21 +1,19 @@
 
--- -- fix LGA and POA ID prefix errors
--- update census_2016_bdys.lga_2016_aust
---     set lga_code16 = substring(lga_code16, 4, length(lga_code16))
--- ;
--- vacuum analyse census_2016_bdys.lga_2016_aust;
--- 
--- update census_2016_bdys.poa_2016_aust
--- set poa_code16 = substring(poa_code16, 4, length(poa_code16))
--- ;
--- vacuum analyse census_2016_bdys.poa_2016_aust;
+-- fix LGA and POA ID prefix errors
+update census_2016_bdys.lga_2016_aust
+    set lga_code16 = substring(lga_code16, 4, length(lga_code16))
+;
+vacuum analyse census_2016_bdys.lga_2016_aust;
 
-
+update census_2016_bdys.poa_2016_aust
+set poa_code16 = substring(poa_code16, 4, length(poa_code16))
+;
+vacuum analyse census_2016_bdys.poa_2016_aust;
 
 
 -- get all combinations of PSMA and ABS 2016 LGAs -- 562 rows affected in 3 m 0 s 850 ms
-drop table if exists customer_growth.lga_ids;
-create table customer_growth.lga_ids as
+drop table if exists testing.lga_ids;
+create table testing.lga_ids as
 with psma_lga as (
     select lga_pid,
            name as psma_name,
@@ -67,19 +65,19 @@ group by lga_pid,
          lga_code16,
          lga_name16
 ;
-analyse customer_growth.lga_ids;
+analyse testing.lga_ids;
 
 
 
 
 -- different names -- 54 rows
 select *
-from customer_growth.lga_ids
+from testing.lga_ids
 where psma_name <> lga_ids.lga_name16
 ;
 
 -- only a one-way match -- 33 rows
 select *
-from customer_growth.lga_ids
+from testing.lga_ids
 where match_count < 2
 ;
