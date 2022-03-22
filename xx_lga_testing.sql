@@ -1,17 +1,37 @@
 
--- fix LGA and POA ID prefix errors
-update census_2016_bdys.lga_2016_aust
-    set lga_code16 = substring(lga_code16, 4, length(lga_code16))
-;
-vacuum analyse census_2016_bdys.lga_2016_aust;
+-- -- fix LGA and POA ID prefix errors
+-- update census_2016_bdys.lga_2016_aust
+--     set lga_code16 = substring(lga_code16, 4, length(lga_code16))
+-- ;
+-- vacuum analyse census_2016_bdys.lga_2016_aust;
+--
+-- update census_2016_bdys.poa_2016_aust
+-- set poa_code16 = substring(poa_code16, 4, length(poa_code16))
+-- ;
+-- vacuum analyse census_2016_bdys.poa_2016_aust;
 
-update census_2016_bdys.poa_2016_aust
-set poa_code16 = substring(poa_code16, 4, length(poa_code16))
-;
-vacuum analyse census_2016_bdys.poa_2016_aust;
+
+-- projet current population from changes to address counts since 201708 and test against 2021 LGA population data
+
+-- step 1 - add current address counts to 2016 meshblocks
 
 
--- get all combinations of PSMA and ABS 2016 LGAs -- 562 rows affected in 3 m 0 s 850 ms
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-- get all combinations of PSMA and ABS 2016 LGAs using centroids -- 562 rows affected in 3 m 0 s 850 ms
 drop table if exists testing.lga_ids;
 create table testing.lga_ids as
 with psma_lga as (
@@ -81,3 +101,68 @@ select *
 from testing.lga_ids
 where match_count < 2
 ;
+
+
+
+
+
+
+-- works in progress.....
+
+-- get all combinations of PSMA and ABS 2016 LGAs using centroids -- 562 rows affected in 3 m 0 s 850 ms
+drop table if exists testing.lga_ids_by_area;
+create table testing.lga_ids_by_area as
+with psma_lga as (
+    select lga_pid,
+           name as psma_name,
+           sum(st_area(st_transform(geom, 3577))) as area_m2
+    from admin_bdys_202202.local_government_areas
+    group by lga_pid,
+             name
+), psma_lga_pnt as (
+    select lga_pid,
+           psma_name,
+           ST_PointOnSurface(geom) as geom  -- use point on surface to ensure point is within polygon
+    from psma_lga
+), abs_lga_pnt as (
+    select lga_code16,
+           split_part(lga_name16, ' (', 1) as lga_name16,
+           ST_PointOnSurface(geom) as geom
+    from census_2016_bdys.lga_2016_aust
+), merge1 as (
+--     select 'ABS pnt in PSMA bdy'::text as match_type,
+    select lga_pid,
+           psma_name,
+           lga_code16,
+           lga_name16
+--            abs_lga_pnt.geom
+    from psma_lga
+             inner join abs_lga_pnt on st_intersects(abs_lga_pnt.geom, psma_lga.geom)
+), merge2 as (
+--     select 'PSMA pnt in ABS bdy'::text as match_type,
+    select lga_pid,
+           psma_name,
+           lga_code16,
+           split_part(lga_name16, ' (', 1) as lga_name16
+--            abs_lga_pnt.geom
+    from psma_lga_pnt
+             inner join census_2016_bdys.lga_2016_aust as abs_lga on st_intersects(psma_lga_pnt.geom, abs_lga.geom)
+), uni as (
+    select * from merge1
+    union all
+    select * from merge2
+)
+select lga_pid,
+       psma_name,
+       lga_code16,
+       lga_name16,
+       count(*) as match_count
+from uni
+group by lga_pid,
+         psma_name,
+         lga_code16,
+         lga_name16
+;
+analyse testing.lga_ids_by_area;
+
+
