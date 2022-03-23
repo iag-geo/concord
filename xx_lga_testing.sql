@@ -16,29 +16,34 @@
 -- step 1 - add 201708 and 220202 address counts to 2016 meshblocks
 with gnaf_2017 as (
     select mb_2016_code,
-           count(*) as address_count_201708
+           count(*) as address_count
     from gnaf_201708.address_principals
     group by mb_2016_code
 ), gnaf_2022 as (
     select mb_2016_code,
-           count(*) as address_count_202202
+           count(*) as address_count
     from gnaf_202202.address_principals
     group by mb_2016_code
+), merge as (
+    select mb.mb_2016_code,
+           mb_category_name_2016,
+           area_albers_sqkm,
+           dwelling,
+           person,
+           mb.address_count,
+           coalesce(gnaf_2017.address_count, 0) as address_count_201708,
+           coalesce(gnaf_2022.address_count, 0) as address_count_202202,
+           0::integer                           as person_202202,
+           state,
+           geom
+    from testing.mb_2016_counts as mb
+             left outer join gnaf_2017 on gnaf_2017.mb_2016_code = mb.mb_2016_code
+             left outer join gnaf_2022 on gnaf_2022.mb_2016_code = mb.mb_2016_code
 )
-select mb.mb_2016_code,
-       mb_category_name_2016,
-       area_albers_sqkm,
-       dwelling,
-       person,
-       address_count,
-       address_count_201708,
-       address_count_202202,
-       0::integer as person_202202,
-       state,
-       geom
-from testing.mb_2016_counts as mb
-left outer join gnaf_2017 on gnaf_2017.mb_2016_code = mb.mb_2016_code
-left outer join gnaf_2022 on gnaf_2022.mb_2016_code = mb.mb_2016_code
+
+
+
+
 ;
 
 
