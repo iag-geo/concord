@@ -13,13 +13,16 @@
 
 -- projet current population from changes to address counts since 201708 and test against 2021 LGA population data
 
--- step 1 - add current address counts to 2016 meshblocks
-
-
-with gnaf as (
+-- step 1 - add 201708 and 220202 address counts to 2016 meshblocks
+with gnaf_2017 as (
     select mb_2016_code,
            count(*) as address_count_201708
     from gnaf_201708.address_principals
+    group by mb_2016_code
+), gnaf_2022 as (
+    select mb_2016_code,
+           count(*) as address_count_202202
+    from gnaf_202202.address_principals
     group by mb_2016_code
 )
 select mb.mb_2016_code,
@@ -29,12 +32,13 @@ select mb.mb_2016_code,
        person,
        address_count,
        address_count_201708,
-       0::integer as address_count_202202,
+       address_count_202202,
        0::integer as person_202202,
        state,
        geom
 from testing.mb_2016_counts as mb
-inner join gnaf on gnaf.mb_2016_code = mb.mb_2016_code
+left outer join gnaf_2017 on gnaf_2017.mb_2016_code = mb.mb_2016_code
+left outer join gnaf_2022 on gnaf_2022.mb_2016_code = mb.mb_2016_code
 ;
 
 
