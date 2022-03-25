@@ -14,6 +14,8 @@
 
 
 -- create concordance file using addresses as a residential population proxy (yes, it's flawed but close)
+
+-- step 1 of 2 -- get ABS and PSMA LGA IDs for ech GNAFPID
 drop table if exists testing.lga_concordance;
 create table testing.lga_concordance as
 with mb as (
@@ -38,18 +40,23 @@ select abs.gnaf_pid,
        state
 from gnaf_202202.address_principal_admin_boundaries as psma
 inner join abs on abs.gnaf_pid = psma.gnaf_pid
-limit 100000
+-- limit 100000
 ;
 analyse testing.lga_concordance;
 
-create index lga_concordance_lga_code16_idx on testing.lga_concordance using btree (lga_code16);
-create index lga_concordance_lga_pid_idx on testing.lga_concordance using btree (lga_pid);
+-- create index lga_concordance_lga_code16_idx on testing.lga_concordance using btree (lga_code16);
+-- create index lga_concordance_lga_pid_idx on testing.lga_concordance using btree (lga_pid);
 
 
 
 select *
 from testing.lga_concordance
 where lga_pid is not null;
+
+
+-- step 2 of 2 -- aggregate addresses and determine % overlap between all bdys.
+--   This is the % that will be applied to all datasets being converted between bdys
+with ....
 
 
 select lga_code16,
