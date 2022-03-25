@@ -23,6 +23,7 @@ with mb as (
 ), abs as (
     select gnaf_pid,
            lga_code16,
+           state as abs_state,
            split_part(lga_name16, ' (', 1) as lga_name16
     from mb
     inner join census_2016_bdys.lga_2016_aust as abs_lga on st_intersects(mb.geom, abs_lga.geom)
@@ -31,8 +32,10 @@ with mb as (
 select abs.gnaf_pid,
        lga_code16,
        lga_name16,
+       abs_state,
        lga_pid,
-       lga_name
+       lga_name,
+       state
 from gnaf_202202.address_principal_admin_boundaries as psma
 inner join abs on abs.gnaf_pid = psma.gnaf_pid
 limit 100000
@@ -51,15 +54,19 @@ where lga_pid is not null;
 
 select lga_code16,
        lga_name16,
+       abs_state,
        lga_pid,
        lga_name,
+       state,
        count(*) as address_count
 from testing.lga_concordance
 where lga_pid is not null
 group by lga_code16,
          lga_name16,
+         abs_state,
          lga_pid,
-         lga_name;
+         lga_name,
+         state;
 
 
 
