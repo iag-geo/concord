@@ -15,7 +15,7 @@
 
 -- create concordance file using addresses as a residential population proxy (yes, it's flawed but close)
 
--- step 1 of 2 -- get ABS and PSMA LGA IDs for ech GNAFPID
+-- step 1 of 2 -- get ABS and PSMA LGA IDs for ech GNAFPID -- 14,451,352 rows affected in 4 m 29 s 11 ms
 drop table if exists testing.lga_concordance;
 create table testing.lga_concordance as
 with mb as (
@@ -67,7 +67,7 @@ select lga_code16,
        state,
        count(*) as address_count
 from testing.lga_concordance
-where lga_pid is not null
+where lga_name16 = 'Ballina'
 group by lga_code16,
          lga_name16,
          abs_state,
