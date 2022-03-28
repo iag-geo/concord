@@ -44,9 +44,6 @@ inner join abs on abs.gnaf_pid = psma.gnaf_pid
 ;
 analyse testing.temp_lga_concordance;
 
--- create index lga_concordance_lga_code16_idx on testing.lga_concordance using btree (lga_code16);
--- create index lga_concordance_lga_pid_idx on testing.lga_concordance using btree (lga_pid);
-
 -- select *
 -- from testing.temp_lga_concordance
 -- where lga_pid is not null;
@@ -82,31 +79,37 @@ with abs_counts as (
              lga_name,
              state
 ), final as (
-    select 'ABS LGA'::text as id1_type,
-           lga.lga_code16 as id1,
-           lga_name16 as name1,
-           abs_state as state1,
-           'GEOSCAPE LGA'::text as id1_type,
-           lga.lga_pid as id2,
-           lga_name as name2,
-           state as state2,
+    select 'abs lga'::text as bdy1_type,
+           lga.lga_code16 as bdy1_id,
+           lga_name16 as bdy1_name,
+           abs_state as bdy1_state,
+           'geoscape lga'::text as bdy2_type,
+           lga.lga_pid as bdy2_id,
+           lga_name as bdy2_name,
+           state as bdy2_state,
            lga.address_count,
-           abs_counts.address_count                                                        as total_abs_addresses,
-           (lga.address_count::float / abs_counts.address_count::float * 100.0)::smallint  as percent_abs_addresses,
-           psma_counts.address_count                                                       as total_psma_addresses,
-           (lga.address_count::float / psma_counts.address_count::float * 100.0)::smallint as percent_psma_addresses
+           abs_counts.address_count                                                        as total_bdy1_addresses,
+           (lga.address_count::float / abs_counts.address_count::float * 100.0)::smallint  as percent_bdy1_addresses,
+           psma_counts.address_count                                                       as total_bdy2_addresses,
+           (lga.address_count::float / psma_counts.address_count::float * 100.0)::smallint as percent_bdy2_addresses
     from lga
              inner join abs_counts on abs_counts.lga_code16 = lga.lga_code16
              inner join psma_counts on psma_counts.lga_pid = lga.lga_pid
 )
-select *
+select final.*,
+       st_intersection(abs_lga.geom, psma_lga.geom) as geom
 from final
-where percent_abs_addresses > 0
-   or percent_psma_addresses > 0
+inner join census_2016_bdys.lga_2016_aust as abs_lga on final.bdy1_id = abs_lga.lga_code16
+inner join admin_bdys_202202.local_government_areas as psma_lga on final.bdy2_id = psma_lga.lga_pid
+where percent_bdy1_addresses > 0
+   or percent_bdy2_addresses > 0
 -- where (percent_abs_addresses > 0 and percent_abs_addresses < 100)
 --       or (percent_psma_addresses > 0 and percent_psma_addresses < 100)
 ;
+analyse testing.concordance;
 
+select *
+from testing.concordance;
 
 
 -- -- project current population from changes to address counts since 201708 and test against 2021 LGA population data
