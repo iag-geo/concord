@@ -112,7 +112,7 @@ ALTER TABLE testing.concordance ADD CONSTRAINT concordance_pkey PRIMARY KEY (bdy
 create index concordance_geom_idx on testing.concordance using gist (geom);
 alter table testing.concordance cluster on concordance_geom_idx;
 
-select *
+select count(*)
 from testing.concordance;
 
 
