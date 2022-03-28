@@ -108,6 +108,10 @@ where percent_bdy1_addresses > 0
 ;
 analyse testing.concordance;
 
+ALTER TABLE testing.concordance ADD CONSTRAINT concordance_pkey PRIMARY KEY (bdy1_id, bdy2_id);
+create index concordance_geom_idx on testing.concordance using gist (geom);
+alter table testing.concordance cluster on concordance_geom_idx;
+
 select *
 from testing.concordance;
 
