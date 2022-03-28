@@ -16,8 +16,8 @@
 -- create concordance file using addresses as a residential population proxy (yes, it's flawed but close)
 
 -- step 1 of 2 -- get ABS and PSMA LGA IDs for ech GNAFPID -- 14,451,352 rows affected in 4 m 29 s 11 ms
-drop table if exists testing.lga_concordance;
-create table testing.lga_concordance as
+drop table if exists testing.temp_lga_concordance;
+create table testing.temp_lga_concordance as
 with mb as (
     select mb_2016_code,
            ST_PointOnSurface(geom)         as geom
@@ -42,38 +42,70 @@ from gnaf_202202.address_principal_admin_boundaries as psma
 inner join abs on abs.gnaf_pid = psma.gnaf_pid
 -- limit 100000
 ;
-analyse testing.lga_concordance;
+analyse testing.temp_lga_concordance;
 
 -- create index lga_concordance_lga_code16_idx on testing.lga_concordance using btree (lga_code16);
 -- create index lga_concordance_lga_pid_idx on testing.lga_concordance using btree (lga_pid);
 
-
-
-select *
-from testing.lga_concordance
-where lga_pid is not null;
-
+-- select *
+-- from testing.temp_lga_concordance
+-- where lga_pid is not null;
 
 -- step 2 of 2 -- aggregate addresses and determine % overlap between all bdys.
 --   This is the % that will be applied to all datasets being converted between bdys
-with ....
-
-
-select lga_code16,
-       lga_name16,
-       abs_state,
-       lga_pid,
-       lga_name,
-       state,
-       count(*) as address_count
-from testing.lga_concordance
-where lga_name16 = 'Ballina'
-group by lga_code16,
-         lga_name16,
-         abs_state,
-         lga_pid,
-         lga_name,
-         state;
+drop table if exists testing.concordance;
+create table testing.concordance as
+with abs_counts as (
+    select lga_code16,
+           count(*) as address_count
+    from testing.temp_lga_concordance
+    group by lga_code16
+), psma_counts as (
+    select lga_pid,
+           count(*) as address_count
+    from testing.temp_lga_concordance
+    group by lga_pid
+), lga as (
+    select lga_code16,
+           lga_name16,
+           abs_state,
+           lga_pid,
+           lga_name,
+           state,
+           count(*) as address_count
+    from testing.temp_lga_concordance
+--     where lga_name16 = 'Ballina'
+    group by lga_code16,
+             lga_name16,
+             abs_state,
+             lga_pid,
+             lga_name,
+             state
+), final as (
+    select 'ABS LGA'::text as id1_type,
+           lga.lga_code16 as id1,
+           lga_name16 as name1,
+           abs_state as state1,
+           'GEOSCAPE LGA'::text as id1_type,
+           lga.lga_pid as id2,
+           lga_name as name2,
+           state as state2,
+           lga.address_count,
+           abs_counts.address_count                                                        as total_abs_addresses,
+           (lga.address_count::float / abs_counts.address_count::float * 100.0)::smallint  as percent_abs_addresses,
+           psma_counts.address_count                                                       as total_psma_addresses,
+           (lga.address_count::float / psma_counts.address_count::float * 100.0)::smallint as percent_psma_addresses
+    from lga
+             inner join abs_counts on abs_counts.lga_code16 = lga.lga_code16
+             inner join psma_counts on psma_counts.lga_pid = lga.lga_pid
+)
+select *
+from final
+where percent_abs_addresses > 0
+   or percent_psma_addresses > 0
+-- where (percent_abs_addresses > 0 and percent_abs_addresses < 100)
+--       or (percent_psma_addresses > 0 and percent_psma_addresses < 100)
+;
 
 
 
