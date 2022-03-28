@@ -95,12 +95,17 @@ with abs_counts as (
     from lga
              inner join abs_counts on abs_counts.lga_code16 = lga.lga_code16
              inner join psma_counts on psma_counts.lga_pid = lga.lga_pid
+), psma_lga as (
+    select lga_pid,
+           st_collect(geom) as geom
+    from admin_bdys_202202.local_government_areas
+    group by lga_pid
 )
 select final.*,
        st_intersection(abs_lga.geom, psma_lga.geom) as geom
 from final
 inner join census_2016_bdys.lga_2016_aust as abs_lga on final.bdy1_id = abs_lga.lga_code16
-inner join admin_bdys_202202.local_government_areas as psma_lga on final.bdy2_id = psma_lga.lga_pid
+inner join psma_lga on final.bdy2_id = psma_lga.lga_pid
 where percent_bdy1_addresses > 0
    or percent_bdy2_addresses > 0
 -- where (percent_abs_addresses > 0 and percent_abs_addresses < 100)
