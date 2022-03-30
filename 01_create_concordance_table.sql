@@ -1,107 +1,105 @@
 
--- create concordance file using addresses as a residential population proxy (yes, it's flawed but close)
+-- create concordance table using addresses as a residential population proxy (yes, it's flawed but close)
 
 -- step 1 of 2 -- get ABS and PSMA LGA IDs for ech GNAFPID -- 14,451,352 rows affected in 4 m 29 s 11 ms
-drop table if exists testing.temp_lga_concordance;
-create table testing.temp_lga_concordance as
+-- use meshblock centroids to assign addresses to ABS LGAs
+drop table if exists temp_lga_concordance;
+create temporary table temp_lga_concordance as
 with mb as (
     select mb_2016_code,
-           ST_PointOnSurface(geom)         as geom
+           ST_PointOnSurface(geom) as geom
     from testing.mb_2016_counts_2022
-), abs as (
+), bdy1 as (
     select gnaf_pid,
-           lga_code16,
-           state as abs_state,
-           split_part(lga_name16, ' (', 1) as lga_name16
+           lga_code16                      as bdy1_id,
+           split_part(lga_name16, ' (', 1) as bdy1_name,
+           state                           as bdy1_state
     from mb
-             inner join census_2016_bdys.lga_2016_aust as abs_lga on st_intersects(mb.geom, abs_lga.geom)
-             inner join gnaf_202202.address_principals as gnaf on gnaf.mb_2016_code = mb.mb_2016_code
+    inner join census_2016_bdys.lga_2016_aust as abs_lga on st_intersects(mb.geom, abs_lga.geom)
+    inner join gnaf_202202.address_principals as gnaf on gnaf.mb_2016_code = mb.mb_2016_code
 )
-select abs.gnaf_pid,
-       lga_code16,
-       lga_name16,
-       abs_state,
-       lga_pid,
-       lga_name,
-       state
+select bdy1.gnaf_pid,
+       bdy1_id,
+       bdy1_name,
+       bdy1_state,
+       lga_pid as bdy2_id,
+       lga_name as bdy2_name,
+       state as bdy2_state
 from gnaf_202202.address_principal_admin_boundaries as psma
-         inner join abs on abs.gnaf_pid = psma.gnaf_pid
--- limit 100000
+         inner join bdy1 on bdy1.gnaf_pid = psma.gnaf_pid
 ;
-analyse testing.temp_lga_concordance;
+analyse temp_lga_concordance;
 
--- select *
--- from testing.temp_lga_concordance
--- where lga_pid is not null;
 
 -- step 2 of 2 -- aggregate addresses and determine % overlap between all bdys.
---   This is the % that will be applied to all datasets being converted between bdys
+-- This is the % that will be applied to all datasets being converted between bdys
 drop table if exists testing.concordance;
 create table testing.concordance as
-with abs_counts as (
-    select lga_code16,
+with bdy1_counts as (
+    select bdy1_id,
            count(*) as address_count
-    from testing.temp_lga_concordance
-    group by lga_code16
-), psma_counts as (
-    select lga_pid,
+    from temp_lga_concordance
+    group by bdy1_id
+), bdy2_counts as (
+    select bdy2_id,
            count(*) as address_count
-    from testing.temp_lga_concordance
-    group by lga_pid
+    from temp_lga_concordance
+    group by bdy2_id
 ), lga as (
-    select lga_code16,
-           lga_name16,
-           abs_state,
-           lga_pid,
-           lga_name,
-           state,
+    select bdy1_id,
+           bdy1_name,
+           bdy1_state,
+           bdy2_id,
+           bdy2_name,
+           bdy2_state,
            count(*) as address_count
-    from testing.temp_lga_concordance
---     where lga_name16 = 'Ballina'
-    group by lga_code16,
-             lga_name16,
-             abs_state,
-             lga_pid,
-             lga_name,
-             state
+    from temp_lga_concordance
+    group by bdy1_id,
+             bdy1_name,
+             bdy1_state,
+             bdy2_id,
+             bdy2_name,
+             bdy2_state
 ), final as (
     select 'abs lga'::text as bdy1_type,
-           lga.lga_code16 as bdy1_id,
-           lga_name16 as bdy1_name,
-           abs_state as bdy1_state,
+           lga.bdy1_id,
+           lga.bdy1_name,
+           lga.bdy1_state,
            'geoscape lga'::text as bdy2_type,
-           lga.lga_pid as bdy2_id,
-           lga_name as bdy2_name,
-           state as bdy2_state,
+           lga.bdy2_id,
+           lga.bdy2_name,
+           lga.bdy2_state,
            lga.address_count,
-           abs_counts.address_count                                                        as total_bdy1_addresses,
-           (lga.address_count::float / abs_counts.address_count::float * 100.0)::smallint  as percent_bdy1_addresses,
-           psma_counts.address_count                                                       as total_bdy2_addresses,
-           (lga.address_count::float / psma_counts.address_count::float * 100.0)::smallint as percent_bdy2_addresses
+           bdy1_counts.address_count                                                        as total_bdy1_addresses,
+           (lga.address_count::float / bdy1_counts.address_count::float * 100.0)::smallint  as percent_bdy1_addresses,
+           bdy2_counts.address_count                                                       as total_bdy2_addresses,
+           (lga.address_count::float / bdy2_counts.address_count::float * 100.0)::smallint as percent_bdy2_addresses
     from lga
-             inner join abs_counts on abs_counts.lga_code16 = lga.lga_code16
-             inner join psma_counts on psma_counts.lga_pid = lga.lga_pid
-), psma_lga as (
+             inner join bdy1_counts on bdy1_counts.bdy1_id = lga.bdy1_id
+             inner join bdy2_counts on bdy2_counts.bdy2_id = lga.bdy2_id
+), bdy2_lga as (
     select lga_pid,
            st_collect(geom) as geom
     from admin_bdys_202202.local_government_areas
     group by lga_pid
 )
 select final.*,
-       st_intersection(abs_lga.geom, psma_lga.geom) as geom
+       st_intersection(bdy1_lga.geom, bdy2_lga.geom) as geom
 from final
-         inner join census_2016_bdys.lga_2016_aust as abs_lga on final.bdy1_id = abs_lga.lga_code16
-         inner join psma_lga on final.bdy2_id = psma_lga.lga_pid
+         inner join census_2016_bdys.lga_2016_aust as bdy1_lga on final.bdy1_id = bdy1_lga.lga_code16
+         inner join bdy2_lga on final.bdy2_id = bdy2_lga.lga_pid
 where percent_bdy1_addresses > 0
    or percent_bdy2_addresses > 0
--- where (percent_abs_addresses > 0 and percent_abs_addresses < 100)
---       or (percent_psma_addresses > 0 and percent_psma_addresses < 100)
+-- where (percent_bdy1_addresses > 0 and percent_bdy1_addresses < 100)
+--       or (percent_bdy2_addresses > 0 and percent_bdy2_addresses < 100)
 ;
 analyse testing.concordance;
 
 ALTER TABLE testing.concordance ADD CONSTRAINT concordance_pkey PRIMARY KEY (bdy1_id, bdy2_id);
 create index concordance_geom_idx on testing.concordance using gist (geom);
 alter table testing.concordance cluster on concordance_geom_idx;
+
+drop table if exists temp_lga_concordance;
 
 select count(*)
 from testing.concordance;
