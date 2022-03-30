@@ -72,25 +72,28 @@ with source_counts as (
 --            target_counts.address_count                                                       as total_target_addresses,
 --            (agg.address_count::float / target_counts.address_count::float * 100.0)::smallint as percent_target_addresses
     from agg
-             inner join source_counts on source_counts.source_id = agg.source_id
+    inner join source_counts on source_counts.source_id = agg.source_id
 --              inner join target_counts on target_counts.target_id = lga.target_id
-), source_bdys as (
-    select postcode,
-           st_collect(geom) as geom
-    from admin_bdys_202202.postcode_bdys_analysis
-    group by postcode
-), target_bdys as (
-    select lga_pid,
-           st_collect(geom) as geom
-    from admin_bdys_202202.local_government_areas_analysis
-    group by lga_pid
+-- ), source_bdys as (
+--     select postcode,
+--            st_collect(geom) as geom
+--     from admin_bdys_202202.postcode_bdys
+--     where postcode is not null
+--     group by postcode
+-- ), target_bdys as (
+--     select lga_pid,
+--            st_collect(geom) as geom
+--     from admin_bdys_202202.local_government_areas_analysis
+--     group by lga_pid
 )
 select final.*,
-       st_intersection(source_bdys.geom, target_bdys.geom) as geom
+       null::geometry(polygon, 4283) as geom
+--        st_intersection(source_bdys.geom, target_bdys.geom) as geom
 from final
-         inner join source_bdys on final.source_id = source_bdys.postcode
-         inner join target_bdys on final.target_id = target_bdys.lga_pid
+--          inner join source_bdys on final.source_id = source_bdys.postcode
+--          inner join target_bdys on final.target_id = target_bdys.lga_pid
 where percent_source_addresses > 0
+and target_id is null
 --    or percent_target_addresses > 0
 ;
 analyse testing.concordance;
