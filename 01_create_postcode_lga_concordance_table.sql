@@ -9,7 +9,7 @@ create temporary table temp_bdy_concordance as
 with source as (
     select gnaf_pid,
            postcode as source_id,
-           postcode as source_name,
+           concat(state, ' ', postcode) as source_name,
            state    as source_state
     from gnaf_202202.address_principals as gnaf
 )
@@ -24,6 +24,22 @@ from gnaf_202202.address_principal_admin_boundaries as psma
          inner join source on source.gnaf_pid = psma.gnaf_pid
 ;
 analyse temp_bdy_concordance;
+
+
+
+select count(*),
+       locality_name,
+       postcode,
+       state
+from gnaf_202202.address_principal_admin_boundaries
+where lga_pid is null
+group by locality_name,
+       postcode,
+       state
+order by locality_name,
+   postcode,
+   state
+;
 
 
 
