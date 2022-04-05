@@ -25,21 +25,91 @@ from gnaf_202202.address_principal_admin_boundaries as psma
 ;
 analyse temp_bdy_concordance;
 
+-- manual fixes
 
-
-select count(*),
-       locality_name,
-       postcode,
-       state
-from gnaf_202202.address_principal_admin_boundaries
-where lga_pid is null
-group by locality_name,
-       postcode,
-       state
-order by locality_name,
-   postcode,
-   state
+-- all of ACT -- 232,665 rows
+update temp_bdy_concordance as tmp
+set target_id = 'lgaact9999991',
+    target_name = 'Unincorporated ACT'
+where target_state = 'ACT'
 ;
+
+-- Specific localities
+update temp_bdy_concordance as tmp
+set target_id = 'lgaot9999991',
+    target_name = 'Unincorporated OT (Norfolk Island)'
+from gnaf_202202.address_principal_admin_boundaries as psma
+where psma.gnaf_pid = tmp.gnaf_pid
+  and locality_pid = 'locc15e0d2d6f2a'
+  and target_id is null;
+
+update temp_bdy_concordance as tmp
+set target_id = 'lgaot9999992',
+    target_name = 'Unincorporated OT (Jervis Bay)'
+from gnaf_202202.address_principal_admin_boundaries as psma
+where psma.gnaf_pid = tmp.gnaf_pid
+  and locality_pid = 'loced195c315de9'
+  and target_id is null;
+
+update temp_bdy_concordance as tmp
+set target_id = 'lgasa9999991',
+    target_name = 'Unincorporated SA (Thistle Island)'
+from gnaf_202202.address_principal_admin_boundaries as psma
+where psma.gnaf_pid = tmp.gnaf_pid
+  and locality_pid = '250190776'
+  and target_id is null;
+
+-- 35 boatsheds in Hobart
+update temp_bdy_concordance as tmp
+set target_id = 'lgacbffb11990f2',
+    target_name = 'Hobart City'
+from gnaf_202202.address_principal_admin_boundaries as psma
+where psma.gnaf_pid = tmp.gnaf_pid
+  and locality_pid = 'loc0f7a581b85b7'
+  and target_id is null;
+
+-- slightly offshore points in SA
+update temp_bdy_concordance as tmp
+set target_id = 'lgaa8d127fa14e7',
+    target_name = 'Ceduna'
+from gnaf_202202.address_principal_admin_boundaries as psma
+where psma.gnaf_pid = tmp.gnaf_pid
+  and locality_pid = 'loccf8be9dcdacd'
+  and target_id is null;
+
+
+-- NSW/QLD border silliness
+update temp_bdy_concordance as tmp
+set target_id = 'lga7872e04f6637',
+    target_name = 'Tenterfield'
+from gnaf_202202.address_principal_admin_boundaries as psma
+where psma.gnaf_pid = tmp.gnaf_pid
+  and locality_pid = 'loc552bd3aef1b8'
+  and target_id is null;
+
+
+-- delete the ~150 records without an LGA - these are all offshore points, a number being oyster leases and boat moorings
+delete from temp_bdy_concordance
+where target_id is null;
+
+analyse temp_bdy_concordance;
+
+-- -- who's left
+-- select count(*) as address_count,
+--        locality_name,
+--        postcode,
+--        state
+-- from temp_bdy_concordance as tmp, gnaf_202202.address_principal_admin_boundaries as psma
+-- where psma.gnaf_pid = tmp.gnaf_pid
+--     and target_id is null
+-- group by locality_name,
+--          postcode,
+--          state
+-- order by address_count desc,
+--          locality_name,
+--          postcode,
+--          state
+-- ;
 
 
 
