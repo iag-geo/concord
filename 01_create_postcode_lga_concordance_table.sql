@@ -115,9 +115,9 @@ analyse temp_bdy_concordance;
 
 -- step 2 of 2 -- aggregate addresses and determine % overlap between all bdys.
 -- This is the % that will be applied to all datasets being converted between bdys
--- drop table if exists testing.concordance;
--- create table testing.concordance as
-insert into testing.concordance
+drop table if exists testing.concordance;
+create table testing.concordance as
+-- insert into testing.concordance
 with source_counts as (
     select source_id,
            count(*) as address_count
@@ -160,39 +160,40 @@ with source_counts as (
     from agg
     inner join source_counts on source_counts.source_id = agg.source_id
 --              inner join target_counts on target_counts.target_id = lga.target_id
--- ), source_bdys as (
---     select postcode,
---            st_collect(geom) as geom
---     from admin_bdys_202202.postcode_bdys
---     where postcode is not null
---     group by postcode
--- ), target_bdys as (
---     select lga_pid,
---            st_collect(geom) as geom
---     from admin_bdys_202202.local_government_areas_analysis
---     group by lga_pid
+), source_bdys as (
+    select postcode,
+           st_collect(geom) as geom
+    from admin_bdys_202202.postcode_bdys
+    where postcode is not null
+    group by postcode
+), target_bdys as (
+    select lga_pid,
+           st_collect(geom) as geom
+    from admin_bdys_202202.local_government_areas_analysis
+    group by lga_pid
 )
 select final.*,
-       null::geometry(polygon, 4283) as geom
---        st_intersection(source_bdys.geom, target_bdys.geom) as geom
+--        null::geometry(polygon, 4283) as geom,
+       st_intersection(source_bdys.geom, target_bdys.geom) as geom
 from final
---          inner join source_bdys on final.source_id = source_bdys.postcode
---          inner join target_bdys on final.target_id = target_bdys.lga_pid
+         inner join source_bdys on final.source_id = source_bdys.postcode
+         inner join target_bdys on final.target_id = target_bdys.lga_pid
 where percent_source_addresses > 0
-and target_id is null
 --    or percent_target_addresses > 0
 ;
 analyse testing.concordance;
 
--- ALTER TABLE testing.concordance ADD CONSTRAINT concordance_pkey PRIMARY KEY (source_id, target_id);
--- create index concordance_geom_idx on testing.concordance using gist (geom);
--- alter table testing.concordance cluster on concordance_geom_idx;
+ALTER TABLE testing.concordance ADD CONSTRAINT concordance_pkey PRIMARY KEY (source_id, target_id);
+create index concordance_geom_idx on testing.concordance using gist (geom);
+alter table testing.concordance cluster on concordance_geom_idx;
 
 -- drop table if exists temp_bdy_concordance;
 
 
 select count(*)
 from testing.concordance;
+
+
 
 select *
 from testing.concordance
