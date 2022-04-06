@@ -111,26 +111,24 @@ analyse temp_bdy_concordance;
 drop table if exists testing.concordance;
 create table testing.concordance as
 -- insert into testing.concordance
-with source_counts as (
-    select source_id,
-           count(*) as address_count
-    from temp_bdy_concordance
-    group by source_id
--- ), target_counts as (
---     select target_id,
+-- with source_counts as (
+--     select source_id,
 --            count(*) as address_count
 --     from temp_bdy_concordance
---     group by target_id
-), agg as (
+--     group by source_id
+-- -- ), target_counts as (
+-- --     select target_id,
+-- --            count(*) as address_count
+-- --     from temp_bdy_concordance
+-- --     group by target_id
+with agg as (
     select source_id,
            source_name,
            source_state,
            target_id,
            target_name,
            target_state,
-           count(*) as address_count,
-	       count(*) over (partition by source_id) as fred,
-           (count(*)::float / (count(*) over (partition by source_id))::float * 100.0) as percent_source_addresses_new
+           count(*) as address_count
     from temp_bdy_concordance
     group by source_id,
              source_name,
@@ -148,13 +146,13 @@ with source_counts as (
            agg.target_name,
            agg.target_state,
            agg.address_count,
-           source_counts.address_count                                                        as total_source_addresses,
-           (agg.address_count::float / source_counts.address_count::float * 100.0)::smallint  as percent_source_addresses,
-           agg.percent_source_addresses_new
+--            source_counts.address_count                                                        as total_source_addresses,
+--            (agg.address_count::float / source_counts.address_count::float * 100.0)::smallint  as percent_source_addresses,
+           (agg.address_count::float / (sum(agg.address_count) over (partition by agg.source_id))::float * 100.0)::smallint as percent_source_addresses
 --            target_counts.address_count                                                       as total_target_addresses,
 --            (agg.address_count::float / target_counts.address_count::float * 100.0)::smallint as percent_target_addresses
     from agg
-    inner join source_counts on source_counts.source_id = agg.source_id
+--     inner join source_counts on source_counts.source_id = agg.source_id
 --              inner join target_counts on target_counts.target_id = lga.target_id
 --), source_bdys as (
 --    select postcode,
@@ -192,6 +190,7 @@ from testing.concordance;
 
 select *
 from testing.concordance
+
 ;
 
 
