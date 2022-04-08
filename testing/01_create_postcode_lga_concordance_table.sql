@@ -1,5 +1,5 @@
 
--- create concordance table using addresses as a residential population proxy (yes, it's flawed but close)
+-- create concordance table using addresses as a residential population proxy (it's flawed but close)
 
 
 -- step 1 of 2 -- get both boundary IDs for each GNAFPID -- 14,451,352 rows affected in 38 s 631 ms
