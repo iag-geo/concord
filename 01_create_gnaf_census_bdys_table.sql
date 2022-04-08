@@ -18,42 +18,40 @@ alter table temp_mb cluster on temp_mb_geom_idx;
 -- get temp tables of meshblock IDs by boundary
 drop table if exists temp_lga_mb;
 create temporary table temp_lga_mb as
-select temp_mb.mb_16code, bdy.lga_code16 as lga_16code, bdy.lga_name16 as lga_16name from temp_mb
+select distinct temp_mb.mb_16code, bdy.lga_code16 as lga_16code, bdy.lga_name16 as lga_16name from temp_mb
 inner join census_2016_bdys.lga_2016_aust as bdy on st_intersects(temp_mb.geom, bdy.geom);
 analyse temp_lga_mb;
-ALTER TABLE temp_lga_mb ADD CONSTRAINT temp_lga_mb_pkey PRIMARY KEY (lga_16code);
+-- ALTER TABLE temp_lga_mb ADD CONSTRAINT temp_lga_mb_pkey PRIMARY KEY (mb_16code);
 
 drop table if exists temp_poa_mb;
 create temporary table temp_poa_mb as
-select temp_mb.mb_16code, bdy.poa_code16 as poa_16code, bdy.poa_name16 as poa_16name from temp_mb
+select distinct temp_mb.mb_16code, bdy.poa_code16 as poa_16code, bdy.poa_name16 as poa_16name from temp_mb
 inner join census_2016_bdys.poa_2016_aust as bdy on st_intersects(temp_mb.geom, bdy.geom);
 analyse temp_poa_mb;
-ALTER TABLE temp_poa_mb ADD CONSTRAINT temp_poa_mb_pkey PRIMARY KEY (poa_16code);
+-- ALTER TABLE temp_poa_mb ADD CONSTRAINT temp_poa_mb_pkey PRIMARY KEY (mb_16code);
 
 drop table if exists temp_ra_mb;
 create temporary table temp_ra_mb as
-select temp_mb.mb_16code, bdy.ra_code16 as ra_16code, bdy.ra_name16 as ra_16name from temp_mb
+select distinct temp_mb.mb_16code, bdy.ra_code16 as ra_16code, bdy.ra_name16 as ra_16name from temp_mb
 inner join census_2016_bdys.ra_2016_aust as bdy on st_intersects(temp_mb.geom, bdy.geom);
 analyse temp_ra_mb;
-ALTER TABLE temp_ra_mb ADD CONSTRAINT temp_ra_mb_pkey PRIMARY KEY (ra_16code);
+-- ALTER TABLE temp_ra_mb ADD CONSTRAINT temp_ra_mb_pkey PRIMARY KEY (mb_16code);
 
 drop table if exists temp_ucl_mb;
 create temporary table temp_ucl_mb as
-select temp_mb.mb_16code, bdy.ucl_code16 as ucl_16code, bdy.ucl_name16 as ucl_16name from temp_mb
+select distinct temp_mb.mb_16code, bdy.ucl_code16 as ucl_16code, bdy.ucl_name16 as ucl_16name from temp_mb
 inner join census_2016_bdys.ucl_2016_aust as bdy on st_intersects(temp_mb.geom, bdy.geom);
 analyse temp_ucl_mb;
-ALTER TABLE temp_ucl_mb ADD CONSTRAINT temp_ucl_mb_pkey PRIMARY KEY (ucl_16code);
+-- ALTER TABLE temp_ucl_mb ADD CONSTRAINT temp_ucl_mb_pkey PRIMARY KEY (mb_16code);
 
 drop table temp_mb;
 
 
-
+-- get ABS bdy IDs for all addresses -- 14,451,352 rows affected in 59 s 570 ms
 drop table if exists gnaf_202202.address_principal_census_2016_boundaries;
 create table gnaf_202202.address_principal_census_2016_boundaries as
-with merge as (
-    select gnaf_pid,
-           reliability,
-           mb.mb_16code,
+with abs as (
+    select mb.mb_16code,
            mb_category,
            sa1_16main,
            sa1_16_7cd,
@@ -75,15 +73,17 @@ with merge as (
            ucl_16code,
            ucl_16name,
            mb.state
-    from gnaf_202202.address_principals as gnaf
-        inner join admin_bdys_202202.abs_2016_mb as mb on mb.mb_16code = gnaf.mb_2016_code
+    from admin_bdys_202202.abs_2016_mb as mb
         inner join temp_lga_mb as lga on lga.mb_16code = mb.mb_16code
         inner join temp_poa_mb as poa on poa.mb_16code = mb.mb_16code
         inner join temp_ra_mb as ra on ra.mb_16code = mb.mb_16code
         inner join temp_ucl_mb as ucl on ucl.mb_16code = mb.mb_16code
 )
-select *
-from merge
+select gnaf_pid,
+       reliability,
+       abs.*
+from gnaf_202202.address_principals as gnaf
+     inner join abs on abs.mb_16code = gnaf.mb_2016_code
 ;
 analyse gnaf_202202.address_principal_census_2016_boundaries;
 
