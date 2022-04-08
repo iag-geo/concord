@@ -116,6 +116,5 @@ drop table if exists temp_ucl_mb;
 drop table if exists temp_sed_mb;
 
 
-select * from gnaf_202202.address_principal_census_2016_boundaries
-;
+-- select * from gnaf_202202.address_principal_census_2016_boundaries;
 
