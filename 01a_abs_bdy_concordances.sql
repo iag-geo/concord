@@ -21,11 +21,11 @@ with agg as (
              target_name,
              target_state
 ), final as (
-    select 'geoscape postcode'::text as source_type,
+    select 'abs 2016 postcode'::text as source_type,
            agg.source_id,
            agg.source_name,
            agg.source_state,
-           'geoscape lga'::text as target_type,
+           'abs 2016 lga'::text as target_type,
            agg.target_id,
            agg.target_name,
            agg.target_state,
@@ -54,8 +54,3 @@ from testing.concordance
 
 ;
 
-
-
-select *
-from testing.concordance
-where source_id = '0822';
