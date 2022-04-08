@@ -21,24 +21,28 @@ create temporary table temp_lga_mb as
 select temp_mb.mb_16code, bdy.lga_code16 as lga_16code, bdy.lga_name16 as lga_16name from temp_mb
 inner join census_2016_bdys.lga_2016_aust as bdy on st_intersects(temp_mb.geom, bdy.geom);
 analyse temp_lga_mb;
+ALTER TABLE temp_lga_mb ADD CONSTRAINT temp_lga_mb_pkey PRIMARY KEY (lga_16code);
 
 drop table if exists temp_poa_mb;
 create temporary table temp_poa_mb as
 select temp_mb.mb_16code, bdy.poa_code16 as poa_16code, bdy.poa_name16 as poa_16name from temp_mb
 inner join census_2016_bdys.poa_2016_aust as bdy on st_intersects(temp_mb.geom, bdy.geom);
 analyse temp_poa_mb;
+ALTER TABLE temp_poa_mb ADD CONSTRAINT temp_poa_mb_pkey PRIMARY KEY (poa_16code);
 
 drop table if exists temp_ra_mb;
 create temporary table temp_ra_mb as
 select temp_mb.mb_16code, bdy.ra_code16 as ra_16code, bdy.ra_name16 as ra_16name from temp_mb
 inner join census_2016_bdys.ra_2016_aust as bdy on st_intersects(temp_mb.geom, bdy.geom);
 analyse temp_ra_mb;
+ALTER TABLE temp_ra_mb ADD CONSTRAINT temp_ra_mb_pkey PRIMARY KEY (ra_16code);
 
 drop table if exists temp_ucl_mb;
 create temporary table temp_ucl_mb as
 select temp_mb.mb_16code, bdy.ucl_code16 as ucl_16code, bdy.ucl_name16 as ucl_16name from temp_mb
 inner join census_2016_bdys.ucl_2016_aust as bdy on st_intersects(temp_mb.geom, bdy.geom);
 analyse temp_ucl_mb;
+ALTER TABLE temp_ucl_mb ADD CONSTRAINT temp_ucl_mb_pkey PRIMARY KEY (ucl_16code);
 
 drop table temp_mb;
 
