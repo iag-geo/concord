@@ -3,6 +3,8 @@
 
 -- step 1 - create a bunch of temp tables merging meshblocks with non-ABS structures (LGA, RAs etc...)
 -- use meshblock bdy centroids to get the bdy ID
+-- this approach is simpler than downloading & importing ABS correspondence files, which are subject to change
+-- also RA, SED and CED bdys are groups of SA1s; the rest are groups of meshblocks. Meshblocks are used for all bdys to keep the code simple (performance hit is minimal)
 
 -- create temp table of meshblock centroids (ensure centroid is within polygon by using ST_PointOnSurface)
 drop table if exists temp_mb;
