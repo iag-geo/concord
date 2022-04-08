@@ -1,4 +1,49 @@
 
+-- get all ABS Census boundaries for each GNAF address (GNAF only links directly to meshblocks, SAs & GCCs)
+
+
+
+
+
+
+
+
+
+
+select * from admin_bdys_202202.abs_2016_mb
+;
+
+select * from census_2016_bdys.mb_2016_aust
+;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 -- create concordance table using addresses as a residential population proxy (yes, it's flawed but close)
 
 
