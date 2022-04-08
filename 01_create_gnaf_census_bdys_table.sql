@@ -1,208 +1,70 @@
 
 -- get all ABS Census boundaries for each GNAF address (GNAF only links directly to meshblocks, SAs & GCCs)
 
+-- step 1 - create a bunch of temp tables merging meshblocks with non-ABS structures (LGA, RAs etc...)
+-- use meshblock bdy centroids to get the bdy ID
+
+drop table if exists temp_lga_mb;
+create temporary table temp_lga_mb as
+with mb as (select mb_16code, ST_PointOnSurface(geom) as geom from admin_bdys_202202.abs_2016_mb),
+bdy as (select lga_code16, lga_name16, st_subdivide(geom, 512) as geom from census_2016_bdys.lga_2016_aust)
+select distinct mb. mb_16code, bdy.lga_code16, bdy.lga_name16 from mb
+inner join bdy on st_intersects(mb.geom, bdy.geom);
+analyse temp_lga_mb;
+
+drop table if exists temp_poa_mb;
+create temporary table temp_poa_mb as
+with mb as (select mb_16code, ST_PointOnSurface(geom) as geom from admin_bdys_202202.abs_2016_mb)
+select mb. mb_16code, bdy.poa_code16, bdy.poa_name16 from mb
+inner join census_2016_bdys.poa_2016_aust as bdy on st_intersects(mb.geom, bdy.geom);
+analyse temp_poa_mb;
+
+drop table if exists temp_ra_mb;
+create temporary table temp_ra_mb as
+with mb as (select mb_16code, ST_PointOnSurface(geom) as geom from admin_bdys_202202.abs_2016_mb)
+select mb. mb_16code, bdy.ra_code16, bdy.ra_name16 from mb
+inner join census_2016_bdys.ra_2016_aust as bdy on st_intersects(mb.geom, bdy.geom);
+analyse temp_ra_mb;
+
+drop table if exists temp_ucl_mb;
+create temporary table temp_ucl_mb as
+with mb as (select mb_16code, ST_PointOnSurface(geom) as geom from admin_bdys_202202.abs_2016_mb)
+select mb. mb_16code, bdy.ucl_code16, bdy.ucl_name16 from mb
+inner join census_2016_bdys.ucl_2016_aust as bdy on st_intersects(mb.geom, bdy.geom);
+analyse temp_ucl_mb;
 
 
-
-
-
-
-
-
-
-select * from admin_bdys_202202.abs_2016_mb
-;
-
-select * from census_2016_bdys.mb_2016_aust
-;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
--- create concordance table using addresses as a residential population proxy (yes, it's flawed but close)
-
-
--- step 1 of 2 -- get both boundary IDs for each GNAFPID -- 14,451,352 rows affected in 38 s 631 ms
--- If ABS LGAs or Postcodes - use meshblock centroids to assign addresses to ABS LGAs or Postcodes
-drop table if exists temp_bdy_concordance;
-create temporary table temp_bdy_concordance as
-select source.gnaf_pid,
-       source.postcode as source_id,
-       concat(source.state, ' ', source.postcode) as source_name,
-       source.state as source_state,
-       target.lga_pid as target_id,
-       target.lga_name as target_name,
-       target.state as target_state
-from gnaf_202202.address_principal_admin_boundaries as target
-inner join gnaf_202202.address_principals as source on source.gnaf_pid = target.gnaf_pid
-;
-analyse temp_bdy_concordance;
-
--- manual fixes for addresses with no LGA (these are mostly valid nulls. e.g. ACT has no councils)
-
--- all of ACT -- 232,665 rows
-update temp_bdy_concordance as tmp
-set target_id = 'lgaact9999991',
-    target_name = 'Unincorporated ACT'
-where target_state = 'ACT'
-;
-
--- Specific localities
-update temp_bdy_concordance as tmp
-set target_id = 'lgaot9999991',
-    target_name = 'Unincorporated OT (Norfolk Island)'
-from gnaf_202202.address_principal_admin_boundaries as psma
-where psma.gnaf_pid = tmp.gnaf_pid
-  and locality_pid = 'locc15e0d2d6f2a'
-  and target_id is null;
-
-update temp_bdy_concordance as tmp
-set target_id = 'lgaot9999992',
-    target_name = 'Unincorporated OT (Jervis Bay)'
-from gnaf_202202.address_principal_admin_boundaries as psma
-where psma.gnaf_pid = tmp.gnaf_pid
-  and locality_pid = 'loced195c315de9'
-  and target_id is null;
-
-update temp_bdy_concordance as tmp
-set target_id = 'lgasa9999991',
-    target_name = 'Unincorporated SA (Thistle Island)'
-from gnaf_202202.address_principal_admin_boundaries as psma
-where psma.gnaf_pid = tmp.gnaf_pid
-  and locality_pid = '250190776'
-  and target_id is null;
-
--- 35 boatsheds in Hobart
-update temp_bdy_concordance as tmp
-set target_id = 'lgacbffb11990f2',
-    target_name = 'Hobart City'
-from gnaf_202202.address_principal_admin_boundaries as psma
-where psma.gnaf_pid = tmp.gnaf_pid
-  and locality_pid = 'loc0f7a581b85b7'
-  and target_id is null;
-
--- slightly offshore points in SA
-update temp_bdy_concordance as tmp
-set target_id = 'lgaa8d127fa14e7',
-    target_name = 'Ceduna'
-from gnaf_202202.address_principal_admin_boundaries as psma
-where psma.gnaf_pid = tmp.gnaf_pid
-  and locality_pid = 'loccf8be9dcdacd'
-  and target_id is null;
-
--- NSW/QLD border silliness
-update temp_bdy_concordance as tmp
-set target_id = 'lga7872e04f6637',
-    target_name = 'Tenterfield'
-from gnaf_202202.address_principal_admin_boundaries as psma
-where psma.gnaf_pid = tmp.gnaf_pid
-  and locality_pid = 'loc552bd3aef1b8'
-  and target_id is null;
-
--- delete the ~150 records without an LGA - these are all offshore points, a number being oyster leases and boat moorings
-delete from temp_bdy_concordance
-where target_id is null;
-
-analyse temp_bdy_concordance;
-
--- -- who's left
--- select count(*) as address_count,
---        locality_name,
---        postcode,
---        state
--- from temp_bdy_concordance as tmp, gnaf_202202.address_principal_admin_boundaries as psma
--- where psma.gnaf_pid = tmp.gnaf_pid
---     and target_id is null
--- group by locality_name,
---          postcode,
---          state
--- order by address_count desc,
---          locality_name,
---          postcode,
---          state
--- ;
-
-
--- step 2 of 2 -- aggregate by both boundaries and determine % of addresses in each.
--- This is the % that will be applied to all datasets being converted between bdys
-drop table if exists testing.concordance;
-create table testing.concordance as
-with agg as (
-    select source_id,
-           source_name,
-           source_state,
-           target_id,
-           target_name,
-           target_state,
-           count(*) as address_count
-    from temp_bdy_concordance
-    group by source_id,
-             source_name,
-             source_state,
-             target_id,
-             target_name,
-             target_state
-), final as (
-    select 'geoscape postcode'::text as source_type,
-           agg.source_id,
-           agg.source_name,
-           agg.source_state,
-           'geoscape lga'::text as target_type,
-           agg.target_id,
-           agg.target_name,
-           agg.target_state,
-           agg.address_count,
-           (sum(agg.address_count) over (partition by agg.source_id))::integer as total_source_addresses,
-           (agg.address_count::float / (sum(agg.address_count) over (partition by agg.source_id))::float * 100.0)::smallint as percent_source_addresses
-    from agg
+drop table if exists gnaf_202202.address_principal_census_2016_boundaries;
+create table gnaf_202202.address_principal_census_2016_boundaries as
+with merge as (
+    select gnaf_pid,
+           reliability,
+           mb_16code,
+           mb_category,
+           sa1_16main,
+           sa1_16_7cd,
+           sa2_16main,
+           sa2_16_5cd,
+           sa2_16name,
+           sa3_16code,
+           sa3_16name,
+           sa4_16code,
+           sa4_16name,
+           gcc_16code,
+           gcc_16name,
+           mb.state
+    from gnaf_202202.address_principals as gnaf
+             inner join admin_bdys_202202.abs_2016_mb as mb on mb.mb_16code = gnaf.mb_2016_code
 )
 select *
-from final
-where percent_source_addresses > 0
+from merge
 ;
-analyse testing.concordance;
-
-ALTER TABLE testing.concordance ADD CONSTRAINT concordance_pkey PRIMARY KEY (source_id, target_id);
-
--- drop table if exists temp_bdy_concordance;
+analyse gnaf_202202.address_principal_census_2016_boundaries;
 
 
-select count(*)
-from testing.concordance;
-
-
-select *
-from testing.concordance
-
+select * from gnaf_202202.address_principal_census_2016_boundaries
 ;
 
 
+drop table if exists temp_lga_mb;
 
-select *
-from testing.concordance
-where source_id = '0822';
