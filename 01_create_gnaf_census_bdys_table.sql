@@ -21,33 +21,29 @@ create temporary table temp_lga_mb as
 select distinct temp_mb.mb_16code, bdy.lga_code16 as lga_16code, bdy.lga_name16 as lga_16name from temp_mb
 inner join census_2016_bdys.lga_2016_aust as bdy on st_intersects(temp_mb.geom, bdy.geom);
 analyse temp_lga_mb;
--- ALTER TABLE temp_lga_mb ADD CONSTRAINT temp_lga_mb_pkey PRIMARY KEY (mb_16code);
 
 drop table if exists temp_poa_mb;
 create temporary table temp_poa_mb as
 select distinct temp_mb.mb_16code, bdy.poa_code16 as poa_16code, bdy.poa_name16 as poa_16name from temp_mb
 inner join census_2016_bdys.poa_2016_aust as bdy on st_intersects(temp_mb.geom, bdy.geom);
 analyse temp_poa_mb;
--- ALTER TABLE temp_poa_mb ADD CONSTRAINT temp_poa_mb_pkey PRIMARY KEY (mb_16code);
 
 drop table if exists temp_ra_mb;
 create temporary table temp_ra_mb as
 select distinct temp_mb.mb_16code, bdy.ra_code16 as ra_16code, bdy.ra_name16 as ra_16name from temp_mb
 inner join census_2016_bdys.ra_2016_aust as bdy on st_intersects(temp_mb.geom, bdy.geom);
 analyse temp_ra_mb;
--- ALTER TABLE temp_ra_mb ADD CONSTRAINT temp_ra_mb_pkey PRIMARY KEY (mb_16code);
 
 drop table if exists temp_ucl_mb;
 create temporary table temp_ucl_mb as
 select distinct temp_mb.mb_16code, bdy.ucl_code16 as ucl_16code, bdy.ucl_name16 as ucl_16name from temp_mb
 inner join census_2016_bdys.ucl_2016_aust as bdy on st_intersects(temp_mb.geom, bdy.geom);
 analyse temp_ucl_mb;
--- ALTER TABLE temp_ucl_mb ADD CONSTRAINT temp_ucl_mb_pkey PRIMARY KEY (mb_16code);
 
 drop table temp_mb;
 
 
--- get ABS bdy IDs for all addresses -- 14,451,352 rows affected in 59 s 570 ms
+-- step 2 -- get ABS bdy IDs for all addresses -- 14,451,352 rows in 5 mins
 drop table if exists gnaf_202202.address_principal_census_2016_boundaries;
 create table gnaf_202202.address_principal_census_2016_boundaries as
 with abs as (
@@ -79,13 +75,24 @@ with abs as (
         inner join temp_ra_mb as ra on ra.mb_16code = mb.mb_16code
         inner join temp_ucl_mb as ucl on ucl.mb_16code = mb.mb_16code
 )
-select gnaf_pid,
-       reliability,
+select gid,
+       gnaf_pid,
+       -- reliability,
        abs.*
 from gnaf_202202.address_principals as gnaf
      inner join abs on abs.mb_16code = gnaf.mb_2016_code
 ;
 analyse gnaf_202202.address_principal_census_2016_boundaries;
+
+alter table gnaf_202202.address_principal_census_2016_boundaries add constraint address_principal_census_2016_boundaries_pkey primary key (gnaf_pid);
+alter table gnaf_202202.address_principal_census_2016_boundaries cluster on address_principal_census_2016_boundaries_pkey;
+
+drop table if exists temp_lga_mb;
+drop table if exists temp_poa_mb;
+drop table if exists temp_ra_mb;
+drop table if exists temp_ucl_mb;
+
+
 
 
 select * from gnaf_202202.address_principal_census_2016_boundaries
@@ -99,10 +106,4 @@ select * from gnaf_202202.address_principal_census_2016_boundaries
 -- select count(*) from temp_poa_mb; -- 358011
 -- select count(*) from temp_ra_mb; -- 358011
 -- select count(*) from temp_ucl_mb; -- 358011
-
-
-drop table if exists temp_lga_mb;
-drop table if exists temp_poa_mb;
-drop table if exists temp_ra_mb;
-drop table if exists temp_ucl_mb;
 
