@@ -25,9 +25,9 @@ output_table = "census_2016_bdy_concordance"
 boundary_list = [{"from": "poa", "to": "lga"},
                  {"from": "lga", "to": "poa"},
                  {"from": "sa3", "to": "lga"},
-                 {"from": "lga", "to": "sa3"}
-                 # {"from": "sa2", "to": "lga"},
-                 # {"from": "lga", "to": "sa2"}
+                 {"from": "lga", "to": "sa3"},
+                 {"from": "sa2", "to": "lga"},
+                 {"from": "lga", "to": "sa2"}
                  ]
 
 # ---------------------------------------------------------------------------------------
@@ -44,7 +44,7 @@ def main():
 
     # add concordances
     for bdys in boundary_list:
-        add_concordances(bdys["from"], bdys["to"], pg_cur)
+        add_concordances(bdys["from"].lower(), bdys["to"].lower(), pg_cur)
 
     # analyse and index table
     index_table(pg_cur)
@@ -82,7 +82,7 @@ def add_concordances(from_bdy, to_bdy, pg_cur):
     query = f"""insert into {output_schema}.{output_table}
                 with agg as (
                     select {from_bdy}_16code as from_id,
-                           {from_bdy}_16code as from_name,
+                           {from_bdy}_16name as from_name,
                            {to_bdy}_16code as to_id,
                            {to_bdy}_16name as to_name,
                            count(*) as address_count
@@ -104,6 +104,13 @@ def add_concordances(from_bdy, to_bdy, pg_cur):
                     from agg
                 )
                 select * from final where percent > 0.0;"""
+
+    # hardcode fixes for SA1 and SA2 oddities
+    if "sa1" in [from_bdy, to_bdy]:
+        query = query.replace("sa1_16code", "sa1_16main").replace("sa1_16name", "sa1_16_7cd")
+
+    if "sa2" in [from_bdy, to_bdy]:
+        query = query.replace("sa2_16code", "sa2_16main")
 
     pg_cur.execute(query)
 

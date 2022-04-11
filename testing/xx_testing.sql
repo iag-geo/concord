@@ -1,7 +1,6 @@
 
-
-
-
+select *
+from testing.census_2016_bdy_concordance;
 
 
 
