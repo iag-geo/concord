@@ -25,9 +25,9 @@ output_table = "census_2016_bdy_concordance"
 boundary_list = [{"from": "poa", "to": "lga"},
                  {"from": "lga", "to": "poa"},
                  {"from": "sa3", "to": "lga"},
-                 {"from": "lga", "to": "sa3"},
-                 {"from": "sa2", "to": "lga"},
-                 {"from": "lga", "to": "sa2"},
+                 {"from": "lga", "to": "sa3"}
+                 # {"from": "sa2", "to": "lga"},
+                 # {"from": "lga", "to": "sa2"}
                  ]
 
 # ---------------------------------------------------------------------------------------
@@ -42,8 +42,12 @@ def main():
     # create table
     create_table(pg_cur)
 
+    # add concordances
     for bdys in boundary_list:
         add_concordances(bdys["from"], bdys["to"], pg_cur)
+
+    # analyse and index table
+    index_table(pg_cur)
 
     # cleanup
     pg_cur.close()
@@ -51,6 +55,8 @@ def main():
 
 
 def create_table(pg_cur):
+    start_time = datetime.now()
+
     query = f"""drop table if exists {output_schema}.{output_table};
                 create table {output_schema}.{output_table}
                 (
@@ -63,11 +69,11 @@ def create_table(pg_cur):
                     address_count   integer,
                     address_percent double precision
                 );
-                alter table {output_schema}.{output_table} owner to postgres;
-                alter table {output_schema}.{output_table} 
-                    add constraint {output_table}_pkey primary key (from_id, to_id);"""
+                alter table {output_schema}.{output_table} owner to postgres;"""
 
     pg_cur.execute(query)
+
+    logger.info(f"\t - {output_schema}.{output_table} table created : {datetime.now() - start_time}")
 
 
 def add_concordances(from_bdy, to_bdy, pg_cur):
@@ -86,10 +92,10 @@ def add_concordances(from_bdy, to_bdy, pg_cur):
                              to_id,
                              to_name
                 ), final as (
-                    select {from_bdy},
+                    select '{from_bdy}',
                            agg.from_id,
                            agg.from_name,
-                           {to_bdy},
+                           '{to_bdy}',
                            agg.to_id,
                            agg.to_name,
                            agg.address_count,
@@ -97,14 +103,23 @@ def add_concordances(from_bdy, to_bdy, pg_cur):
                                (sum(agg.address_count) over (partition by agg.from_id))::float * 100.0) as percent
                     from agg
                 )
-                select * from final where percent > 0.0;
-                analyse {output_schema}.{output_table};"""
+                select * from final where percent > 0.0;"""
 
-    row_count = pg_cur.execute(query)
+    pg_cur.execute(query)
 
-    logger.info(f"\t - {from_bdy} > {to_bdy} added : {row_count} total rows : {datetime.now() - start_time}")
+    logger.info(f"\t - from {from_bdy} to {to_bdy} records added : {datetime.now() - start_time}")
 
 
+def index_table(pg_cur):
+    start_time = datetime.now()
+
+    query = f"""analyse {output_schema}.{output_table};
+                alter table {output_schema}.{output_table} 
+                    add constraint {output_table}_pkey primary key (from_id, to_id);"""
+
+    pg_cur.execute(query)
+
+    logger.info(f"\t - primary key added : {datetime.now() - start_time}")
 
 
 def copy_table(input_pg_cur, export_pg_cur, input_schema, input_table, export_schema, export_table):
@@ -156,7 +171,7 @@ if __name__ == '__main__':
     # add the handler to the root logger
     logging.getLogger('').addHandler(console)
 
-    task_name = "Copy Postgres table between databases"
+    task_name = "Create boundary concordance table"
     system_name = "mobility.ai"
 
     logger.info("{} started".format(task_name))
