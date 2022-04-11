@@ -1,154 +1,167 @@
-# ---------------------------------------------------------------------------------------------------------------------
-#
-# script to download S3 parquet files for loading into local postgres
-#
-# ---------------------------------------------------------------------------------------------------------------------
 
-import argparse
-import boto3
-import dask.dataframe as dd
-# import dask_geopandas
+import io
+import logging
 import os
-import sqlalchemy
-import sys
+import psycopg2  # need to install package
 
 from datetime import datetime
 
+# ---------------------------------------------------------------------------------------
+# edit database parameters
+# ---------------------------------------------------------------------------------------
 
-# create postgres connect string
-sql_alchemy_engine_string = "postgresql+psycopg2://postgres:password@localhost/geo"
+pg_connect_string = "dbname=geo host=localhost port=5432 user=postgres password=password"
+
+input_schema = "gnaf_202202"
+input_table = "address_principal_census_2016_boundaries"
+
+output_schema = "testing"
+output_table = "census_2016_bdy_concordance"
+
+# ---------------------------------------------------------------------------------------
+# edit boundary list tovfind concordances with
+# ---------------------------------------------------------------------------------------
+
+boundary_list = [{"from": "poa", "to": "lga"},
+                 {"from": "lga", "to": "poa"},
+                 {"from": "sa3", "to": "lga"},
+                 {"from": "lga", "to": "sa3"},
+                 {"from": "sa2", "to": "lga"},
+                 {"from": "lga", "to": "sa2"},
+                 ]
+
+# ---------------------------------------------------------------------------------------
 
 
 def main():
+    # connect to Postgres database
+    pg_conn = psycopg2.connect(pg_connect_string)
+    pg_conn.autocommit = True
+    pg_cur = pg_conn.cursor()
+
+    # create table
+    create_table(pg_cur)
+
+    for bdys in boundary_list:
+        add_concordances(bdys["from"], bdys["to"], pg_cur)
+
+    # cleanup
+    pg_cur.close()
+    pg_conn.close()
+
+
+def create_table(pg_cur):
+    query = f"""drop table if exists {output_schema}.{output_table};
+                create table {output_schema}.{output_table}
+                (
+                    from_type       text not null,
+                    from_id         text not null,
+                    from_name       text not null,
+                    to_type         text not null,
+                    to_id           text not null,
+                    to_name         text not null,
+                    address_count   integer,
+                    address_percent double precision
+                );
+                alter table {output_schema}.{output_table} owner to postgres;
+                alter table {output_schema}.{output_table} 
+                    add constraint {output_table}_pkey primary key (from_id, to_id);"""
+
+    pg_cur.execute(query)
+
+
+def add_concordances(from_bdy, to_bdy, pg_cur):
     start_time = datetime.now()
 
-    # parser = argparse.ArgumentParser(
-    #     description='downloads S3 parquet files for loading into local postgres')
-    #
-    # parser.add_argument('--source-s3-bucket',
-    #                     default='mobai-sandpit-bucket-compassiot-oem', help='The S3 bucket for the CSV file(s)')
-    # parser.add_argument('--source-s3-folder',
-    #                     help='The S3 folder for the parquet file(s)')
-    # parser.add_argument('--spatial',
-    #                     default='false', help='Do the  input files have a geomtry column?')
-    # parser.add_argument('--target-table',
-    #                     help='The schema and table name (e.g. <schemaname>.<tablename>) for the target Postgres table')
-    #
-    # args = parser.parse_args()
-    # s3_bucket = args.source_s3_bucket
-    # s3_folder = args.source_s3_folder
-    # is_spatial = args.spatial
-    # schema_name = args.target_table.split(".")[0]
-    # table_name = args.target_table.split(".")[1]
+    query = f"""insert into {output_schema}.{output_table}
+                with agg as (
+                    select {from_bdy}_16code as from_id,
+                           {from_bdy}_16code as from_name,
+                           {to_bdy}_16code as to_id,
+                           {to_bdy}_16name as to_name,
+                           count(*) as address_count
+                    from {input_schema}.{input_table}
+                    group by from_id,
+                             from_name,
+                             to_id,
+                             to_name
+                ), final as (
+                    select {from_bdy},
+                           agg.from_id,
+                           agg.from_name,
+                           {to_bdy},
+                           agg.to_id,
+                           agg.to_name,
+                           agg.address_count,
+                           (agg.address_count::float / 
+                               (sum(agg.address_count) over (partition by agg.from_id))::float * 100.0) as percent
+                    from agg
+                )
+                select * from final where percent > 0.0;
+                analyse {output_schema}.{output_table};"""
 
-    # input_folder = os.path.join(temp_folder, s3_folder)
+    row_count = pg_cur.execute(query)
 
-    # # create missing directory path
-    # Path(input_folder).mkdir(parents=True, exist_ok=True)
-
-    # # create AWS s3 client
-    # initialize()
-    #
-    # # get list of S3files
-    # s3 = boto3.resource('s3')
-    # bucket = s3.Bucket(s3_bucket)
-    # objs = bucket.objects.filter(Prefix=s3_folder)
-    #
-    # s3_files = list()
-    #
-    # for obj in objs:
-    #     s3_files.append(obj.key)
-    #
-    # # config = TransferConfig(multipart_threshold=1024 ** 2)  # 1MB
-    # jobs = [(s3_bucket, key, os.path.join(temp_folder, key)) for key in s3_files]
-    # # print(jobs)
-    #
-    # print("Got S3 file list : {}".format(datetime.now() - start_time))
-    # start_time = datetime.now()
-    #
-    # # make a process pool and download all files in parallel
-    # pool = multiprocessing.Pool(multiprocessing.cpu_count(), initialize)
-    # pool.map(download, jobs)
-    # pool.close()
-    # pool.join()
-    #
-    # print("Downloaded {} files from S3 : {}".format(len(jobs), datetime.now() - start_time))
-    # start_time = datetime.now()
-
-
-    # create dask dataframe from Postgres table
-    df = dd.read_sql_table("address_principal_census_2016_boundaries", sql_alchemy_engine_string,
-                           schema="gnaf_202202", index_col="gid", npartitions=32)
-
-    # print(df.head())
-
-    # print(f"{df.count()} rows")
+    logger.info(f"\t - {from_bdy} > {to_bdy} added : {row_count} total rows : {datetime.now() - start_time}")
 
 
 
 
-#     # create dask GeoDataFrame from local parquet files
-#     ddf = dask.dataframe.read_parquet(input_folder, engine='pyarrow')
-#     dgdf = dask_geopandas.from_dask_dataframe(ddf)
-#
-#     # add geometry column if required
-#
-#     # TODO: test this when 'from_wkt' gets added to dask_geopandas
-#
-#     if is_spatial:
-#         output_df = dgdf.set_geometry(dask_geopandas.GeoSeries.from_wkt(dgdf["wkt_geom"].str.replace("SRID=4326;", "")))
-#
-#         # output_df = geopandas.GeoDataFrame(df, geometry=geopandas.GeoSeries.from_wkt(df["wkt_geom"].str.replace("SRID=4326;", "")), crs="EPSG:4326") \
-#         #     .drop(["wkt_geom"], axis=1)
-#         # print("Imported {} into a GeoPandas dataframe : {}".format(s3_path, datetime.now() - start_time))
-#     else:
-#         output_df = dgdf
-#         # print("Imported {} into a Pandas dataframe : {}".format(s3_path, datetime.now() - start_time))
-#
-#     print("Dask GeoDataFrame created : {}".format(datetime.now() - start_time))
-#     start_time = datetime.now()
-#
-#     # Export to Postgres/PostGIS
-#     engine = sqlalchemy.create_engine(sql_alchemy_engine_string)
-#     output_df.to_postgis(table_name, engine, schema=schema_name, if_exists="replace")
-#
-#     print("Exported to Postgres : {}".format(datetime.now() - start_time))
-#     start_time = datetime.now()
-#
-#     # analyse & cluster table - and rename geom column to PostGIS standard
-#     with engine.connect() as conn:
-#         conn.execute("ANALYSE {}.{}".format(schema_name, table_name))
-#
-#         if is_spatial:
-#             conn.execute("ALTER TABLE {0}.{1} CLUSTER ON idx_{1}_geometry".format(schema_name, table_name))
-#             conn.execute("ALTER TABLE {}.{} RENAME COLUMN geometry TO geom".format(schema_name, table_name))
-#
-#     print("Table optimised : {}".format(datetime.now() - start_time))
-#
-#
-# def initialize():
-#     global s3_client
-#     s3_client = boto3.client('s3')
-#
-#
-# def download(job):
-#     bucket, key, filename = job
-#
-#     print(filename)
-#
-#     s3_client.download_file(bucket, key, filename)
+def copy_table(input_pg_cur, export_pg_cur, input_schema, input_table, export_schema, export_table):
+    start_time = datetime.now()
+
+    # load source table into memory
+    input_rows = io.StringIO()
+
+    export_sql = "COPY (SELECT * FROM {}.{}) TO STDOUT".format(input_schema, input_table)
+
+    input_pg_cur.copy_expert(export_sql, input_rows)
+    input_rows.seek(0)
+
+    logger.info("\t - source table loaded into memory: {}".format(datetime.now() - start_time))
+    start_time = datetime.now()
+
+    # import into target Postgres
+    export_pg_cur.copy_expert("COPY {}.{} FROM STDOUT".format(export_schema, export_table), input_rows)
+    export_pg_cur.execute("ANALYSE {}.{}".format(export_schema, export_table))
+
+    input_rows.close()
+
+    export_pg_cur.execute("SELECT count(*) FROM {}.{}".format(export_schema, export_table))
+    num_rows = export_pg_cur.fetchone()[0]
+
+    logger.info("\t - target table imported : {} total rows : {}"
+                .format(num_rows, datetime.now() - start_time))
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     full_start_time = datetime.now()
 
-    task_name = "Create Boundary Concordance Table"
+    # set logger
+    log_file = os.path.abspath(__file__).replace(".py", ".log")
+    logging.basicConfig(filename=log_file, level=logging.DEBUG, format="%(asctime)s %(message)s",
+                        datefmt="%m/%d/%Y %I:%M:%S %p")
 
-    print("{} started".format(task_name))
-    print("Running on Python {}".format(sys.version.replace("\n", " ")))
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
+
+    # setup logger to write to screen as well as writing to log file
+    # define a Handler which writes INFO messages or higher to the sys.stderr
+    console = logging.StreamHandler()
+    console.setLevel(logging.INFO)
+    # set a format which is simpler for console use
+    formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
+    # tell the handler to use this format
+    console.setFormatter(formatter)
+    # add the handler to the root logger
+    logging.getLogger('').addHandler(console)
+
+    task_name = "Copy Postgres table between databases"
+    system_name = "mobility.ai"
+
+    logger.info("{} started".format(task_name))
 
     main()
 
-    time_taken = datetime.now() - full_start_time
-    print("{} finished : {}".format(task_name, time_taken))
-    print()
+    logger.info("{} finished : {}".format(task_name, datetime.now() - full_start_time))
+
