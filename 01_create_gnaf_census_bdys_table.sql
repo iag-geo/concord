@@ -89,12 +89,12 @@ with abs as (
            ucl_16name,
            mb.state
     from admin_bdys_202202.abs_2016_mb as mb
-    left outer join temp_ced_mb as ced on ced.mb_16code = mb.mb_16code
-    left outer join temp_lga_mb as lga on lga.mb_16code = mb.mb_16code
-    left outer join temp_poa_mb as poa on poa.mb_16code = mb.mb_16code
+    inner join temp_ced_mb as ced on ced.mb_16code = mb.mb_16code
+    inner join temp_lga_mb as lga on lga.mb_16code = mb.mb_16code
+    inner join temp_poa_mb as poa on poa.mb_16code = mb.mb_16code
+    inner join temp_ra_mb as ra on ra.mb_16code = mb.mb_16code
+    inner join temp_ucl_mb as ucl on ucl.mb_16code = mb.mb_16code
     left outer join temp_sed_mb as sed on sed.mb_16code = mb.mb_16code
-    left outer join temp_ra_mb as ra on ra.mb_16code = mb.mb_16code
-    left outer join temp_ucl_mb as ucl on ucl.mb_16code = mb.mb_16code
 )
 select gid,
        gnaf_pid,
@@ -115,10 +115,7 @@ drop table if exists temp_ra_mb;
 drop table if exists temp_ucl_mb;
 drop table if exists temp_sed_mb;
 
+-- select count(*) from gnaf_202202.address_principals; -- 14,451,352
+select count(*) from gnaf_202202.address_principal_census_2016_boundaries; -- 14,451,352
 
-select * from gnaf_202202.address_principal_census_2016_boundaries;
-
-select count(*) from gnaf_202202.address_principals; -- 14,451,352
-select count(*) from gnaf_202202.address_principals where mb_2016_code is null; -- 0
-
-select count(*) from gnaf_202202.address_principal_census_2016_boundaries; -- 14,447,589
+-- select * from gnaf_202202.address_principal_census_2016_boundaries where sed_16code is null;
