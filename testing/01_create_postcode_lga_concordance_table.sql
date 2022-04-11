@@ -23,14 +23,14 @@ analyse temp_bdy_concordance;
 -- all of ACT -- 232,665 rows
 update temp_bdy_concordance as tmp
 set target_id = 'lgaact9999991',
-    target_name = 'Unincorporated ACT'
+    target_name = 'Unincorporated - ACT'
 where target_state = 'ACT'
 ;
 
 -- Specific localities
 update temp_bdy_concordance as tmp
 set target_id = 'lgaot9999991',
-    target_name = 'Unincorporated OT (Norfolk Island)'
+    target_name = 'Unincorporated - Norfolk Island'
 from gnaf_202202.address_principal_admin_boundaries as psma
 where psma.gnaf_pid = tmp.gnaf_pid
   and locality_pid = 'locc15e0d2d6f2a'
@@ -38,7 +38,7 @@ where psma.gnaf_pid = tmp.gnaf_pid
 
 update temp_bdy_concordance as tmp
 set target_id = 'lgaot9999992',
-    target_name = 'Unincorporated OT (Jervis Bay)'
+    target_name = 'Unincorporated - Jervis Bay'
 from gnaf_202202.address_principal_admin_boundaries as psma
 where psma.gnaf_pid = tmp.gnaf_pid
   and locality_pid = 'loced195c315de9'
@@ -46,7 +46,7 @@ where psma.gnaf_pid = tmp.gnaf_pid
 
 update temp_bdy_concordance as tmp
 set target_id = 'lgasa9999991',
-    target_name = 'Unincorporated SA (Thistle Island)'
+    target_name = 'Unincorporated - Thistle Island'
 from gnaf_202202.address_principal_admin_boundaries as psma
 where psma.gnaf_pid = tmp.gnaf_pid
   and locality_pid = '250190776'
