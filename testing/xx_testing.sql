@@ -30,11 +30,13 @@ group by from_type,
 ;
 
 
--- from testing.census_2016_bdy_concordance as con
--- where from_type = 'poa'
---     and to_type = 'lga'
---
--- ;
+select * from testing.boundary_concordance as con
+where from_type = 'sa2'
+    and to_type = 'sa2'
+    and address_percent < 100
+order by from_id,
+         address_percent
+;
 
 -- from_id,weighted_address_count,address_count
 -- POA5172,149595.24688509462,2167
