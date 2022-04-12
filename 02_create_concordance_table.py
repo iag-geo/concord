@@ -93,10 +93,15 @@ def create_table(pg_cur):
 def add_concordances(bdys, pg_cur):
     start_time = datetime.now()
 
+    from_source = bdys["from_source"].lower()
+    to_source = bdys["to_source"].lower()
+
     from_bdy = bdys["from"].lower()
     to_bdy = bdys["to"].lower()
 
-
+    # if more than source table create a join statement
+    if from_source != to_source:
+        input_table=
 
 
     query = f"""insert into {output_schema}.{output_table}
