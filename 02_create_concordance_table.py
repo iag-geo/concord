@@ -27,8 +27,9 @@ boundary_list = [{"from": "poa", "to": "lga"},
                  {"from": "sa3", "to": "lga"},
                  {"from": "lga", "to": "sa3"},
                  {"from": "sa2", "to": "lga"},
-                 {"from": "lga", "to": "sa2"}
-                 ]
+                 {"from": "lga", "to": "sa2"},
+                 {"from": "sa2", "to": "poa"},
+                 {"from": "poa", "to": "sa2"}                 ]
 
 # ---------------------------------------------------------------------------------------
 
