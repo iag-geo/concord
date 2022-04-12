@@ -102,21 +102,44 @@ def add_concordances(bdys, pg_cur):
 
     # get input table(s)
     from_table = get_source_table(from_source)
-
     if from_table is not None:
         # if more than source table create a join statement
         if from_source != to_source:
             to_table = get_source_table(to_source)
+            input_tables = f"""{from_table} as f inner join {to_table} as t on t.gnaf_pid = f.gnaf_pid"""
+        else:
+            input_tables = from_table
 
-            input_tables = f"""{from_table} inner join """
+        # set the code and name field names
+        # TODO: replace the hardcoding
+        # TODO: handle situation where from/to field names are the same on an inner join
+        if from_source == "abs 2016":
+            from_id_field = f"{from_bdy}_16code"
+            from_name_field = f"{from_bdy}_16name"
+        elif from_source == "abs 2021":
+            from_id_field = f"{from_bdy}_code_2021"
+            from_name_field = f"{from_bdy}_name_2021"
+        else:
+            from_id_field = f"{from_bdy}_pid"
+            from_name_field = f"{from_bdy}_name"
 
+        if to_source == "abs 2016":
+            to_id_field = f"{to_bdy}_16code"
+            to_name_field = f"{to_bdy}_16name"
+        elif to_source == "abs 2021":
+            to_id_field = f"{to_bdy}_code_2021"
+            to_name_field = f"{to_bdy}_name_2021"
+        else:
+            to_id_field = f"{to_bdy}_pid"
+            to_name_field = f"{to_bdy}_name"
 
+        # build the query
         query = f"""insert into {output_schema}.{output_table}
                     with agg as (
-                        select {from_bdy}_16code as from_id,
-                               {from_bdy}_16name as from_name,
-                               {to_bdy}_16code as to_id,
-                               {to_bdy}_16name as to_name,
+                        select {from_id_field} as from_id,
+                               {from_name_field} as from_name,
+                               {to_id_field} as to_id,
+                               {to_name_field} as to_name,
                                count(*) as address_count
                         from {input_tables}
                         group by from_id,
