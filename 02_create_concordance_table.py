@@ -158,12 +158,14 @@ def score_results(pg_cur):
     rows = pg_cur.fetchall()
 
     logger.info(f"\t - results scored : {datetime.now() - start_time}")
-    logger.info("\t\t------------------------------------------------------------------------")
-    logger.info("\t\t| {:12}| {:12}| {:9}|".format("from", "to", "concordance"))
-    logger.info("\t\t------------------------------------------------------------------------")
+    logger.info("\t\t---------------------------------------------")
+    logger.info("\t\t| {:12} | {:12} | {:11} |".format("from", "to", "concordance"))
+    logger.info("\t\t---------------------------------------------")
 
     for row in rows:
-        logger.info("\t\t| {:12}| {:12}| {:3}%|".format(row[0], row[1], row[2]))
+        logger.info("\t\t| {:12} | {:12} | {:10}% |".format(row[0], row[1], row[2]))
+
+    logger.info("\t\t---------------------------------------------")
 
 
 def copy_table(input_pg_cur, export_pg_cur, input_schema, input_table, export_schema, export_table):
