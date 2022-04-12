@@ -22,14 +22,18 @@ output_table = "census_2016_bdy_concordance"
 # edit boundary list tovfind concordances with
 # ---------------------------------------------------------------------------------------
 
-boundary_list = [{"from": "poa", "to": "lga"},
+boundary_list = [
+                 {"from": "poa", "to": "lga"},
                  {"from": "lga", "to": "poa"},
                  {"from": "sa3", "to": "lga"},
                  {"from": "lga", "to": "sa3"},
                  {"from": "sa2", "to": "lga"},
                  {"from": "lga", "to": "sa2"},
                  {"from": "sa2", "to": "poa"},
-                 {"from": "poa", "to": "sa2"}                 ]
+                 {"from": "poa", "to": "sa2"},
+                 {"from": "sa1", "to": "poa"},
+                 {"from": "poa", "to": "sa1"}
+                 ]
 
 # ---------------------------------------------------------------------------------------
 
@@ -50,7 +54,7 @@ def main():
     # analyse and index table
     index_table(pg_cur)
 
-    # get weighted scores as a concordance percent
+    # get weighted scores as % concordance
     score_results(pg_cur)
 
     # cleanup
@@ -118,7 +122,7 @@ def add_concordances(from_bdy, to_bdy, pg_cur):
 
     pg_cur.execute(query)
 
-    logger.info(f"\t - from {from_bdy} to {to_bdy} records added : {datetime.now() - start_time}")
+    logger.info(f"\t - {from_bdy} to {to_bdy} records added : {datetime.now() - start_time}")
 
 
 def index_table(pg_cur):

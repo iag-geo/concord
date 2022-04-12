@@ -8,10 +8,7 @@ from testing.census_2016_bdy_concordance
 where from_type = 'poa'
   and to_type = 'lga'
 group by from_id
-
-
-
-
+;
 
 with cnt as (
     select from_type,
