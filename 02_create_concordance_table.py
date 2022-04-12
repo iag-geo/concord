@@ -25,6 +25,7 @@ source_list = [
     {"name": "geoscape", "schema": "gnaf_202202", "table": "address_principal_admin_boundaries"}
 ]
 
+# from and to sources must match the names of the above sources
 boundary_list = [
     {"from": "sa3", "from_source": "abs 2016", "to": "sa3", "to_source": "abs 2021"},
     # {"from": "poa", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
@@ -93,55 +94,72 @@ def create_table(pg_cur):
 def add_concordances(bdys, pg_cur):
     start_time = datetime.now()
 
-    from_source = bdys["from_source"].lower()
-    to_source = bdys["to_source"].lower()
-
+    from_source = bdys["from_source"]
     from_bdy = bdys["from"].lower()
+
+    to_source = bdys["to_source"]
     to_bdy = bdys["to"].lower()
 
-    # if more than source table create a join statement
-    if from_source != to_source:
-        input_table=
+    # get input table(s)
+    from_table = get_source_table(from_source)
+
+    if from_table is not None:
+        # if more than source table create a join statement
+        if from_source != to_source:
+            to_table = get_source_table(to_source)
+
+            input_tables = f"""{from_table} inner join """
 
 
-    query = f"""insert into {output_schema}.{output_table}
-                with agg as (
-                    select {from_bdy}_16code as from_id,
-                           {from_bdy}_16name as from_name,
-                           {to_bdy}_16code as to_id,
-                           {to_bdy}_16name as to_name,
-                           count(*) as address_count
-                    from {input_tables}
-                    group by from_id,
-                             from_name,
-                             to_id,
-                             to_name
-                ), final as (
-                    select '{from_source}',
-                           '{from_bdy}',
-                           agg.from_id,
-                           agg.from_name,
-                           '{to_source}',
-                           '{to_bdy}',
-                           agg.to_id,
-                           agg.to_name,
-                           agg.address_count,
-                           (agg.address_count::float / 
-                               (sum(agg.address_count) over (partition by agg.from_id))::float * 100.0) as percent
-                    from agg
-                )
-                select * from final where percent > 0.0;"""
+        query = f"""insert into {output_schema}.{output_table}
+                    with agg as (
+                        select {from_bdy}_16code as from_id,
+                               {from_bdy}_16name as from_name,
+                               {to_bdy}_16code as to_id,
+                               {to_bdy}_16name as to_name,
+                               count(*) as address_count
+                        from {input_tables}
+                        group by from_id,
+                                 from_name,
+                                 to_id,
+                                 to_name
+                    ), final as (
+                        select '{from_source}',
+                               '{from_bdy}',
+                               agg.from_id,
+                               agg.from_name,
+                               '{to_source}',
+                               '{to_bdy}',
+                               agg.to_id,
+                               agg.to_name,
+                               agg.address_count,
+                               (agg.address_count::float / 
+                                   (sum(agg.address_count) over (partition by agg.from_id))::float * 100.0) as percent
+                        from agg
+                    )
+                    select * from final where percent > 0.0;"""
 
-    # hardcode fixes for SA1 and SA2 oddities
-    if "sa1" in [from_bdy, to_bdy]:
-        query = query.replace("sa1_16code", "sa1_16main").replace("sa1_16name", "sa1_16_7cd")
+        # hardcode fixes for SA1 and SA2 oddities
+        if "sa1" in [from_bdy, to_bdy]:
+            query = query.replace("sa1_16code", "sa1_16main").replace("sa1_16name", "sa1_16_7cd")
 
-    if "sa2" in [from_bdy, to_bdy]:
-        query = query.replace("sa2_16code", "sa2_16main")
+        if "sa2" in [from_bdy, to_bdy]:
+            query = query.replace("sa2_16code", "sa2_16main")
 
-    pg_cur.execute(query)
+        pg_cur.execute(query)
 
-    logger.info(f"\t - {from_bdy} to {to_bdy} records added : {datetime.now() - start_time}")
+        logger.info(f"\t - {from_bdy} to {to_bdy} records added : {datetime.now() - start_time}")
+
+    else:
+        logger.fatal(f"\t - {from_source} not in sources!")
+
+
+def get_source_table(name):
+    for source_dict in source_list:
+        if source_dict["name"] == name:
+            return f'{source_dict["schema"]}.{source_dict["table"]}'
+
+    return None
 
 
 def index_table(pg_cur):
