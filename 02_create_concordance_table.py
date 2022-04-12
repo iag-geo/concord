@@ -12,28 +12,32 @@ from datetime import datetime
 
 pg_connect_string = "dbname=geo host=localhost port=5432 user=postgres password=password"
 
-input_schema = "gnaf_202202"
-input_table = "address_principal_census_2016_boundaries"
-
 output_schema = "testing"
-output_table = "census_2016_bdy_concordance"
+output_table = "boundary_concordance"
 
 # ---------------------------------------------------------------------------------------
 # edit boundary list tovfind concordances with
 # ---------------------------------------------------------------------------------------
 
+source_list = [
+    {"name": "abs 2016", "schema": "gnaf_202202", "table": "address_principal_census_2016_boundaries"},
+    {"name": "abs 2021", "schema": "gnaf_202202", "table": "address_principal_census_2021_boundaries"},
+    {"name": "geoscape", "schema": "gnaf_202202", "table": "address_principal_admin_boundaries"}
+]
+
 boundary_list = [
-                 {"from": "poa", "to": "lga"},
-                 {"from": "lga", "to": "poa"},
-                 {"from": "sa3", "to": "lga"},
-                 {"from": "lga", "to": "sa3"},
-                 {"from": "sa2", "to": "lga"},
-                 {"from": "lga", "to": "sa2"},
-                 {"from": "sa2", "to": "poa"},
-                 {"from": "poa", "to": "sa2"},
-                 {"from": "sa1", "to": "poa"},
-                 {"from": "poa", "to": "sa1"}
-                 ]
+    {"from": "sa3", "from_source": "abs 2016", "to": "sa3", "to_source": "abs 2021"},
+    # {"from": "poa", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
+    # {"from": "lga", "from_source": "abs 2016", "to": "poa", "to_source": "abs 2016"},
+    # {"from": "sa3", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
+    # {"from": "lga", "from_source": "abs 2016", "to": "sa3", "to_source": "abs 2016"},
+    # {"from": "sa2", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
+    # {"from": "lga", "from_source": "abs 2016", "to": "sa2", "to_source": "abs 2016"},
+    # {"from": "sa2", "from_source": "abs 2016", "to": "poa", "to_source": "abs 2016"},
+    # {"from": "poa", "from_source": "abs 2016", "to": "sa2", "to_source": "abs 2016"},
+    # {"from": "sa1", "from_source": "abs 2016", "to": "poa", "to_source": "abs 2016"},
+    {"from": "poa", "from_source": "abs 2016", "to": "sa1", "to_source": "abs 2016"}
+]
 
 # ---------------------------------------------------------------------------------------
 
@@ -49,7 +53,7 @@ def main():
 
     # add concordances
     for bdys in boundary_list:
-        add_concordances(bdys["from"].lower(), bdys["to"].lower(), pg_cur)
+        add_concordances(bdys, pg_cur)
 
     # analyse and index table
     index_table(pg_cur)
@@ -68,9 +72,11 @@ def create_table(pg_cur):
     query = f"""drop table if exists {output_schema}.{output_table};
                 create table {output_schema}.{output_table}
                 (
+                    from_source     text not null,
                     from_type       text not null,
                     from_id         text not null,
                     from_name       text not null,
+                    to_source       text not null,
                     to_type         text not null,
                     to_id           text not null,
                     to_name         text not null,
@@ -84,8 +90,14 @@ def create_table(pg_cur):
     logger.info(f"\t - {output_schema}.{output_table} table created : {datetime.now() - start_time}")
 
 
-def add_concordances(from_bdy, to_bdy, pg_cur):
+def add_concordances(bdys, pg_cur):
     start_time = datetime.now()
+
+    from_bdy = bdys["from"].lower()
+    to_bdy = bdys["to"].lower()
+
+
+
 
     query = f"""insert into {output_schema}.{output_table}
                 with agg as (
@@ -94,15 +106,17 @@ def add_concordances(from_bdy, to_bdy, pg_cur):
                            {to_bdy}_16code as to_id,
                            {to_bdy}_16name as to_name,
                            count(*) as address_count
-                    from {input_schema}.{input_table}
+                    from {input_tables}
                     group by from_id,
                              from_name,
                              to_id,
                              to_name
                 ), final as (
-                    select '{from_bdy}',
+                    select '{from_source}',
+                           '{from_bdy}',
                            agg.from_id,
                            agg.from_name,
+                           '{to_source}',
                            '{to_bdy}',
                            agg.to_id,
                            agg.to_name,
