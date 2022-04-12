@@ -1,6 +1,52 @@
 
-select *
-from testing.census_2016_bdy_concordance;
+
+select from_id,
+       sum(address_count::float * address_percent) as weighted_address_count,
+       sum(address_count) as address_count,
+       sum(address_count::float * address_percent)  / sum(address_count)::float as weighted_percent
+from testing.census_2016_bdy_concordance
+where from_type = 'poa'
+  and to_type = 'lga'
+group by from_id
+
+
+
+
+
+with cnt as (
+    select from_type,
+           from_id,
+           to_type,
+           sum(address_count::float * address_percent) as weighted_address_count,
+           sum(address_count) as address_count
+    from testing.census_2016_bdy_concordance
+    group by from_type,
+             from_id,
+             to_type
+)
+select from_type,
+       to_type,
+       (sum(weighted_address_count) / sum(address_count)::float)::smallint as concordance_percent
+from cnt
+group by from_type,
+         to_type
+;
+
+
+-- from testing.census_2016_bdy_concordance as con
+-- where from_type = 'poa'
+--     and to_type = 'lga'
+--
+-- ;
+
+-- from_id,weighted_address_count,address_count
+-- POA5172,149595.24688509462,2167
+
+select * from testing.census_2016_bdy_concordance
+where from_id = 'POA5172'
+;
+
+
 
 
 

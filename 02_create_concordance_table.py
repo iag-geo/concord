@@ -49,6 +49,9 @@ def main():
     # analyse and index table
     index_table(pg_cur)
 
+    # get weighted scores as a concordance percent
+    score_results(pg_cur)
+
     # cleanup
     pg_cur.close()
     pg_conn.close()
@@ -127,6 +130,40 @@ def index_table(pg_cur):
     pg_cur.execute(query)
 
     logger.info(f"\t - primary key added : {datetime.now() - start_time}")
+
+
+def score_results(pg_cur):
+    start_time = datetime.now()
+
+    # calculate concordance score (weighted by address count)
+    query = f"""with cnt as (
+                select from_type,
+                       from_id,
+                       to_type,
+                       sum(address_count::float * address_percent) as weighted_address_count,
+                       sum(address_count) as address_count
+                from {output_schema}.{output_table}
+                group by from_type,
+                         from_id,
+                         to_type
+            )
+            select from_type,
+                   to_type,
+                   (sum(weighted_address_count) / sum(address_count)::float)::smallint as concordance_percent
+            from cnt
+            group by from_type,
+                     to_type;"""
+
+    pg_cur.execute(query)
+    rows = pg_cur.fetchall()
+
+    logger.info(f"\t - results scored : {datetime.now() - start_time}")
+    logger.info("\t\t------------------------------------------------------------------------")
+    logger.info("\t\t|{:15}|{:15}|{:9}|".format("from_type", "to_type", "concordance_%"))
+    logger.info("\t\t------------------------------------------------------------------------")
+
+    for row in rows:
+        logger.info("\t\t|{:15}|{:15}|{:9}|".format(row[0], row[1], row[2]))
 
 
 def copy_table(input_pg_cur, export_pg_cur, input_schema, input_table, export_schema, export_table):
