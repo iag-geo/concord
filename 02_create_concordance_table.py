@@ -107,7 +107,7 @@ def add_concordances(bdys, pg_cur):
         # if more than source table create a join statement
         if from_source != to_source:
             to_table = get_source_table(to_source)
-            input_tables = f"""{from_table} as f inner join {to_table} as t on t.gnaf_pid = f.gnaf_pid"""
+            input_tables = f"""{from_table} as f\n\t\t\t\t\t\tinner join {to_table} as t on t.gnaf_pid = f.gnaf_pid"""
         else:
             input_tables = from_table
 
@@ -137,12 +137,13 @@ def add_concordances(bdys, pg_cur):
         # build the query
         query = f"""insert into {output_schema}.{output_table}
                     with agg as (
-                        select {from_id_field} as from_id,
+                        select {from_id_field}::text as from_id,
                                {from_name_field} as from_name,
-                               {to_id_field} as to_id,
+                               {to_id_field}::text as to_id,
                                {to_name_field} as to_name,
                                count(*) as address_count
                         from {input_tables}
+                        where mb_category = 'Residential'
                         group by from_id,
                                  from_name,
                                  to_id,

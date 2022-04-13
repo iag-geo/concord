@@ -9,16 +9,20 @@ where abs(cor.ratio_from_to * 100.0 - bdy.address_percent) > 5.0
 ;
 
 
-
+select *
+from gnaf_202202.address_principal_census_2016_boundaries;
 
 
 with agg as (
-    select sa2_16main as from_id,
+    select sa2_16main::text as from_id,
            sa2_16name as from_name,
-           sa2_code_2021 as to_id,
+           sa2_code_2021::text as to_id,
            sa2_name_2021 as to_name,
            count(*) as address_count
-    from gnaf_202202.address_principal_census_2016_boundaries as f inner join gnaf_202202.address_principal_census_2021_boundaries as t on t.gnaf_pid = f.gnaf_pid
+    from gnaf_202202.address_principal_census_2016_boundaries as f
+        inner join gnaf_202202.address_principal_census_2021_boundaries as t on t.gnaf_pid = f.gnaf_pid
+    where sa2_16main = '101021011'
+        and mb_category = 'RESIDENTIAL'
     group by from_id,
              from_name,
              to_id,
@@ -37,10 +41,15 @@ with agg as (
            (sum(agg.address_count) over (partition by agg.from_id))::float * 100.0) as percent
     from agg
 )
-select * from final where percent > 0.0;
+select final.*,
+       (st_area(st_intersection(st_transform(old.geom, 3577), st_transform(new.geom, 3577))) / 1000000.0) / old.areasqkm16 * 100.0 as percent_area
+from final
+inner join census_2016_bdys.sa2_2016_aust as old on old.sa2_main16 = final.from_id
+inner join census_2021_bdys.sa2_2021_aust_gda94 as new on new.sa2_code_2021 = final.to_id
+-- where percent > 0.0
+;
 
 
 
 
 
-st_intersection(source.geom, target.geom) as geom
