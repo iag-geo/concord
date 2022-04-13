@@ -143,7 +143,7 @@ def add_concordances(bdys, pg_cur):
                                {to_name_field} as to_name,
                                count(*) as address_count
                         from {input_tables}
-                        where mb_category IN ('RESIDENTIAL', 'COMMERCIAL', 'INDUSTRIAL')
+                        where mb_category IN ('RESIDENTIAL')
                         group by from_id,
                                  from_name,
                                  to_id,
