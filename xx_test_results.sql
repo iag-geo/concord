@@ -27,23 +27,13 @@ where abs(cor.ratio_from_to * 100.0 - bdy.address_percent) > 5.0
 -- |107           |12  |0         |-40      |26       |57988        |
 -- +--------------+----+----------+---------+---------+-------------+
 
--- +--------------+----+----------+---------+---------+-------------+
--- |bdy_pair_count|rmse|mean_delta|min_delta|max_delta|address_count|
--- +--------------+----+----------+---------+---------+-------------+
--- |161           |19  |-1        |-100     |56       |168616       |
--- +--------------+----+----------+---------+---------+-------------+
-
-
-
-
-
 
 select cor.ratio_from_to * 100.0 - bdy.address_percent as delta,
        *
 from census_2021_bdys.correspondences_sa2 as cor
          inner join testing.boundary_concordance as bdy on bdy.from_id = cor.sa2_maincode_2016
     and bdy.to_id = cor.sa2_code_2021
-where sa2_maincode_2016 = '302031036'
+where sa2_maincode_2016 = '213051369'
 order by delta
 ;
 
