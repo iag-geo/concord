@@ -158,7 +158,7 @@ def add_concordances(bdys, pg_cur):
                                agg.to_name,
                                agg.address_count,
                                (agg.address_count::float / 
-                                   (sum(agg.address_count) over (partition by agg.from_id))::float * 100.0) as percent
+                               (sum(agg.address_count) over (partition by agg.from_id))::float * 100.0) as percent
                         from agg
                     )
                     select * from final where percent > 0.0;"""
@@ -169,6 +169,8 @@ def add_concordances(bdys, pg_cur):
 
         if "sa2" in [from_bdy, to_bdy]:
             query = query.replace("sa2_16code", "sa2_16main")
+
+        print(query)
 
         pg_cur.execute(query)
 
