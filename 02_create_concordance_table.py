@@ -143,7 +143,7 @@ def add_concordances(bdys, pg_cur):
                                {to_name_field} as to_name,
                                count(*) as address_count
                         from {input_tables}
-                        where mb_category = 'Residential'
+                        where mb_category = 'RESIDENTIAL'
                         group by from_id,
                                  from_name,
                                  to_id,
@@ -171,8 +171,7 @@ def add_concordances(bdys, pg_cur):
         if "sa2" in [from_bdy, to_bdy]:
             query = query.replace("sa2_16code", "sa2_16main")
 
-        print(query)
-
+        # print(query)
         pg_cur.execute(query)
 
         logger.info(f"\t - {from_bdy} to {to_bdy} records added : {datetime.now() - start_time}")
