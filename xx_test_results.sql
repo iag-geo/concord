@@ -9,10 +9,10 @@ where abs(cor.ratio_from_to * 100.0 - bdy.address_percent) > 5.0
 ;
 
 -- comparison stats
-select sqrt(avg(power(cor.ratio_from_to * 100.0 - bdy.address_percent, 2))) as rmse,
-       avg(cor.ratio_from_to * 100.0 - bdy.address_percent) as mean_delta,
-       min(cor.ratio_from_to * 100.0 - bdy.address_percent) as min_delta,
-       max(cor.ratio_from_to * 100.0 - bdy.address_percent) as max_delta
+select sqrt(avg(power(cor.ratio_from_to * 100.0 - bdy.address_percent, 2)))::smallint  as rmse,
+       avg(cor.ratio_from_to * 100.0 - bdy.address_percent)::smallint as mean_delta,
+       min(cor.ratio_from_to * 100.0 - bdy.address_percent)::smallint as min_delta,
+       max(cor.ratio_from_to * 100.0 - bdy.address_percent)::smallint as max_delta
 from census_2021_bdys.correspondences_sa2 as cor
          inner join testing.boundary_concordance as bdy on bdy.from_id = cor.sa2_maincode_2016
     and bdy.to_id = cor.sa2_code_2021
