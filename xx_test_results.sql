@@ -9,33 +9,50 @@ where abs(cor.ratio_from_to * 100.0 - bdy.address_percent) > 5.0
 ;
 
 -- comparison stats
-select sqrt(avg(power(cor.ratio_from_to * 100.0 - bdy.address_percent, 2)))::smallint  as rmse,
+select count(*) as bdy_pair_count,
+       sqrt(avg(power(cor.ratio_from_to * 100.0 - bdy.address_percent, 2)))::smallint  as rmse,
        avg(cor.ratio_from_to * 100.0 - bdy.address_percent)::smallint as mean_delta,
        min(cor.ratio_from_to * 100.0 - bdy.address_percent)::smallint as min_delta,
-       max(cor.ratio_from_to * 100.0 - bdy.address_percent)::smallint as max_delta
+       max(cor.ratio_from_to * 100.0 - bdy.address_percent)::smallint as max_delta,
+       (sum(abs(cor.ratio_from_to * 100.0 - bdy.address_percent) * address_count) / 100.0)::integer as address_count
 from census_2021_bdys.correspondences_sa2 as cor
          inner join testing.boundary_concordance as bdy on bdy.from_id = cor.sa2_maincode_2016
     and bdy.to_id = cor.sa2_code_2021
 where abs(cor.ratio_from_to * 100.0 - bdy.address_percent) > 5.0
 ;
 
--- +------------------+-------------------+---------+------------------+
--- |rmse              |mean_delta         |min_delta|max_delta         |
--- +------------------+-------------------+---------+------------------+
--- |18.890779379336106|-0.6046173298343015|-99.99983|55.995065242929655|
--- +------------------+-------------------+---------+------------------+
+-- +--------------+----+----------+---------+---------+-------------+
+-- |bdy_pair_count|rmse|mean_delta|min_delta|max_delta|address_count|
+-- +--------------+----+----------+---------+---------+-------------+
+-- |107           |12  |0         |-40      |26       |57988        |
+-- +--------------+----+----------+---------+---------+-------------+
 
--- +------------------+-------------------+-------------------+-----------------+
--- |rmse              |mean_delta         |min_delta          |max_delta        |
--- +------------------+-------------------+-------------------+-----------------+
--- |11.780807976984471|-0.3882958870770031|-40.161570000000005|26.46975494669509|
--- +------------------+-------------------+-------------------+-----------------+
-
-
+-- +--------------+----+----------+---------+---------+-------------+
+-- |bdy_pair_count|rmse|mean_delta|min_delta|max_delta|address_count|
+-- +--------------+----+----------+---------+---------+-------------+
+-- |161           |19  |-1        |-100     |56       |168616       |
+-- +--------------+----+----------+---------+---------+-------------+
 
 
-select *
-from gnaf_202202.address_principal_census_2016_boundaries;
+
+
+
+
+select cor.ratio_from_to * 100.0 - bdy.address_percent as delta,
+       *
+from census_2021_bdys.correspondences_sa2 as cor
+         inner join testing.boundary_concordance as bdy on bdy.from_id = cor.sa2_maincode_2016
+    and bdy.to_id = cor.sa2_code_2021
+where sa2_maincode_2016 = '302031036'
+order by delta
+;
+
+
+
+
+select *,
+       mb_category_2021
+from gnaf_202202.address_principal_census_2021_boundaries;
 
 
 with agg as (
