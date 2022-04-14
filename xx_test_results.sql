@@ -84,5 +84,6 @@ from final
 
 
 
-
+select *
+from gnaf_202202.address_principal_admin_boundaries;
 

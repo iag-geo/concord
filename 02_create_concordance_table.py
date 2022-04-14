@@ -28,15 +28,17 @@ source_list = [
 # from and to sources must match the names of the above sources
 boundary_list = [
     # ABS 2016 to ABS 2016 bdys
-    {"from": "poa", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
-    {"from": "sa3", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
-    {"from": "lga", "from_source": "abs 2016", "to": "sa3", "to_source": "abs 2016"},
-    {"from": "sa2", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
-    {"from": "sa2", "from_source": "abs 2016", "to": "sa3", "to_source": "abs 2016"},
-    {"from": "sa2", "from_source": "abs 2016", "to": "poa", "to_source": "abs 2016"}
+    # {"from": "poa", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
+    # {"from": "sa3", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
+    # {"from": "lga", "from_source": "abs 2016", "to": "sa3", "to_source": "abs 2016"},
+    # {"from": "sa2", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
+    # {"from": "sa2", "from_source": "abs 2016", "to": "sa3", "to_source": "abs 2016"},
+    # {"from": "sa2", "from_source": "abs 2016", "to": "poa", "to_source": "abs 2016"},
 
     # Geoscape to ABS 2016 bdys
-    # {"from": "", "from_source": "geoscape", "to": "lga", "to_source": "abs 2016"},
+    {"from": "locality", "from_source": "geoscape", "to": "lga", "to_source": "abs 2016"},
+    {"from": "postcode", "from_source": "geoscape", "to": "lga", "to_source": "abs 2016"},
+    {"from": "lga", "from_source": "geoscape", "to": "lga", "to_source": "abs 2016"}
 ]
 
 # ---------------------------------------------------------------------------------------
@@ -110,27 +112,8 @@ def add_concordances(bdys, pg_cur):
             input_tables = from_table
 
         # set the code and name field names
-        # TODO: replace the hardcoding
-        # TODO: handle situation where from/to field names are the same on an inner join
-        if from_source == "abs 2016":
-            from_id_field = f"{from_bdy}_16code"
-            from_name_field = f"{from_bdy}_16name"
-        elif from_source == "abs 2021":
-            from_id_field = f"{from_bdy}_code_2021"
-            from_name_field = f"{from_bdy}_name_2021"
-        else:
-            from_id_field = f"{from_bdy}_pid"
-            from_name_field = f"{from_bdy}_name"
-
-        if to_source == "abs 2016":
-            to_id_field = f"{to_bdy}_16code"
-            to_name_field = f"{to_bdy}_16name"
-        elif to_source == "abs 2021":
-            to_id_field = f"{to_bdy}_code_2021"
-            to_name_field = f"{to_bdy}_name_2021"
-        else:
-            to_id_field = f"{to_bdy}_pid"
-            to_name_field = f"{to_bdy}_name"
+        from_id_field, from_name_field = get_field_names(from_bdy, from_source)
+        to_id_field, to_name_field = get_field_names(to_bdy, to_source)
 
         # build the query
         query = f"""insert into {output_schema}.{output_table}
@@ -178,6 +161,25 @@ def add_concordances(bdys, pg_cur):
         logger.fatal(f"\t - {from_source} not in sources!")
 
 
+def get_field_names(bdy, source):
+    # TODO: replace the hardcoding
+    if source == "abs 2016":
+        id_field = f"{bdy}_16code"
+        name_field = f"{bdy}_16name"
+    elif source == "abs 2021":
+        id_field = f"{bdy}_code_2021"
+        name_field = f"{bdy}_name_2021"
+    else:
+        if bdy == "postcode":
+            id_field = "postcode"
+            name_field = "postcode + ' ' + state"
+        else:
+            id_field = f"{bdy}_pid"
+            name_field = f"{bdy}_name"
+
+    return id_field, name_field
+
+
 def get_source_table(name):
     for source_dict in source_list:
         if source_dict["name"] == name:
@@ -203,8 +205,10 @@ def score_results(pg_cur):
 
     # calculate concordance score (weighted by address count)
     query = f"""with cnt as (
-                select from_type,
+                select from_source,
+                       from_type,
                        from_id,
+                       to_source,
                        to_type,
                        sum(address_count::float * address_percent) as weighted_address_count,
                        sum(address_count) as address_count
@@ -213,11 +217,15 @@ def score_results(pg_cur):
                          from_id,
                          to_type
             )
-            select from_type,
+            select from_source,
+                   from_type,
+                   to_source,
                    to_type,
                    (sum(weighted_address_count) / sum(address_count)::float)::smallint as concordance_percent
             from cnt
-            group by from_type,
+            group by from_source,
+                     from_type,
+                     to_source,
                      to_type;"""
 
     pg_cur.execute(query)
