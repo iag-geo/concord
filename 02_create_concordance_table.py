@@ -104,12 +104,12 @@ def add_concordances(bdys, pg_cur):
     # get input table(s)
     from_table = get_source_table(from_source)
     if from_table is not None:
+        input_tables = f"{from_table} as f"
+
         # if more than source table create a join statement
         if from_source != to_source:
             to_table = get_source_table(to_source)
-            input_tables = f"""{from_table} as f\n\t\t\t\t\t\tinner join {to_table} as t on t.gnaf_pid = f.gnaf_pid"""
-        else:
-            input_tables = from_table
+            input_tables += f"\n\t\t\t\t\t\tinner join {to_table} as t on t.gnaf_pid = f.gnaf_pid"""
 
         # set the code and name field names
         from_id_field, from_name_field = get_field_names(from_bdy, from_source)
@@ -172,7 +172,8 @@ def get_field_names(bdy, source):
     else:
         if bdy == "postcode":
             id_field = "postcode"
-            name_field = "postcode + ' ' + state"
+            name_field = "concat(state)"
+            # name_field = "concat(postcode, ' ', state)"
         else:
             id_field = f"{bdy}_pid"
             name_field = f"{bdy}_name"
