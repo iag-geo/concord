@@ -24,6 +24,8 @@ Concordance describes what % of residential addresses in the "from" boundary fit
 
 _e.g. 100% of postcode 2040 fits within the Inner West Council LGA. However, only ~40% of postcode 2042 fits within the City of Sydney LGA._
 
+A high average concordance indicates your data can be converted to the new boundary reliability. THe lower the concordance the more biases will appear in your converted data. 
+
 | from                     | to                  | avg. concordance |
 |:-------------------------|:--------------------|-----------------:|
 | abs 2016 lga             | abs 2016 sa3        |              73% |
