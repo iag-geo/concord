@@ -30,20 +30,20 @@ source_list = [
 boundary_list = [
     # ABS 2016 to ABS 2016 bdys
     {"from": "poa", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
-    # {"from": "sa3", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
-    # {"from": "lga", "from_source": "abs 2016", "to": "sa3", "to_source": "abs 2016"},
-    # {"from": "sa2", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
-    # {"from": "sa2", "from_source": "abs 2016", "to": "sa3", "to_source": "abs 2016"},
-    # {"from": "sa2", "from_source": "abs 2016", "to": "poa", "to_source": "abs 2016"},
-    #
-    # # Geoscape to ABS 2016 bdys
-    # {"from": "locality", "from_source": "geoscape 202202", "to": "lga", "to_source": "abs 2016"},
-    # {"from": "postcode", "from_source": "geoscape 202202", "to": "lga", "to_source": "abs 2016"},
-    # {"from": "lga", "from_source": "geoscape 202202", "to": "lga", "to_source": "abs 2016"},
-    #
-    # # Geoscape to Geoscape bdys
-    # {"from": "locality", "from_source": "geoscape 202202", "to": "lga", "to_source": "geoscape 202202"},
-    # {"from": "postcode", "from_source": "geoscape 202202", "to": "lga", "to_source": "geoscape 202202"}
+    {"from": "sa3", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
+    {"from": "lga", "from_source": "abs 2016", "to": "sa3", "to_source": "abs 2016"},
+    {"from": "sa2", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
+    {"from": "sa2", "from_source": "abs 2016", "to": "sa3", "to_source": "abs 2016"},
+    {"from": "sa2", "from_source": "abs 2016", "to": "poa", "to_source": "abs 2016"},
+
+    # Geoscape to ABS 2016 bdys
+    {"from": "locality", "from_source": "geoscape 202202", "to": "lga", "to_source": "abs 2016"},
+    {"from": "postcode", "from_source": "geoscape 202202", "to": "lga", "to_source": "abs 2016"},
+    {"from": "lga", "from_source": "geoscape 202202", "to": "lga", "to_source": "abs 2016"},
+
+    # Geoscape to Geoscape bdys
+    {"from": "locality", "from_source": "geoscape 202202", "to": "lga", "to_source": "geoscape 202202"},
+    {"from": "postcode", "from_source": "geoscape 202202", "to": "lga", "to_source": "geoscape 202202"}
 ]
 
 # ---------------------------------------------------------------------------------------
@@ -75,8 +75,8 @@ def main():
     score_results(pg_cur)
 
     # # export results to csv
-    export_to_csv(pg_cur, f"{output_schema}.{output_table}", output_table)
-    export_to_csv(pg_cur, f"{output_schema}.{output_score_table}", output_score_table)
+    export_to_csv(pg_cur, f"{output_schema}.{output_table}", output_table + ".csv")
+    export_to_csv(pg_cur, f"{output_schema}.{output_score_table}", output_score_table + ".csv")
 
     # cleanup
     pg_cur.close()
