@@ -183,7 +183,7 @@ def add_concordances(bdys, pg_cur):
         # print(query)
         pg_cur.execute(query)
 
-        logger.info(f"\t - {from_bdy} to {to_bdy} records added : {datetime.now() - start_time}")
+        logger.info(f"\t - {from_source} {from_bdy} to {to_source} {to_bdy} records added : {datetime.now() - start_time}")
 
     else:
         logger.fatal(f"\t - {from_source} not in sources!")
@@ -263,7 +263,7 @@ def score_results(pg_cur):
     pg_cur.execute(query)
 
     # log results
-    pg_cur.execute(f"select * from {output_schema}.{output_score_table}")
+    pg_cur.execute(f"select * from {output_schema}.{output_score_table} order by from_bdy, to_bdy")
     rows = pg_cur.fetchall()
 
     logger.info(f"\t - results scored : {datetime.now() - start_time}")
@@ -279,11 +279,8 @@ def score_results(pg_cur):
 
 def export_to_csv(pg_cur, table, file_name):
 
-    output_file = os.path.join(output_path, file_name)
-
     query = f"COPY (select * from {table}) TO STDOUT WITH CSV HEADER"
-    
-    with open(output_file, "w") as f:
+    with open(os.path.join(output_path, file_name), "w") as f:
         pg_cur.copy_expert(query, f)
 
 
