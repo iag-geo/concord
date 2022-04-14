@@ -1,5 +1,4 @@
 
-import io
 import logging
 import os
 import psycopg2  # need to install package
@@ -14,6 +13,7 @@ pg_connect_string = "dbname=geo host=localhost port=5432 user=postgres password=
 
 output_schema = "testing"
 output_table = "boundary_concordance"
+output_score_table = "boundary_concordance_score"
 
 # ---------------------------------------------------------------------------------------
 # edit boundary list to find concordances with
@@ -23,29 +23,34 @@ output_table = "boundary_concordance"
 source_list = [
     {"name": "abs 2016", "schema": "gnaf_202202", "table": "address_principal_census_2016_boundaries"},
     {"name": "abs 2021", "schema": "gnaf_202202", "table": "address_principal_census_2021_boundaries"},
-    {"name": "geoscape", "schema": "gnaf_202202", "table": "address_principal_admin_boundaries"}
+    {"name": "geoscape 202202", "schema": "gnaf_202202", "table": "address_principal_admin_boundaries"}
 ]
 
 # from and to sources must match the names of the above sources
 boundary_list = [
     # ABS 2016 to ABS 2016 bdys
     {"from": "poa", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
-    {"from": "sa3", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
-    {"from": "lga", "from_source": "abs 2016", "to": "sa3", "to_source": "abs 2016"},
-    {"from": "sa2", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
-    {"from": "sa2", "from_source": "abs 2016", "to": "sa3", "to_source": "abs 2016"},
-    {"from": "sa2", "from_source": "abs 2016", "to": "poa", "to_source": "abs 2016"},
-
-    # Geoscape to ABS 2016 bdys
-    {"from": "locality", "from_source": "geoscape", "to": "lga", "to_source": "abs 2016"},
-    {"from": "postcode", "from_source": "geoscape", "to": "lga", "to_source": "abs 2016"},
-    {"from": "lga", "from_source": "geoscape", "to": "lga", "to_source": "abs 2016"},
-
-    # Geoscape to Geoscape bdys
-    {"from": "locality", "from_source": "geoscape", "to": "lga", "to_source": "geoscape"},
-    {"from": "postcode", "from_source": "geoscape", "to": "lga", "to_source": "geoscape"},
-
+    # {"from": "sa3", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
+    # {"from": "lga", "from_source": "abs 2016", "to": "sa3", "to_source": "abs 2016"},
+    # {"from": "sa2", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
+    # {"from": "sa2", "from_source": "abs 2016", "to": "sa3", "to_source": "abs 2016"},
+    # {"from": "sa2", "from_source": "abs 2016", "to": "poa", "to_source": "abs 2016"},
+    #
+    # # Geoscape to ABS 2016 bdys
+    # {"from": "locality", "from_source": "geoscape 202202", "to": "lga", "to_source": "abs 2016"},
+    # {"from": "postcode", "from_source": "geoscape 202202", "to": "lga", "to_source": "abs 2016"},
+    # {"from": "lga", "from_source": "geoscape 202202", "to": "lga", "to_source": "abs 2016"},
+    #
+    # # Geoscape to Geoscape bdys
+    # {"from": "locality", "from_source": "geoscape 202202", "to": "lga", "to_source": "geoscape 202202"},
+    # {"from": "postcode", "from_source": "geoscape 202202", "to": "lga", "to_source": "geoscape 202202"}
 ]
+
+# ---------------------------------------------------------------------------------------
+# edit output file path
+# ---------------------------------------------------------------------------------------
+
+output_path = os.path.dirname(os.path.realpath(__file__))
 
 # ---------------------------------------------------------------------------------------
 
@@ -56,18 +61,22 @@ def main():
     pg_conn.autocommit = True
     pg_cur = pg_conn.cursor()
 
-    # # create table
-    # create_table(pg_cur)
-    #
-    # # add concordances
-    # for bdys in boundary_list:
-    #     add_concordances(bdys, pg_cur)
-    #
-    # # analyse and index table
-    # index_table(pg_cur)
+    # create table
+    create_table(pg_cur)
+
+    # add concordances
+    for bdys in boundary_list:
+        add_concordances(bdys, pg_cur)
+
+    # analyse and index table
+    index_table(pg_cur)
 
     # get weighted scores as % concordance
     score_results(pg_cur)
+
+    # # export results to csv
+    export_to_csv(pg_cur, f"{output_schema}.{output_table}", output_table)
+    export_to_csv(pg_cur, f"{output_schema}.{output_score_table}", output_score_table)
 
     # cleanup
     pg_cur.close()
@@ -228,7 +237,9 @@ def score_results(pg_cur):
     start_time = datetime.now()
 
     # calculate concordance score (weighted by address count)
-    query = f"""with cnt as (
+    query = f"""drop table if exists {output_schema}.{output_score_table};
+                create table {output_schema}.{output_score_table} as
+                with cnt as (
                     select concat(from_source, ' ', from_type) as from_bdy,
                            from_id,
                            concat(to_source, ' ', to_type) as to_bdy,
@@ -244,47 +255,36 @@ def score_results(pg_cur):
                        (sum(weighted_address_count) / sum(address_count)::float)::smallint as concordance_percent
                 from cnt
                 group by from_bdy,
-                         to_bdy;"""
+                         to_bdy;
+                analyse {output_schema}.{output_score_table};
+                alter table {output_schema}.{output_score_table} 
+                    add constraint {output_score_table}_pkey primary key (from_bdy, to_bdy);"""
 
     pg_cur.execute(query)
+
+    # log results
+    pg_cur.execute(f"select * from {output_schema}.{output_score_table}")
     rows = pg_cur.fetchall()
 
     logger.info(f"\t - results scored : {datetime.now() - start_time}")
-    logger.info("\t\t-------------------------------------------------------")
-    logger.info("\t\t| {:17} | {:17} | {:11} |".format("from", "to", "concordance"))
-    logger.info("\t\t-------------------------------------------------------")
+    logger.info("\t\t---------------------------------------------------------------------")
+    logger.info("\t\t| {:24} | {:24} | {:11} |".format("from", "to", "concordance"))
+    logger.info("\t\t---------------------------------------------------------------------")
 
     for row in rows:
-        logger.info("\t\t| {:17} | {:17} | {:10}% |".format(row[0], row[1], row[2]))
+        logger.info("\t\t| {:24} | {:24} | {:10}% |".format(row[0], row[1], row[2]))
 
-    logger.info("\t\t-------------------------------------------------------")
+    logger.info("\t\t---------------------------------------------------------------------")
 
 
-def copy_table(input_pg_cur, export_pg_cur, input_schema, input_table, export_schema, export_table):
-    start_time = datetime.now()
+def export_to_csv(pg_cur, table, file_name):
 
-    # load source table into memory
-    input_rows = io.StringIO()
+    output_file = os.path.join(output_path, file_name)
 
-    export_sql = "COPY (SELECT * FROM {}.{}) TO STDOUT".format(input_schema, input_table)
-
-    input_pg_cur.copy_expert(export_sql, input_rows)
-    input_rows.seek(0)
-
-    logger.info("\t - source table loaded into memory: {}".format(datetime.now() - start_time))
-    start_time = datetime.now()
-
-    # import into target Postgres
-    export_pg_cur.copy_expert("COPY {}.{} FROM STDOUT".format(export_schema, export_table), input_rows)
-    export_pg_cur.execute("ANALYSE {}.{}".format(export_schema, export_table))
-
-    input_rows.close()
-
-    export_pg_cur.execute("SELECT count(*) FROM {}.{}".format(export_schema, export_table))
-    num_rows = export_pg_cur.fetchone()[0]
-
-    logger.info("\t - target table imported : {} total rows : {}"
-                .format(num_rows, datetime.now() - start_time))
+    query = f"COPY (select * from {table}) TO STDOUT WITH CSV HEADER"
+    
+    with open(output_file, "w") as f:
+        pg_cur.copy_expert(query, f)
 
 
 if __name__ == '__main__':
