@@ -27,18 +27,16 @@ source_list = [
 
 # from and to sources must match the names of the above sources
 boundary_list = [
-    {"from": "sa2", "from_source": "abs 2016", "to": "sa2", "to_source": "abs 2021"}
-    # {"from": "sa3", "from_source": "abs 2016", "to": "sa3", "to_source": "abs 2021"},
-    # {"from": "poa", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"}
-    # {"from": "lga", "from_source": "abs 2016", "to": "poa", "to_source": "abs 2016"},
-    # {"from": "sa3", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
-    # {"from": "lga", "from_source": "abs 2016", "to": "sa3", "to_source": "abs 2016"},
-    # {"from": "sa2", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
-    # {"from": "lga", "from_source": "abs 2016", "to": "sa2", "to_source": "abs 2016"},
-    # {"from": "sa2", "from_source": "abs 2016", "to": "poa", "to_source": "abs 2016"},
-    # {"from": "poa", "from_source": "abs 2016", "to": "sa2", "to_source": "abs 2016"},
-    # {"from": "sa1", "from_source": "abs 2016", "to": "poa", "to_source": "abs 2016"},
-    # {"from": "poa", "from_source": "abs 2016", "to": "sa1", "to_source": "abs 2016"}
+    # ABS 2016 to ABS 2016 bdys
+    {"from": "poa", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
+    {"from": "sa3", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
+    {"from": "lga", "from_source": "abs 2016", "to": "sa3", "to_source": "abs 2016"},
+    {"from": "sa2", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
+    {"from": "sa2", "from_source": "abs 2016", "to": "sa3", "to_source": "abs 2016"},
+    {"from": "sa2", "from_source": "abs 2016", "to": "poa", "to_source": "abs 2016"}
+
+    # Geoscape to ABS 2016 bdys
+    # {"from": "", "from_source": "geoscape", "to": "lga", "to_source": "abs 2016"},
 ]
 
 # ---------------------------------------------------------------------------------------
