@@ -1,8 +1,6 @@
 # Concord
 
-An easy-to-use dataset for converting data between Australian census and administrative boundaries.
-
-Its purpose is to allow you to merge data that's based on different boundaries, into a single dataset or report.
+An easy-to-use dataset for converting data between Australian census and administrative boundaries. It allows you to merge data that's based on different boundaries into a single dataset or report.
 
 **Important:** only works with data related to residents, citizens & consumers. Industrial, commercial & special use areas are deliberately ignored in the analysis.
 
