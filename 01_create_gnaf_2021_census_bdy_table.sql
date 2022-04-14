@@ -6,6 +6,8 @@
 -- this approach is simpler than downloading & importing ABS correspondence files, which are subject to change
 -- also RA, SED and CED bdys are groups of SA1s; the rest are groups of meshblocks. Meshblocks are used for all bdys to keep the code simple (performance hit is minimal)
 
+-- TODO: find out which 6 addreses got NULL bdy IDs
+
 -- create temp table of meshblock centroids (ensure centroid is within polygon by using ST_PointOnSurface)
 drop table if exists temp_mb;
 create temporary table temp_mb as
