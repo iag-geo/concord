@@ -24,19 +24,19 @@ Concordance describes what % of residential addresses in the "from" boundary fit
 
 _e.g. 100% of postcode 2040 fits within the Inner West Council LGA. However, only ~40% of postcode 2042 fits within the City of Sydney LGA._
 
-| from                     | to                  | concordance |
-|:-------------------------|:--------------------|------------:|
-| abs 2016 lga             | abs 2016 sa3        |         73% |
-| abs 2016 poa             | abs 2016 lga        |         94% |
-| abs 2016 sa2             | abs 2016 lga        |         98% |
-| abs 2016 sa2             | abs 2016 poa        |         82% |
-| abs 2016 sa2             | abs 2016 sa3        |        100% |
-| abs 2016 sa3             | abs 2016 lga        |         85% |
-| geoscape 202202 lga      | abs 2016 lga        |        100% |
-| geoscape 202202 locality | abs 2016 lga        |         98% |
-| geoscape 202202 locality | geoscape 202202 lga |         98% |
-| geoscape 202202 postcode | abs 2016 lga        |         94% |
-| geoscape 202202 postcode | geoscape 202202 lga |         93% |
+| from                     | to                  | avg. concordance |
+|:-------------------------|:--------------------|-----------------:|
+| abs 2016 lga             | abs 2016 sa3        |              73% |
+| abs 2016 poa             | abs 2016 lga        |              94% |
+| abs 2016 sa2             | abs 2016 lga        |              98% |
+| abs 2016 sa2             | abs 2016 poa        |              82% |
+| abs 2016 sa2             | abs 2016 sa3        |             100% |
+| abs 2016 sa3             | abs 2016 lga        |              85% |
+| geoscape 202202 lga      | abs 2016 lga        |             100% |
+| geoscape 202202 locality | abs 2016 lga        |              98% |
+| geoscape 202202 locality | geoscape 202202 lga |              98% |
+| geoscape 202202 postcode | abs 2016 lga        |              94% |
+| geoscape 202202 postcode | geoscape 202202 lga |              93% |
 
 
 
