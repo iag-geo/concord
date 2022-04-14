@@ -16,7 +16,7 @@ output_schema = "testing"
 output_table = "boundary_concordance"
 
 # ---------------------------------------------------------------------------------------
-# edit boundary list tovfind concordances with
+# edit boundary list to find concordances with
 # ---------------------------------------------------------------------------------------
 
 # sources of address level data with boundary tags - names are hardcoded, don't edit them!
@@ -30,11 +30,11 @@ source_list = [
 boundary_list = [
     # ABS 2016 to ABS 2016 bdys
     {"from": "poa", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
-    # {"from": "sa3", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
-    # {"from": "lga", "from_source": "abs 2016", "to": "sa3", "to_source": "abs 2016"},
-    # {"from": "sa2", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
-    # {"from": "sa2", "from_source": "abs 2016", "to": "sa3", "to_source": "abs 2016"},
-    # {"from": "sa2", "from_source": "abs 2016", "to": "poa", "to_source": "abs 2016"},
+    {"from": "sa3", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
+    {"from": "lga", "from_source": "abs 2016", "to": "sa3", "to_source": "abs 2016"},
+    {"from": "sa2", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
+    {"from": "sa2", "from_source": "abs 2016", "to": "sa3", "to_source": "abs 2016"},
+    {"from": "sa2", "from_source": "abs 2016", "to": "poa", "to_source": "abs 2016"},
 
     # Geoscape to ABS 2016 bdys
     {"from": "locality", "from_source": "geoscape", "to": "lga", "to_source": "abs 2016"},
@@ -42,6 +42,7 @@ boundary_list = [
     {"from": "lga", "from_source": "geoscape", "to": "lga", "to_source": "abs 2016"},
 
     # Geoscape to Geoscape bdys
+    {"from": "locality", "from_source": "geoscape", "to": "lga", "to_source": "geoscape"},
     {"from": "postcode", "from_source": "geoscape", "to": "lga", "to_source": "geoscape"},
 
 ]
