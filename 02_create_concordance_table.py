@@ -19,6 +19,7 @@ output_table = "boundary_concordance"
 # edit boundary list tovfind concordances with
 # ---------------------------------------------------------------------------------------
 
+# sources of address level data with boundary tags - names are hardcoded, don't edit them!
 source_list = [
     {"name": "abs 2016", "schema": "gnaf_202202", "table": "address_principal_census_2016_boundaries"},
     {"name": "abs 2021", "schema": "gnaf_202202", "table": "address_principal_census_2021_boundaries"},
@@ -28,7 +29,7 @@ source_list = [
 # from and to sources must match the names of the above sources
 boundary_list = [
     # ABS 2016 to ABS 2016 bdys
-    # {"from": "poa", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
+    {"from": "poa", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
     # {"from": "sa3", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
     # {"from": "lga", "from_source": "abs 2016", "to": "sa3", "to_source": "abs 2016"},
     # {"from": "sa2", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
@@ -38,7 +39,11 @@ boundary_list = [
     # Geoscape to ABS 2016 bdys
     {"from": "locality", "from_source": "geoscape", "to": "lga", "to_source": "abs 2016"},
     {"from": "postcode", "from_source": "geoscape", "to": "lga", "to_source": "abs 2016"},
-    {"from": "lga", "from_source": "geoscape", "to": "lga", "to_source": "abs 2016"}
+    {"from": "lga", "from_source": "geoscape", "to": "lga", "to_source": "abs 2016"},
+
+    # Geoscape to Geoscape bdys
+    {"from": "postcode", "from_source": "geoscape", "to": "lga", "to_source": "geoscape"},
+
 ]
 
 # ---------------------------------------------------------------------------------------
@@ -50,15 +55,15 @@ def main():
     pg_conn.autocommit = True
     pg_cur = pg_conn.cursor()
 
-    # create table
-    create_table(pg_cur)
-
-    # add concordances
-    for bdys in boundary_list:
-        add_concordances(bdys, pg_cur)
-
-    # analyse and index table
-    index_table(pg_cur)
+    # # create table
+    # create_table(pg_cur)
+    #
+    # # add concordances
+    # for bdys in boundary_list:
+    #     add_concordances(bdys, pg_cur)
+    #
+    # # analyse and index table
+    # index_table(pg_cur)
 
     # get weighted scores as % concordance
     score_results(pg_cur)
@@ -112,8 +117,19 @@ def add_concordances(bdys, pg_cur):
             input_tables += f"\n\t\t\t\t\t\tinner join {to_table} as t on t.gnaf_pid = f.gnaf_pid"""
 
         # set the code and name field names
-        from_id_field, from_name_field = get_field_names(from_bdy, from_source)
-        to_id_field, to_name_field = get_field_names(to_bdy, to_source)
+        from_id_field, from_name_field = get_field_names(from_bdy, from_source, "from", input_tables)
+        to_id_field, to_name_field = get_field_names(to_bdy, to_source, "to", input_tables)
+
+        # add the meshblock filter if the from or to table is ABS based
+        meshblock_filter = ""
+        if from_source == "abs 2016":
+            meshblock_filter = "and f.mb_category IN ('RESIDENTIAL')"
+        elif from_source == "abs 2021":
+            meshblock_filter = "and f.mb_category_2021 IN ('Residential')"
+        elif to_source == "abs 2016":
+            meshblock_filter = "and t.mb_category IN ('RESIDENTIAL')"
+        elif to_source == "abs 2021":
+            meshblock_filter = "and t.mb_category_2021 IN ('Residential')"
 
         # build the query
         query = f"""insert into {output_schema}.{output_table}
@@ -124,7 +140,9 @@ def add_concordances(bdys, pg_cur):
                                {to_name_field} as to_name,
                                count(*) as address_count
                         from {input_tables}
-                        where mb_category IN ('RESIDENTIAL')
+                        where {from_id_field} is not null
+                            and {to_id_field} is not null
+                            {meshblock_filter}
                         group by from_id,
                                  from_name,
                                  to_id,
@@ -161,19 +179,23 @@ def add_concordances(bdys, pg_cur):
         logger.fatal(f"\t - {from_source} not in sources!")
 
 
-def get_field_names(bdy, source):
-    # TODO: replace the hardcoding
+def get_field_names(bdy, source, type, sql):
+    # determine which table alias to prefix fields with
+    if "inner join" in sql and type == "to":
+        table = "t"
+    else:
+        table = "f"
+
     if source == "abs 2016":
-        id_field = f"{bdy}_16code"
-        name_field = f"{bdy}_16name"
+        id_field = f"{table}.{bdy}_16code"
+        name_field = f"{table}.{bdy}_16name"
     elif source == "abs 2021":
-        id_field = f"{bdy}_code_2021"
-        name_field = f"{bdy}_name_2021"
+        id_field = f"{table}.{bdy}_code_2021"
+        name_field = f"{table}.{bdy}_name_2021"
     else:
         if bdy == "postcode":
-            id_field = "postcode"
-            name_field = "concat(state)"
-            # name_field = "concat(postcode, ' ', state)"
+            id_field = f"{table}.postcode"
+            name_field = f"concat({table}.postcode, ' ', {table}.state)"
         else:
             id_field = f"{bdy}_pid"
             name_field = f"{bdy}_name"
@@ -206,41 +228,35 @@ def score_results(pg_cur):
 
     # calculate concordance score (weighted by address count)
     query = f"""with cnt as (
-                select from_source,
-                       from_type,
-                       from_id,
-                       to_source,
-                       to_type,
-                       sum(address_count::float * address_percent) as weighted_address_count,
-                       sum(address_count) as address_count
-                from {output_schema}.{output_table}
-                group by from_type,
-                         from_id,
-                         to_type
-            )
-            select from_source,
-                   from_type,
-                   to_source,
-                   to_type,
-                   (sum(weighted_address_count) / sum(address_count)::float)::smallint as concordance_percent
-            from cnt
-            group by from_source,
-                     from_type,
-                     to_source,
-                     to_type;"""
+                    select concat(from_source, ' ', from_type) as from_bdy,
+                           from_id,
+                           concat(to_source, ' ', to_type) as to_bdy,
+                           sum(address_count::float * address_percent) as weighted_address_count,
+                           sum(address_count) as address_count
+                    from {output_schema}.{output_table}
+                    group by from_bdy,
+                             from_id,
+                             to_bdy
+                )
+                select from_bdy,
+                       to_bdy,
+                       (sum(weighted_address_count) / sum(address_count)::float)::smallint as concordance_percent
+                from cnt
+                group by from_bdy,
+                         to_bdy;"""
 
     pg_cur.execute(query)
     rows = pg_cur.fetchall()
 
     logger.info(f"\t - results scored : {datetime.now() - start_time}")
-    logger.info("\t\t---------------------------------------------")
-    logger.info("\t\t| {:12} | {:12} | {:11} |".format("from", "to", "concordance"))
-    logger.info("\t\t---------------------------------------------")
+    logger.info("\t\t-------------------------------------------------------")
+    logger.info("\t\t| {:17} | {:17} | {:11} |".format("from", "to", "concordance"))
+    logger.info("\t\t-------------------------------------------------------")
 
     for row in rows:
-        logger.info("\t\t| {:12} | {:12} | {:10}% |".format(row[0], row[1], row[2]))
+        logger.info("\t\t| {:17} | {:17} | {:10}% |".format(row[0], row[1], row[2]))
 
-    logger.info("\t\t---------------------------------------------")
+    logger.info("\t\t-------------------------------------------------------")
 
 
 def copy_table(input_pg_cur, export_pg_cur, input_schema, input_table, export_schema, export_table):
