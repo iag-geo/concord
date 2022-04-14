@@ -8,8 +8,6 @@ An easy-to-use dataset for converting data between Australian census and adminis
 
 You have sales volumes by postcode & competitor data by local government area (LGA) and need to determine market share. Using Concord, you convert the postcode data to LGA and then merge both datasets by LGA ID to determine market penetration.
 
-With a known concordance of 94% between postcodes & LGAs, this results in a maximum error of 6%.
-
 ## Methodology
 
 The concordance file is generated using the following approach:
@@ -21,6 +19,10 @@ The concordance file is generated using the following approach:
 ## Concordances
 
 Below are the average concordances between 2 boundary types, weighted by residential address counts
+
+Concordance describes what % of residential addresses in the "from" boundary fit within a "to" boundary.
+
+_e.g. 100% of postcode 2040 fits within the Inner West Council LGA. However, only ~40% of postcode 2042 fits within the City of Sydney LGA._
 
 | from                     | to                  | concordance |
 |:-------------------------|:--------------------|------------:|
