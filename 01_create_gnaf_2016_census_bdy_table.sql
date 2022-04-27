@@ -98,10 +98,7 @@ with abs as (
 )
 select gid,
        gnaf.gnaf_pid,
-       case when lower(blg.planning_zone) LIKE '%residential%'
-           or lower(blg.planning_zone) LIKE '%mixed use%'
-                then 'residential'
-           end as is_residential,
+       blg.is_residential,
        -- reliability,
        abs.*
 from gnaf_202202.address_principals as gnaf

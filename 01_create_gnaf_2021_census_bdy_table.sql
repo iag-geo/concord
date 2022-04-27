@@ -98,10 +98,7 @@ with abs as (
 )
 select gid,
        gnaf.gnaf_pid,
-       case when lower(blg.planning_zone) LIKE '%residential%'
-           or lower(blg.planning_zone) LIKE '%mixed use%'
-                then 'residential'
-           end as is_residential,
+       blg.is_residential,
        -- reliability,
        abs.*
 from gnaf_202202.address_principals as gnaf
@@ -121,7 +118,7 @@ drop table if exists temp_poa_mb;
 drop table if exists temp_sed_mb;
 
 
--- update where non-residential planning zone but MB is residential
+-- update where non-residential planning zone but MB is residential -- 2,994,117 rows
 update gnaf_202202.address_principal_census_2021_boundaries
 set is_residential = 'residential'
 where is_residential is null

@@ -1,12 +1,5 @@
 
-
-drop schema geoscape_202111 cascade
-
-
-select count(*) from gnaf_202202.address_principals; -- 14,451,352
-
-
-
+-- get counts of GNAFPIDS with and without buildings
 with blg as (
     select address_detail_pid as gnaf_pid,
            coalesce(is_residential, 'unknown') as is_residential,
@@ -51,7 +44,7 @@ from merge
 -- +--------------+--------------+-----------+---------------+-------------------------+
 
 
--- create temp table of gnaf points with a buildings flag
+-- create table of gnaf points with building counts and planning zone data
 drop table if exists geoscape_202203.address_principals_buildings;
 create table geoscape_202203.address_principals_buildings as
 with blg as (
@@ -71,7 +64,7 @@ select gnaf.gnaf_pid,
        geom
 from gnaf_202202.address_principals as gnaf
     left outer join blg on blg.gnaf_pid = gnaf.gnaf_pid
-)
+), final as (
 select gnaf_pid,
        reliability,
        state,
@@ -83,8 +76,30 @@ from merge
              reliability,
              state,
              geom
+)
+select gnaf_pid,
+       reliability,
+       state,
+       planning_zone,
+       case when lower(planning_zone) LIKE '%residential%'
+                or lower(planning_zone) LIKE '%mixed use%'
+            then 'residential'
+            end as is_residential,
+       building_count,
+       geom
+from final
+
 ;
 analyse geoscape_202203.address_principals_buildings;
+
+
+-- flag non-residential addresses that have a building
+update geoscape_202203.address_principals_buildings
+    set is_residential = 'non-residential'
+where building_count > 0
+;
+analyse geoscape_202203.address_principals_buildings;
+
 
 alter table geoscape_202203.address_principals_buildings add constraint address_principals_buildings_pkey primary key (gnaf_pid);
 create index address_principals_buildings_geom_idx on geoscape_202203.address_principals_buildings using gist (geom);
@@ -94,21 +109,12 @@ alter table geoscape_202203.address_principals_buildings cluster on address_prin
 -- compare planning_zone with meshblock category
 drop table if exists testing.temp_address_principals_buildings;
 create table testing.temp_address_principals_buildings as
-with gnaf1 as (
-    select gnaf_pid,
-           case when lower(planning_zone) LIKE '%residential%'
-                    or lower(planning_zone) LIKE '%mixed use%'
-                then 'residential'
-           end as is_residential,
-           planning_zone
-    from geoscape_202203.address_principals_buildings
-)
 select gnaf1.gnaf_pid,
        gnaf1.is_residential,
        gnaf1.planning_zone,
        lower(gnaf2.mb_category) as mb_category,
        mb_16code
-from gnaf1
+from geoscape_202203.address_principals_buildings as gnaf1
 inner join gnaf_202202.address_principal_census_2016_boundaries as gnaf2 on gnaf2.gnaf_pid = gnaf1.gnaf_pid
 -- where gnaf1.is_residential = lower(gnaf2.mb_category)
 ;
