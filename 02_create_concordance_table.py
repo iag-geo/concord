@@ -12,8 +12,8 @@ from datetime import datetime
 pg_connect_string = "dbname=geo host=localhost port=5432 user=postgres password=password"
 
 output_schema = "testing"
-output_table = "boundary_concordance_sa2"
-output_score_table = "boundary_concordance_sa2_score"
+output_table = "boundary_concordance"
+output_score_table = "boundary_concordance_score"
 
 # ---------------------------------------------------------------------------------------
 # edit boundary list to find concordances with
@@ -135,17 +135,17 @@ def add_concordances(bdys, pg_cur):
         # add the meshblock filter if the from or to table is ABS based
         meshblock_filter = ""
         if from_source == "abs 2016":
-            # meshblock_filter = "and f.mb_category IN ('RESIDENTIAL')"
-            meshblock_filter = "and f.is_residential = 'residential'"
+            meshblock_filter = "and f.mb_category IN ('RESIDENTIAL')"
+            # meshblock_filter = "and f.is_residential = 'residential'"
         elif from_source == "abs 2021":
-            # meshblock_filter = "and f.mb_category_2021 IN ('Residential')"
-            meshblock_filter = "and f.is_residential = 'residential'"
+            meshblock_filter = "and f.mb_category_2021 IN ('Residential')"
+            # meshblock_filter = "and f.is_residential = 'residential'"
         elif to_source == "abs 2016":
-            # meshblock_filter = "and t.mb_category IN ('RESIDENTIAL')"
-            meshblock_filter = "and t.is_residential = 'residential'"
+            meshblock_filter = "and t.mb_category IN ('RESIDENTIAL')"
+            # meshblock_filter = "and t.is_residential = 'residential'"
         elif to_source == "abs 2021":
-            # meshblock_filter = "and t.mb_category_2021 IN ('Residential')"
-            meshblock_filter = "and t.is_residential = 'residential'"
+            meshblock_filter = "and t.mb_category_2021 IN ('Residential')"
+            # meshblock_filter = "and t.is_residential = 'residential'"
 
         # build the query
         query = f"""insert into {output_schema}.{output_table}

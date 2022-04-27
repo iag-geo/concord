@@ -119,7 +119,7 @@ drop table if exists temp_ucl_mb;
 drop table if exists temp_sed_mb;
 
 
--- update where non-residential planning zone but MB is residential -- 2,619,459 rows
+-- update where non-residential planning zone but MB is residential -- 1,686,417 rows
 update gnaf_202202.address_principal_census_2016_boundaries
 set is_residential = 'residential'
 where is_residential is null

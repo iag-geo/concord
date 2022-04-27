@@ -16,9 +16,9 @@ select count(*) as bdy_pair_count,
        max(cor.ratio_from_to * 100.0 - bdy.address_percent)::smallint as max_delta,
        (sum(abs(cor.ratio_from_to * 100.0 - bdy.address_percent) * address_count) / 100.0)::integer as address_count
 from census_2021_bdys.correspondences_sa2 as cor
-         inner join testing.boundary_concordance_sa2 as bdy on bdy.from_id = cor.sa2_maincode_2016
+         inner join testing.boundary_concordance as bdy on bdy.from_id = cor.sa2_maincode_2016
     and bdy.to_id = cor.sa2_code_2021
-where abs(cor.ratio_from_to * 100.0 - bdy.address_percent) > 5.0
+-- where abs(cor.ratio_from_to * 100.0 - bdy.address_percent) > 5.0
 ;
 
 -- residential MB comparison
@@ -41,6 +41,14 @@ where abs(cor.ratio_from_to * 100.0 - bdy.address_percent) > 5.0
 -- +--------------+----+----------+---------+---------+-------------+
 -- |119           |14  |0         |-38      |38       |75936        |
 -- +--------------+----+----------+---------+---------+-------------+
+
+-- address level residential planning zone + residential MB  only where planning zone is null comparison
+-- +--------------+----+----------+---------+---------+-------------+
+-- |bdy_pair_count|rmse|mean_delta|min_delta|max_delta|address_count|
+-- +--------------+----+----------+---------+---------+-------------+
+-- |225           |18  |0         |-61      |58       |28071        |
+-- +--------------+----+----------+---------+---------+-------------+
+
 
 
 
