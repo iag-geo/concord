@@ -120,6 +120,16 @@ drop table if exists temp_poa_mb;
 -- drop table if exists temp_ucl_mb;
 drop table if exists temp_sed_mb;
 
+
+-- update where non-residential planning zone but MB is residential
+update gnaf_202202.address_principal_census_2021_boundaries
+set is_residential = 'residential'
+where is_residential is null
+  and mb_category_2021 = 'Residential'
+;
+analyse gnaf_202202.address_principal_census_2021_boundaries;
+
+
 -- select count(*) from gnaf_202202.address_principals; -- 14,451,352
 select count(*) from gnaf_202202.address_principal_census_2021_boundaries; -- 14,451,346
 

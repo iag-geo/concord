@@ -12,8 +12,8 @@ from datetime import datetime
 pg_connect_string = "dbname=geo host=localhost port=5432 user=postgres password=password"
 
 output_schema = "testing"
-output_table = "boundary_concordance"
-output_score_table = "boundary_concordance_score"
+output_table = "boundary_concordance_sa2"
+output_score_table = "boundary_concordance_sa2_score"
 
 # ---------------------------------------------------------------------------------------
 # edit boundary list to find concordances with
@@ -28,22 +28,24 @@ source_list = [
 
 # from and to sources must match the names of the above sources
 boundary_list = [
-    # ABS 2016 to ABS 2016 bdys
-    {"from": "poa", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
-    {"from": "sa3", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
-    {"from": "lga", "from_source": "abs 2016", "to": "sa3", "to_source": "abs 2016"},
-    {"from": "sa2", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
-    {"from": "sa2", "from_source": "abs 2016", "to": "sa3", "to_source": "abs 2016"},
-    {"from": "sa2", "from_source": "abs 2016", "to": "poa", "to_source": "abs 2016"},
+    # # ABS 2016 to ABS 2016 bdys
+    # {"from": "poa", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
+    # {"from": "sa3", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
+    # {"from": "lga", "from_source": "abs 2016", "to": "sa3", "to_source": "abs 2016"},
+    # {"from": "sa2", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
+    # {"from": "sa2", "from_source": "abs 2016", "to": "sa3", "to_source": "abs 2016"},
+    # {"from": "sa2", "from_source": "abs 2016", "to": "poa", "to_source": "abs 2016"},
+    #
+    # # Geoscape to ABS 2016 bdys
+    # {"from": "locality", "from_source": "geoscape 202202", "to": "lga", "to_source": "abs 2016"},
+    # {"from": "postcode", "from_source": "geoscape 202202", "to": "lga", "to_source": "abs 2016"},
+    # {"from": "lga", "from_source": "geoscape 202202", "to": "lga", "to_source": "abs 2016"},
+    #
+    # # Geoscape to Geoscape bdys
+    # {"from": "locality", "from_source": "geoscape 202202", "to": "lga", "to_source": "geoscape 202202"},
+    # {"from": "postcode", "from_source": "geoscape 202202", "to": "lga", "to_source": "geoscape 202202"}
 
-    # Geoscape to ABS 2016 bdys
-    {"from": "locality", "from_source": "geoscape 202202", "to": "lga", "to_source": "abs 2016"},
-    {"from": "postcode", "from_source": "geoscape 202202", "to": "lga", "to_source": "abs 2016"},
-    {"from": "lga", "from_source": "geoscape 202202", "to": "lga", "to_source": "abs 2016"},
-
-    # Geoscape to Geoscape bdys
-    {"from": "locality", "from_source": "geoscape 202202", "to": "lga", "to_source": "geoscape 202202"},
-    {"from": "postcode", "from_source": "geoscape 202202", "to": "lga", "to_source": "geoscape 202202"}
+    {"from": "sa2", "from_source": "abs 2016", "to": "sa2", "to_source": "abs 2021"}
 ]
 
 # ---------------------------------------------------------------------------------------
