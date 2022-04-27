@@ -97,11 +97,16 @@ with abs as (
     left outer join temp_sed_mb as sed on sed.mb_code_2021 = mb.mb_code_2021
 )
 select gid,
-       gnaf_pid,
+       gnaf.gnaf_pid,
+       case when lower(blg.planning_zone) LIKE '%residential%'
+           or lower(blg.planning_zone) LIKE '%mixed use%'
+                then 'residential'
+           end as is_residential,
        -- reliability,
        abs.*
 from gnaf_202202.address_principals as gnaf
      inner join abs on abs.mb_code_2021 = gnaf.mb_2021_code::varchar(11)
+     inner join geoscape_202203.address_principals_buildings as blg on blg.gnaf_pid = gnaf.gnaf_pid
 ;
 analyse gnaf_202202.address_principal_census_2021_boundaries;
 

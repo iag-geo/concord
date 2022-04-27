@@ -92,6 +92,8 @@ alter table geoscape_202203.address_principals_buildings cluster on address_prin
 
 
 -- compare planning_zone with meshblock category
+drop table if exists testing.temp_address_principals_buildings;
+create table testing.temp_address_principals_buildings as
 with gnaf1 as (
     select gnaf_pid,
            case when lower(planning_zone) LIKE '%residential%'
@@ -104,14 +106,25 @@ with gnaf1 as (
 select gnaf1.gnaf_pid,
        gnaf1.is_residential,
        gnaf1.planning_zone,
-       gnaf2.mb_category
+       lower(gnaf2.mb_category) as mb_category,
+       mb_16code
 from gnaf1
 inner join gnaf_202202.address_principal_census_2016_boundaries as gnaf2 on gnaf2.gnaf_pid = gnaf1.gnaf_pid
-where gnaf1.is_residential = lower(gnaf2.mb_category)
+-- where gnaf1.is_residential = lower(gnaf2.mb_category)
 ;
+analyse testing.temp_address_principals_buildings;
 
 
+select count(*) as address_count,
+       count(distinct mb_16code) as mb_count
+from testing.temp_address_principals_buildings
+where is_residential <> mb_category;
 
+-- +-------------+--------+
+-- |address_count|mb_count|
+-- +-------------+--------+
+-- |336275       |19484   |
+-- +-------------+--------+
 
 
 
