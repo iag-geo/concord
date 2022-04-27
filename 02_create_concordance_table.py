@@ -133,13 +133,17 @@ def add_concordances(bdys, pg_cur):
         # add the meshblock filter if the from or to table is ABS based
         meshblock_filter = ""
         if from_source == "abs 2016":
-            meshblock_filter = "and f.mb_category IN ('RESIDENTIAL')"
+            # meshblock_filter = "and f.mb_category IN ('RESIDENTIAL')"
+            meshblock_filter = "and f.is_residential = 'residential'"
         elif from_source == "abs 2021":
-            meshblock_filter = "and f.mb_category_2021 IN ('Residential')"
+            # meshblock_filter = "and f.mb_category_2021 IN ('Residential')"
+            meshblock_filter = "and f.is_residential = 'residential'"
         elif to_source == "abs 2016":
-            meshblock_filter = "and t.mb_category IN ('RESIDENTIAL')"
+            # meshblock_filter = "and t.mb_category IN ('RESIDENTIAL')"
+            meshblock_filter = "and t.is_residential = 'residential'"
         elif to_source == "abs 2021":
-            meshblock_filter = "and t.mb_category_2021 IN ('Residential')"
+            # meshblock_filter = "and t.mb_category_2021 IN ('Residential')"
+            meshblock_filter = "and t.is_residential = 'residential'"
 
         # build the query
         query = f"""insert into {output_schema}.{output_table}
