@@ -1,10 +1,9 @@
 
 
-
+drop schema geoscape_202111 cascade
 
 
 select count(*) from gnaf_202202.address_principals; -- 14,451,352
-
 
 
 
@@ -12,7 +11,7 @@ with blg as (
     select address_detail_pid as gnaf_pid,
            coalesce(is_residential, 'unknown') as is_residential,
            count(*)           as building_count
-    from geoscape_202111.building_address
+    from geoscape_202203.building_address
     group by address_detail_pid,
              is_residential
 ), merge as (
@@ -32,6 +31,8 @@ from merge
     group by is_residential
 ;
 
+
+-- 202111 Geoscape Buildings
 -- +--------------+--------------+-----------+---------------+-------------------------+
 -- |is_residential|building_count|match_count|gnaf_only_count|blg_gnaf_only_match_count|
 -- +--------------+--------------+-----------+---------------+-------------------------+
@@ -39,6 +40,19 @@ from merge
 -- |Yes           |19493030      |9329794    |0              |4517                     |
 -- |unknown       |6191638       |2261422    |0              |18021                    |
 -- +--------------+--------------+-----------+---------------+-------------------------+
+
+-- 202222 Geoscape Buildings
+-- +--------------+--------------+-----------+---------------+-------------------------+
+-- |is_residential|building_count|match_count|gnaf_only_count|blg_gnaf_only_match_count|
+-- +--------------+--------------+-----------+---------------+-------------------------+
+-- |NULL          |NULL          |0          |2778451        |0                        |
+-- |Yes           |20585054      |9558707    |0              |3182                     |
+-- |unknown       |6299707       |2114194    |0              |12517                    |
+-- +--------------+--------------+-----------+---------------+-------------------------+
+
+
+select *
+from geoscape_202203.buildings;
 
 
 
