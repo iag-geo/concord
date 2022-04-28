@@ -76,11 +76,6 @@ from gnaf_202202.address_principals as gnaf
 analyse geoscape_202203.address_principals_buildings;
 
 
-
-
-
-
-
 -- flag non-residential addresses that have a building -- 2,208,070 rows affected in 14 s 103 ms
 update geoscape_202203.address_principals_buildings
     set is_residential = 'non-residential'
@@ -99,6 +94,7 @@ where is_residential is null
 ;
 analyse geoscape_202203.address_principals_buildings;
 
+
 -- update addresses with no planning zone in non-residential MBs -- 1,956,429 rows affected in 8 s 741 ms
 update geoscape_202203.address_principals_buildings as gnaf
 set is_residential = 'non-residential'
@@ -106,7 +102,6 @@ where is_residential is null
   and mb_category_2021 <> 'residential'
 ;
 analyse geoscape_202203.address_principals_buildings;
-
 
 
 alter table geoscape_202203.address_principals_buildings add constraint address_principals_buildings_pkey primary key (gnaf_pid);
