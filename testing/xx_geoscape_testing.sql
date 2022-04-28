@@ -63,7 +63,9 @@ select gnaf.gnaf_pid,
            or planning_zone LIKE '%mixed use%'
                 then 'residential' end as is_residential,
        coalesce(building_count, 0) as building_count,
-       geom
+       gnaf.mb_2016_code,
+       gnaf.mb_2021_code,
+       gnaf.geom
 from gnaf_202202.address_principals as gnaf
     left outer join blg on blg.gnaf_pid = gnaf.gnaf_pid
 ;
@@ -75,6 +77,16 @@ update geoscape_202203.address_principals_buildings
     set is_residential = 'non-residential'
 where is_residential is null
     and building_count > 0
+;
+analyse geoscape_202203.address_principals_buildings;
+
+-- update addresses with no buildings in residential MBs -- 1,686,417 rows
+update geoscape_202203.address_principals_buildings as gnaf
+    set is_residential = 'residential'
+from admin_bdys_202202.abs_2021_mb as mb
+where gnaf.mb_2021_code = mb.mb21_code
+  and is_residential is null
+  and lower(mb.mb_cat) = 'residential'
 ;
 analyse geoscape_202203.address_principals_buildings;
 
