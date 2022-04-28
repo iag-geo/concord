@@ -98,12 +98,9 @@ with abs as (
 )
 select gid,
        gnaf.gnaf_pid,
-       blg.is_residential,
-       -- reliability,
        abs.*
 from gnaf_202202.address_principals as gnaf
      inner join abs on abs.mb_code_2021 = gnaf.mb_2021_code::varchar(11)
-     inner join geoscape_202203.address_principals_buildings as blg on blg.gnaf_pid = gnaf.gnaf_pid
 ;
 analyse gnaf_202202.address_principal_census_2021_boundaries;
 
@@ -116,15 +113,6 @@ drop table if exists temp_poa_mb;
 -- drop table if exists temp_ra_mb;
 -- drop table if exists temp_ucl_mb;
 drop table if exists temp_sed_mb;
-
-
--- update where non-residential planning zone but MB is residential -- 1,879,649 rows
-update gnaf_202202.address_principal_census_2021_boundaries
-set is_residential = 'residential'
-where is_residential is null
-  and mb_category_2021 = 'Residential'
-;
-analyse gnaf_202202.address_principal_census_2021_boundaries;
 
 
 -- select count(*) from gnaf_202202.address_principals; -- 14,451,352
