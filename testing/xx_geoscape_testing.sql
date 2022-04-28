@@ -49,7 +49,7 @@ drop table if exists geoscape_202203.address_principals_buildings;
 create table geoscape_202203.address_principals_buildings as
 with blg as (
     select adr.address_detail_pid as gnaf_pid,
-           coalesce(blgs.planning_zone, 'unknown') as planning_zone,
+           coalesce(lower(blgs.planning_zone), 'unknown') as planning_zone,
            count(*)           as building_count
     from geoscape_202203.building_address as adr
     inner join geoscape_202203.buildings as blgs on blgs.building_pid = adr.building_pid
@@ -81,8 +81,8 @@ select gnaf_pid,
        reliability,
        state,
        planning_zone,
-       case when lower(planning_zone) LIKE '%residential%'
-                or lower(planning_zone) LIKE '%mixed use%'
+       case when planning_zone LIKE '%residential%'
+                or planning_zone LIKE '%mixed use%'
             then 'residential'
             end as is_residential,
        building_count,
@@ -102,27 +102,31 @@ analyse geoscape_202203.address_principals_buildings;
 
 
 alter table geoscape_202203.address_principals_buildings add constraint address_principals_buildings_pkey primary key (gnaf_pid);
-create index address_principals_buildings_geom_idx on geoscape_202203.address_principals_buildings using gist (geom);
-alter table geoscape_202203.address_principals_buildings cluster on address_principals_buildings_geom_idx;
+-- create index address_principals_buildings_geom_idx on geoscape_202203.address_principals_buildings using gist (geom);
+-- alter table geoscape_202203.address_principals_buildings cluster on address_principals_buildings_geom_idx;
 
 
--- compare planning_zone with meshblock category
+-- compare planning_zone with meshblock category -- 14,451,346 rows affected in 46 s 513 ms
 drop table if exists testing.temp_address_principals_buildings;
 create table testing.temp_address_principals_buildings as
 select gnaf1.gnaf_pid,
        gnaf1.is_residential,
-       gnaf1.planning_zone,
-       lower(gnaf2.mb_category) as mb_category,
-       mb_16code
+       lower(gnaf1.planning_zone) as planning_zone,
+       lower(gnaf2.mb_category_2021) as mb_category,
+       mb_code_2021
 from geoscape_202203.address_principals_buildings as gnaf1
-inner join gnaf_202202.address_principal_census_2016_boundaries as gnaf2 on gnaf2.gnaf_pid = gnaf1.gnaf_pid
+inner join gnaf_202202.address_principal_census_2021_boundaries as gnaf2 on gnaf2.gnaf_pid = gnaf1.gnaf_pid
 -- where gnaf1.is_residential = lower(gnaf2.mb_category)
 ;
 analyse testing.temp_address_principals_buildings;
 
 
+select *
+from testing.temp_address_principals_buildings;
+
+
 select count(*) as address_count,
-       count(distinct mb_16code) as mb_count
+       count(distinct mb_code_2021) as mb_count
 from testing.temp_address_principals_buildings
 where is_residential <> mb_category;
 
@@ -142,11 +146,11 @@ group by reliability
 order by reliability
 ;
 
-select planning_zone,
+select is_residential,
        count(*) as address_count
 from geoscape_202203.address_principals_buildings
-group by planning_zone
-order by planning_zone
+group by is_residential
+order by is_residential
 ;
 
 
