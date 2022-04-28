@@ -27,10 +27,10 @@ source_list = [
 ]
 
 # source of residential addresses to us - this will either be based on ABS Census 2021 meshblocks
-#   or Geoscpae Planning data from the Geoscape Buildings datasets if you have purchased it
-residential_address_source = {"name": "geoscape", "schema": "geoscape_202203", "table": "address_principals_buildings"}
-# residential_address_source = {"name": "abs 2021", "schema": "gnaf_202202",
-#                               "table": "address_principal_census_2021_boundaries"}
+#   or planning zone data from the Geoscape Buildings datasets if you have purchased it
+# residential_address_source = {"name": "geoscape", "schema": "geoscape_202203", "table": "address_principals_buildings"}
+residential_address_source = {"name": "abs 2021", "schema": "gnaf_202202",
+                              "table": "address_principal_census_2021_boundaries"}
 
 # the list of boundary pair to create concordances - from and to sources must match the names of the above sources
 boundary_list = [
@@ -138,11 +138,11 @@ def add_concordances(bdys, pg_cur):
         if residential_address_source["name"] == 'geoscape':
             res_table = f'{residential_address_source["schema"]}.{residential_address_source["table"]}'
             input_tables += f"\n\t\t\t\t\t\tinner join {res_table} as r on r.gnaf_pid = f.gnaf_pid"""
-            residential_filter = "and is_residential = 'residential'"
+            residential_filter = "and r.is_residential = 'residential'"
         elif from_source == "abs 2021":
-            residential_filter = "and f.mb_category_2021 IN ('Residential')"
+            residential_filter = "and f.mb_category_2021 = 'Residential'"
         elif to_source == "abs 2021":
-            residential_filter = "and t.mb_category_2021 IN ('Residential')"
+            residential_filter = "and t.mb_category_2021 = 'Residential'"
 
         # set the code and name field names
         from_id_field, from_name_field = get_field_names(from_bdy, from_source, "from", input_tables)

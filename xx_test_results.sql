@@ -42,11 +42,11 @@ from census_2021_bdys.correspondences_sa2 as cor
 -- |119           |14  |0         |-38      |38       |75936        |
 -- +--------------+----+----------+---------+---------+-------------+
 
--- address level residential planning zone + residential MB  only where planning zone is null comparison
+-- address level residential planning zone + residential 2021 MB only where planning zone is null comparison
 -- +--------------+----+----------+---------+---------+-------------+
 -- |bdy_pair_count|rmse|mean_delta|min_delta|max_delta|address_count|
 -- +--------------+----+----------+---------+---------+-------------+
--- |225           |18  |0         |-61      |58       |28071        |
+-- |2384          |4   |0         |-42      |42       |113946       |
 -- +--------------+----+----------+---------+---------+-------------+
 
 
