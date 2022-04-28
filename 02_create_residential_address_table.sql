@@ -12,6 +12,7 @@ with blg as (
            count(*)::smallint as building_count
     from geoscape_202203.building_address as adr
     inner join geoscape_202203.buildings as blgs on blgs.building_pid = adr.building_pid
+    where adr.address_detail_pid is not null
     group by adr.address_detail_pid
 )
 select gnaf.gnaf_pid,
