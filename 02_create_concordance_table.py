@@ -26,7 +26,13 @@ source_list = [
     {"name": "geoscape 202202", "schema": "gnaf_202202", "table": "address_principal_admin_boundaries"}
 ]
 
-# from and to sources must match the names of the above sources
+# source of residential addresses to us - this will either be based on ABS Census 2021 meshblocks
+#   or Geoscpae Planning data from the Geoscape Buildings datasets if you have purchased it
+residential_address_source = {"name": "geoscape", "schema": "geoscape_202203", "table": "address_principals_buildings"}
+# residential_address_source = {"name": "abs 2021", "schema": "gnaf_202202",
+#                               "table": "address_principal_census_2021_boundaries"}
+
+# the list of boundary pair to create concordances - from and to sources must match the names of the above sources
 boundary_list = [
     # # ABS 2016 to ABS 2016 bdys
     # {"from": "poa", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
