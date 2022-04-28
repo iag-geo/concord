@@ -49,7 +49,7 @@ drop table if exists geoscape_202203.address_principals_buildings;
 create table geoscape_202203.address_principals_buildings as
 with blg as (
     select adr.address_detail_pid as gnaf_pid,
-           string_agg(coalesce(lower(blgs.planning_zone), 'unknown'), ' - ') as planning_zone,
+           string_agg(distinct coalesce(lower(blgs.planning_zone), 'unknown'), ' - ') as planning_zone,
            count(*) as building_count
     from geoscape_202203.building_address as adr
     inner join geoscape_202203.buildings as blgs on blgs.building_pid = adr.building_pid
@@ -89,31 +89,48 @@ drop table if exists testing.temp_address_principals_buildings;
 create table testing.temp_address_principals_buildings as
 select gnaf1.gnaf_pid,
        gnaf1.is_residential,
-       lower(gnaf1.planning_zone) as planning_zone,
-       lower(gnaf2.mb_category_2021) as mb_category,
-       mb_code_2021
+       gnaf1.planning_zone as planning_zone,
+       lower(gnaf2.mb_category) as mb_category_2016,
+       gnaf2.mb_16code as mb_code_2016,
+       lower(gnaf3.mb_category_2021) as mb_category_2021,
+       gnaf3.mb_code_2021
 from geoscape_202203.address_principals_buildings as gnaf1
-inner join gnaf_202202.address_principal_census_2021_boundaries as gnaf2 on gnaf2.gnaf_pid = gnaf1.gnaf_pid
+inner join gnaf_202202.address_principal_census_2016_boundaries as gnaf2 on gnaf2.gnaf_pid = gnaf1.gnaf_pid
+inner join gnaf_202202.address_principal_census_2021_boundaries as gnaf3 on gnaf3.gnaf_pid = gnaf1.gnaf_pid
 -- where gnaf1.is_residential = lower(gnaf2.mb_category)
 ;
 analyse testing.temp_address_principals_buildings;
 
 
-select *
-from testing.temp_address_principals_buildings;
+-- select *
+-- from testing.temp_address_principals_buildings;
 
 
 select count(*) as address_count,
-       count(distinct mb_code_2021) as mb_count
+       count(distinct mb_code_2016) as mb_count
+--        count(distinct mb_code_2021) as mb_count
 from testing.temp_address_principals_buildings
-where is_residential <> mb_category;
+where is_residential <> mb_category_2016
+-- where is_residential <> mb_category_2021
+;
 
+
+
+
+-- ABS 2016 Meshblocks
 -- +-------------+--------+
 -- |address_count|mb_count|
 -- +-------------+--------+
--- |336275       |19484   |
+-- |2635619      |112689  |
 -- +-------------+--------+
 
+
+-- ABS 2021 Meshblocks
+-- +-------------+--------+
+-- |address_count|mb_count|
+-- +-------------+--------+
+-- |2490668      |115859  |
+-- +-------------+--------+
 
 
 select reliability,
