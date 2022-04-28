@@ -91,13 +91,22 @@ where is_residential is null
 analyse geoscape_202203.address_principals_buildings;
 
 
--- update addresses with no buildings in residential MBs -- 1,956,429 rows affected in 8 s 741 ms
+-- update addresses with no planning zone in residential MBs -- 1,956,429 rows affected in 8 s 741 ms
 update geoscape_202203.address_principals_buildings as gnaf
     set is_residential = 'residential'
 where is_residential is null
   and mb_category_2021 = 'residential'
 ;
 analyse geoscape_202203.address_principals_buildings;
+
+-- update addresses with no planning zone in non-residential MBs -- 1,956,429 rows affected in 8 s 741 ms
+update geoscape_202203.address_principals_buildings as gnaf
+set is_residential = 'non-residential'
+where is_residential is null
+  and mb_category_2021 <> 'residential'
+;
+analyse geoscape_202203.address_principals_buildings;
+
 
 
 alter table geoscape_202203.address_principals_buildings add constraint address_principals_buildings_pkey primary key (gnaf_pid);
@@ -133,6 +142,7 @@ select count(*) as address_count,
 from geoscape_202203.address_principals_buildings
 where is_residential <> mb_category_2021
 -- where is_residential <> mb_category_2021
+and is_residential = 'residential'
 ;
 
 
@@ -150,8 +160,9 @@ where is_residential <> mb_category_2021
 -- +-------------+--------+
 -- |address_count|mb_count|
 -- +-------------+--------+
--- |2490668      |115859  |
+-- |191324       |18496   |
 -- +-------------+--------+
+
 
 
 select reliability,
@@ -182,21 +193,7 @@ order by is_residential,
 
 select *
 from geoscape_202203.address_principals_buildings
-where is_residential is null
-  and building_count > 0
-
-
+where planning_zone = 'unknown'
 ;
 
 
-
--- select is_residential,
---        count(*) as address_count,
---        sum(building_count) as building_count
---
--- from blg
--- group by is_residential;
-
-
-select *
-from geoscape_202111.building_cad;
