@@ -1,14 +1,5 @@
 
 -- compare ABS correspondences with address count correspondences
--- 161 bdy pairs different by more than 5%
-select *
-from census_2021_bdys.correspondences_sa2 as cor
-inner join testing.boundary_concordance_sa2 as bdy on bdy.from_id = cor.sa2_maincode_2016
-    and bdy.to_id = cor.sa2_code_2021
-where abs(cor.ratio_from_to * 100.0 - bdy.address_percent) > 5.0
-;
-
--- comparison stats
 select count(*) as bdy_pair_count,
        sqrt(avg(power(cor.ratio_from_to * 100.0 - bdy.address_percent, 2)))::smallint  as rmse,
        avg(cor.ratio_from_to * 100.0 - bdy.address_percent)::smallint as mean_delta,
@@ -21,34 +12,19 @@ from census_2021_bdys.correspondences_sa2 as cor
 -- where abs(cor.ratio_from_to * 100.0 - bdy.address_percent) > 5.0
 ;
 
--- residential MB comparison
+-- residential 2021 MB comparison
 -- +--------------+----+----------+---------+---------+-------------+
 -- |bdy_pair_count|rmse|mean_delta|min_delta|max_delta|address_count|
 -- +--------------+----+----------+---------+---------+-------------+
--- |107           |12  |0         |-40      |26       |57988        |
+-- |2364          |4   |0         |-40      |41       |136828       |
 -- +--------------+----+----------+---------+---------+-------------+
 
--- address level residential planning zone comparison
--- +--------------+----+----------+---------+---------+-------------+
--- |bdy_pair_count|rmse|mean_delta|min_delta|max_delta|address_count|
--- +--------------+----+----------+---------+---------+-------------+
--- |118           |21  |-2        |-72      |66       |62772        |
--- +--------------+----+----------+---------+---------+-------------+
-
--- address level residential planning zone + residential MB comparison
--- +--------------+----+----------+---------+---------+-------------+
--- |bdy_pair_count|rmse|mean_delta|min_delta|max_delta|address_count|
--- +--------------+----+----------+---------+---------+-------------+
--- |119           |14  |0         |-38      |38       |75936        |
--- +--------------+----+----------+---------+---------+-------------+
-
--- address level residential planning zone + residential 2021 MB only where planning zone is null comparison
+-- address level residential planning zone + residential 2021 MB where planning zone is null comparison
 -- +--------------+----+----------+---------+---------+-------------+
 -- |bdy_pair_count|rmse|mean_delta|min_delta|max_delta|address_count|
 -- +--------------+----+----------+---------+---------+-------------+
 -- |2384          |4   |0         |-42      |42       |113946       |
 -- +--------------+----+----------+---------+---------+-------------+
-
 
 
 
