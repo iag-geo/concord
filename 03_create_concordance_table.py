@@ -129,29 +129,24 @@ def add_concordances(bdys, pg_cur):
     if from_table is not None:
         input_tables = f"{from_table} as f"
 
-        # if more than source table create a join statement
+        # if more than one table being used - add a join statement
         if from_source != to_source:
             to_table = get_source_table(to_source)
             input_tables += f"\n\t\t\t\t\t\tinner join {to_table} as t on t.gnaf_pid = f.gnaf_pid"""
 
+        # add the residential address table join and filter
+        if residential_address_source["name"] == 'geoscape':
+            res_table = f'{residential_address_source["schema"]}.{residential_address_source["table"]}'
+            input_tables += f"\n\t\t\t\t\t\tinner join {res_table} as r on r.gnaf_pid = f.gnaf_pid"""
+            residential_filter = "and is_residential = 'residential'"
+        elif from_source == "abs 2021":
+            residential_filter = "and f.mb_category_2021 IN ('Residential')"
+        elif to_source == "abs 2021":
+            residential_filter = "and t.mb_category_2021 IN ('Residential')"
+
         # set the code and name field names
         from_id_field, from_name_field = get_field_names(from_bdy, from_source, "from", input_tables)
         to_id_field, to_name_field = get_field_names(to_bdy, to_source, "to", input_tables)
-
-        # add the meshblock filter if the from or to table is ABS based
-        meshblock_filter = ""
-        if from_source == "abs 2016":
-            meshblock_filter = "and f.mb_category IN ('RESIDENTIAL')"
-            # meshblock_filter = "and f.is_residential = 'residential'"
-        elif from_source == "abs 2021":
-            meshblock_filter = "and f.mb_category_2021 IN ('Residential')"
-            # meshblock_filter = "and f.is_residential = 'residential'"
-        elif to_source == "abs 2016":
-            meshblock_filter = "and t.mb_category IN ('RESIDENTIAL')"
-            # meshblock_filter = "and t.is_residential = 'residential'"
-        elif to_source == "abs 2021":
-            meshblock_filter = "and t.mb_category_2021 IN ('Residential')"
-            # meshblock_filter = "and t.is_residential = 'residential'"
 
         # build the query
         query = f"""insert into {output_schema}.{output_table}
@@ -164,7 +159,7 @@ def add_concordances(bdys, pg_cur):
                         from {input_tables}
                         where {from_id_field} is not null
                             and {to_id_field} is not null
-                            {meshblock_filter}
+                            {residential_filter}
                         group by from_id,
                                  from_name,
                                  to_id,
