@@ -23,6 +23,11 @@ The concordance file is generated using this approach:
 3. Aggregate all residential address by the _**from**_ boundary and the _**to**_ boundary
 4. Determine the % overlap of addresses between both boundary types for all boundary combinations
 
+![pc_vs_lga.png](https://github.com/iag-geo/concord/blob/main/pc_vs_lga.png "ABS 2016 Postcodes (grey) vs LGAs (red) with respect to addresses (blue)")
+
+ABS 2016 Postcodes (grey) vs LGAs (red) with respect to addresses (blue)
+
+
 ## Concordances
 
 Below are the average concordances between 2 boundary types, weighted by residential address counts
@@ -47,9 +52,6 @@ A high average concordance indicates your data can be converted to the new bound
 | geoscape 202202 postcode | abs 2016 lga             |         93% |
 | geoscape 202202 postcode | geoscape 202202 lga      |         93% |
 
-![pc_vs_lga.png](https://github.com/iag-geo/concord/blob/main/pc_vs_lga.png "ABS 2016 Postcodes (grey) vs LGAs (red)")
-
-ABS 2016 Postcodes (grey) vs LGAs (red)
 
 notes:
  - the benefits of using Geoscape Buildings is minimal due to ~2.3m addresses not having a planning zone
@@ -58,6 +60,4 @@ notes:
 
 
 
-
-TODO: _**Insert useful image here**_
 
