@@ -12,8 +12,8 @@ from datetime import datetime
 pg_connect_string = "dbname=geo host=localhost port=5432 user=postgres password=password"
 
 output_schema = "testing"
-output_table = "boundary_concordance_sa2"
-output_score_table = "boundary_concordance_sa2_score"
+output_table = "boundary_concordance"
+output_score_table = "boundary_concordance_score"
 
 # ---------------------------------------------------------------------------------------
 # edit boundary list to find concordances with
