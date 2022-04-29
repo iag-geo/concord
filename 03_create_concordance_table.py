@@ -28,32 +28,31 @@ source_list = [
 
 # source of residential addresses to us - this will either be based on ABS Census 2021 meshblocks
 #   or planning zone data from the Geoscape Buildings datasets if you have purchased it
-residential_address_source = {"name": "geoscape", "schema": "geoscape_202203", "table": "address_principals_buildings"}
-# residential_address_source = {"name": "abs 2021", "schema": "gnaf_202202",
-#                               "table": "address_principal_census_2021_boundaries"}
-# residential_address_source = {"name": "abs 2016", "schema": "gnaf_202202",
-#                               "table": "address_principal_census_2016_boundaries"}
+# residential_address_source = {"name": "geoscape", "schema": "geoscape_202203", "table": "address_principals_buildings"}
+residential_address_source = {"name": "abs 2021", "schema": "gnaf_202202",
+                              "table": "address_principal_census_2021_boundaries"}
 
 # the list of boundary pair to create concordances - from and to sources must match the names of the above sources
 boundary_list = [
-    # # ABS 2016 to ABS 2016 bdys
-    # {"from": "poa", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
-    # {"from": "sa3", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
-    # {"from": "lga", "from_source": "abs 2016", "to": "sa3", "to_source": "abs 2016"},
-    # {"from": "sa2", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
-    # {"from": "sa2", "from_source": "abs 2016", "to": "sa3", "to_source": "abs 2016"},
-    # {"from": "sa2", "from_source": "abs 2016", "to": "poa", "to_source": "abs 2016"},
-    #
-    # # Geoscape to ABS 2016 bdys
-    # {"from": "locality", "from_source": "geoscape 202202", "to": "lga", "to_source": "abs 2016"},
-    # {"from": "postcode", "from_source": "geoscape 202202", "to": "lga", "to_source": "abs 2016"},
-    # {"from": "lga", "from_source": "geoscape 202202", "to": "lga", "to_source": "abs 2016"},
-    #
-    # # Geoscape to Geoscape bdys
-    # {"from": "locality", "from_source": "geoscape 202202", "to": "lga", "to_source": "geoscape 202202"},
-    # {"from": "postcode", "from_source": "geoscape 202202", "to": "lga", "to_source": "geoscape 202202"}
+    # ABS 2016 to ABS 2016 bdys
+    {"from": "poa", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
+    {"from": "sa3", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
+    {"from": "lga", "from_source": "abs 2016", "to": "sa3", "to_source": "abs 2016"},
+    {"from": "sa2", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
+    {"from": "sa2", "from_source": "abs 2016", "to": "sa3", "to_source": "abs 2016"},
+    {"from": "sa2", "from_source": "abs 2016", "to": "poa", "to_source": "abs 2016"},
 
-    {"from": "sa2", "from_source": "abs 2016", "to": "sa2", "to_source": "abs 2021"}
+    # Geoscape to ABS 2016 bdys
+    {"from": "locality", "from_source": "geoscape 202202", "to": "lga", "to_source": "abs 2016"},
+    {"from": "postcode", "from_source": "geoscape 202202", "to": "lga", "to_source": "abs 2016"},
+    {"from": "lga", "from_source": "geoscape 202202", "to": "lga", "to_source": "abs 2016"},
+
+    # Geoscape to Geoscape bdys
+    {"from": "locality", "from_source": "geoscape 202202", "to": "lga", "to_source": "geoscape 202202"},
+    {"from": "postcode", "from_source": "geoscape 202202", "to": "lga", "to_source": "geoscape 202202"}
+
+    # # test concordance for measuring reliability against known differences
+    # {"from": "sa2", "from_source": "abs 2016", "to": "sa2", "to_source": "abs 2021"}
 ]
 
 # ---------------------------------------------------------------------------------------
@@ -137,6 +136,7 @@ def add_concordances(bdys, pg_cur):
             input_tables += f"\n\t\t\t\t\t\tinner join {to_table} as t on t.gnaf_pid = f.gnaf_pid"""
 
         # add the residential address table join and filter
+        residential_filter = ""
         if residential_address_source["name"] == 'geoscape':
             res_table = f'{residential_address_source["schema"]}.{residential_address_source["table"]}'
             input_tables += f"\n\t\t\t\t\t\tinner join {res_table} as r on r.gnaf_pid = f.gnaf_pid"""

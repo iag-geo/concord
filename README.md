@@ -28,17 +28,17 @@ A high average concordance indicates your data can be converted to the new bound
 
 | from                     | to                  | avg. concordance |
 |:-------------------------|:--------------------|-----------------:|
-| abs 2016 lga             | abs 2016 sa3        |              73% |
-| abs 2016 poa             | abs 2016 lga        |              94% |
-| abs 2016 sa2             | abs 2016 lga        |              98% |
-| abs 2016 sa2             | abs 2016 poa        |              82% |
-| abs 2016 sa2             | abs 2016 sa3        |             100% |
-| abs 2016 sa3             | abs 2016 lga        |              85% |
-| geoscape 202202 lga      | abs 2016 lga        |             100% |
-| geoscape 202202 locality | abs 2016 lga        |              98% |
-| geoscape 202202 locality | geoscape 202202 lga |              98% |
-| geoscape 202202 postcode | abs 2016 lga        |              94% |
-| geoscape 202202 postcode | geoscape 202202 lga |              93% |
+| abs 2016 lga             | abs 2016 sa3             |         74% |
+| abs 2016 poa             | abs 2016 lga             |         93% |
+| abs 2016 sa2             | abs 2016 lga             |         97% |
+| abs 2016 sa2             | abs 2016 poa             |         79% |
+| abs 2016 sa2             | abs 2016 sa3             |        100% |
+| abs 2016 sa3             | abs 2016 lga             |         83% |
+| geoscape 202202 lga      | abs 2016 lga             |        100% |
+| geoscape 202202 locality | abs 2016 lga             |         98% |
+| geoscape 202202 locality | geoscape 202202 lga      |         98% |
+| geoscape 202202 postcode | abs 2016 lga             |         93% |
+| geoscape 202202 postcode | geoscape 202202 lga      |         93% |
 
 
 

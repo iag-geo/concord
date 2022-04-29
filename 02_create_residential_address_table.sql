@@ -3,6 +3,7 @@
 -- https://geoscape.com.au/data/buildings/
 
 
+
 -- create table of gnaf addresses with building counts and planning zone data to identify residential addresses
 drop table if exists geoscape_202203.address_principals_buildings;
 create table geoscape_202203.address_principals_buildings as
