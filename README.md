@@ -1,20 +1,27 @@
 # Concord
 
-An easy-to-use dataset for converting data between Australian census and administrative boundaries. It allows you to merge data that's based on different boundaries into a single dataset or report.
+An easy-to-use dataset for converting data between Australian census & administrative boundaries.
 
-**Important:** only works with data related to residents, citizens & consumers. Industrial, commercial & special use areas are deliberately ignored in the analysis.
+It allows you to merge data based on different boundaries into a single dataset or report.
 
-### Example usage
+The concordance file is a CSV file for importing into your database or reporting tool. A script for importing into Postgres is also provided.
 
-You have sales volumes by postcode & competitor data by local government area (LGA) and need to determine market share. Using Concord, you convert the postcode data to LGA and then merge both datasets by LGA ID to determine market penetration.
+### Examples
+
+- You have sales data by postcode & competitor data by local government area (LGA) and need to determine market share. Using the Concord file, you convert the postcode data to LGA and merge both datasets by LGA ID.
+- You have cancer testing rates by ABS Census 2016 SA2 boundaries and cancer case numbers by LGA and need to determine the rate of disease as a % of tests. You use the Concord file to convert the SA2 data to LGA and merge both datasets by LGA ID.
+
+### Important
+Only works with data related to residents, citizens & consumers. In other words - industrial, commercial & special use data isn't suited.
 
 ## Methodology
 
-The concordance file is generated using the following approach:
+The concordance file is generated using this approach:
 
 1. Tag all GNAF addresses with 2016 & 2021 ABS Census boundaries and Geoscape 202202 Administrative boundaries 
-2. Remove all addresses in ABS Census meshblocks that are non-residential
-3. TODO: etc..
+2. Remove all addresses in ABS Census 2021 meshblocks that are non-residential
+3. Aggregate all residential address by the _**from**_ boundary and the _**to**_ boundary
+4. Determine the % overlap of addresses between both boundary types for all boundary combinations
 
 ## Concordances
 
