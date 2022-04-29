@@ -19,19 +19,41 @@ where abs(cor.ratio_from_to * 100.0 - bdy.address_percent) > 5.0
 -- |2348          |3   |0         |-40      |26       |82437        |
 -- +--------------+----+----------+---------+---------+-------------+
 
--- residential 2016 MB comparison (difference > 5%)
--- +--------------+----+----------+---------+---------+-------------+
--- |bdy_pair_count|rmse|mean_delta|min_delta|max_delta|address_count|
--- +--------------+----+----------+---------+---------+-------------+
--- |107           |12  |0         |-40      |26       |57988        |
--- +--------------+----+----------+---------+---------+-------------+
-
-
 -- residential 2021 MB comparison
 -- +--------------+----+----------+---------+---------+-------------+
 -- |bdy_pair_count|rmse|mean_delta|min_delta|max_delta|address_count|
 -- +--------------+----+----------+---------+---------+-------------+
 -- |2364          |4   |0         |-40      |41       |136828       |
+-- +--------------+----+----------+---------+---------+-------------+
+
+-- address level residential planning zone
+-- +--------------+----+----------+---------+---------+-------------+
+-- |bdy_pair_count|rmse|mean_delta|min_delta|max_delta|address_count|
+-- +--------------+----+----------+---------+---------+-------------+
+-- |2332          |5   |0         |-72      |66       |79503        |
+-- +--------------+----+----------+---------+---------+-------------+
+
+-- address level residential planning zone + residential 2016 MB where planning zone is null comparison
+-- +--------------+----+----------+---------+---------+-------------+
+-- |bdy_pair_count|rmse|mean_delta|min_delta|max_delta|address_count|
+-- +--------------+----+----------+---------+---------+-------------+
+-- |2374          |4   |0         |-50      |39       |93712        |
+-- +--------------+----+----------+---------+---------+-------------+
+
+-- address level residential planning zone + residential 2021 MB where planning zone is null comparison
+-- +--------------+----+----------+---------+---------+-------------+
+-- |bdy_pair_count|rmse|mean_delta|min_delta|max_delta|address_count|
+-- +--------------+----+----------+---------+---------+-------------+
+-- |2384          |4   |0         |-42      |42       |113946       |
+-- +--------------+----+----------+---------+---------+-------------+
+
+
+
+-- residential 2016 MB comparison (difference > 5%)
+-- +--------------+----+----------+---------+---------+-------------+
+-- |bdy_pair_count|rmse|mean_delta|min_delta|max_delta|address_count|
+-- +--------------+----+----------+---------+---------+-------------+
+-- |107           |12  |0         |-40      |26       |57988        |
 -- +--------------+----+----------+---------+---------+-------------+
 
 -- residential 2021 MB comparison (difference > 5%)
@@ -41,20 +63,19 @@ where abs(cor.ratio_from_to * 100.0 - bdy.address_percent) > 5.0
 -- |132           |17  |-1        |-40      |41       |111996       |
 -- +--------------+----+----------+---------+---------+-------------+
 
-
--- address level residential planning zone + residential 2016 MB where planning zone is null comparison
-
-
--- address level residential planning zone + residential 2016 MB where planning zone is null comparison (difference > 5%)
-
-
--- address level residential planning zone + residential 2021 MB where planning zone is null comparison
+-- address level residential planning zone (difference > 5%)
 -- +--------------+----+----------+---------+---------+-------------+
 -- |bdy_pair_count|rmse|mean_delta|min_delta|max_delta|address_count|
 -- +--------------+----+----------+---------+---------+-------------+
--- |2384          |4   |0         |-42      |42       |113946       |
+-- |118           |21  |-2        |-72      |66       |62772        |
 -- +--------------+----+----------+---------+---------+-------------+
 
+-- address level residential planning zone + residential 2016 MB where planning zone is null comparison (difference > 5%)
+-- +--------------+----+----------+---------+---------+-------------+
+-- |bdy_pair_count|rmse|mean_delta|min_delta|max_delta|address_count|
+-- +--------------+----+----------+---------+---------+-------------+
+-- |132           |16  |0         |-50      |39       |75234        |
+-- +--------------+----+----------+---------+---------+-------------+
 
 -- address level residential planning zone + residential 2021 MB where planning zone is null comparison (difference > 5%)
 -- +--------------+----+----------+---------+---------+-------------+
