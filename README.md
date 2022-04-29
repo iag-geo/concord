@@ -47,7 +47,7 @@ A high average concordance indicates your data can be converted to the new bound
 | geoscape 202202 postcode | abs 2016 lga             |         93% |
 | geoscape 202202 postcode | geoscape 202202 lga      |         93% |
 
-![pc_vs_lga.png](https://github.com/iag-geo/concord/blob/main/pc_vs_lga.png "ABS 2016 Postcodes vs LGAs")
+![pc_vs_lga.png](https://github.com/iag-geo/concord/blob/main/pc_vs_lga.png "ABS 2016 Postcodes (grey) vs LGAs (red)")
 
 
 
