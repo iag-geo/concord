@@ -19,9 +19,7 @@ select gnaf.gnaf_pid,
        gnaf.reliability,
        gnaf.state,
        planning_zone,
-       case when planning_zone LIKE '%residential%'
-           or planning_zone LIKE '%mixed use%'
-                then 'residential' end as is_residential,
+       null::boolean as is_residential,
        coalesce(building_count, 0) as building_count,
        gnaf.mb_2016_code,
        lower(mb16.mb_category) as mb_category_2016,
@@ -35,9 +33,17 @@ from gnaf_202202.address_principals as gnaf
 ;
 analyse geoscape_202203.address_principals_buildings;
 
+-- flag residential addreses based on planning zone
+update geoscape_202203.address_principals_buildings
+set is_residential = true
+where planning_zone like '%residential%'
+   or planning_zone like '%mixed use%'
+;
+analyse geoscape_202203.address_principals_buildings;
+
 -- flag non-residential addresses that have a building -- 2,208,070 rows affected in 48 s 602 m
 update geoscape_202203.address_principals_buildings
-    set is_residential = 'non-residential'
+    set is_residential = false
 where is_residential is null
     and building_count > 0
     and planning_zone <> 'unknown'
@@ -46,7 +52,7 @@ analyse geoscape_202203.address_principals_buildings;
 
 -- update addresses with no planning zone in residential MBs -- 1,956,429 rows affected in 11 s 347 ms
 update geoscape_202203.address_principals_buildings as gnaf
-    set is_residential = 'residential'
+    set is_residential = true
 where is_residential is null
   and mb_category_2021 = 'residential'
 ;
@@ -54,7 +60,7 @@ analyse geoscape_202203.address_principals_buildings;
 
 -- update addresses with no planning zone in non-residential MBs -- 913,299 rows affected in 8 s 970 ms
 update geoscape_202203.address_principals_buildings as gnaf
-set is_residential = 'non-residential'
+set is_residential = false
 where is_residential is null
   and mb_category_2021 <> 'residential'
 ;

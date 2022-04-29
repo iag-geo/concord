@@ -12,8 +12,8 @@ from datetime import datetime
 pg_connect_string = "dbname=geo host=localhost port=5432 user=postgres password=password"
 
 output_schema = "testing"
-output_table = "boundary_concordance"
-output_score_table = "boundary_concordance_score"
+output_table = "boundary_concordance_sa2"
+output_score_table = "boundary_concordance_sa2_score"
 
 # ---------------------------------------------------------------------------------------
 # edit boundary list to find concordances with
@@ -28,9 +28,11 @@ source_list = [
 
 # source of residential addresses to us - this will either be based on ABS Census 2021 meshblocks
 #   or planning zone data from the Geoscape Buildings datasets if you have purchased it
-# residential_address_source = {"name": "geoscape", "schema": "geoscape_202203", "table": "address_principals_buildings"}
-residential_address_source = {"name": "abs 2021", "schema": "gnaf_202202",
-                              "table": "address_principal_census_2021_boundaries"}
+residential_address_source = {"name": "geoscape", "schema": "geoscape_202203", "table": "address_principals_buildings"}
+# residential_address_source = {"name": "abs 2021", "schema": "gnaf_202202",
+#                               "table": "address_principal_census_2021_boundaries"}
+# residential_address_source = {"name": "abs 2016", "schema": "gnaf_202202",
+#                               "table": "address_principal_census_2016_boundaries"}
 
 # the list of boundary pair to create concordances - from and to sources must match the names of the above sources
 boundary_list = [
@@ -138,11 +140,15 @@ def add_concordances(bdys, pg_cur):
         if residential_address_source["name"] == 'geoscape':
             res_table = f'{residential_address_source["schema"]}.{residential_address_source["table"]}'
             input_tables += f"\n\t\t\t\t\t\tinner join {res_table} as r on r.gnaf_pid = f.gnaf_pid"""
-            residential_filter = "and r.is_residential = 'residential'"
+            residential_filter = "and r.is_residential"
         elif from_source == "abs 2021":
             residential_filter = "and f.mb_category_2021 = 'Residential'"
         elif to_source == "abs 2021":
             residential_filter = "and t.mb_category_2021 = 'Residential'"
+        # elif from_source == "abs 2016":
+        #     residential_filter = "and f.mb_category = 'RESIDENTIAL'"
+        # elif to_source == "abs 2016":
+        #     residential_filter = "and t.mb_category = 'RESIDENTIAL'"
 
         # set the code and name field names
         from_id_field, from_name_field = get_field_names(from_bdy, from_source, "from", input_tables)
@@ -187,7 +193,7 @@ def add_concordances(bdys, pg_cur):
         if "sa2" in [from_bdy, to_bdy]:
             query = query.replace("sa2_16code", "sa2_16main")
 
-        # print(query)
+        print(query)
         pg_cur.execute(query)
 
         logger.info(f"\t - {from_source} {from_bdy} to {to_source} {to_bdy} records added : {datetime.now() - start_time}")
