@@ -47,6 +47,14 @@ A high average concordance indicates your data can be converted to the new bound
 | geoscape 202202 postcode | abs 2016 lga             |         93% |
 | geoscape 202202 postcode | geoscape 202202 lga      |         93% |
 
+![pc_vs_lga.png](https://github.com/iag-geo/concord/blob/main/pc_vs_lga.png "ABS 2016 Postcodes vs LGAs")
+
+
+
+notes:
+ - the benefits of using Geoscape Buildings is minimal due to ~2.3m addresses not having a planning zone
+ - you need to run 02_create_residential_address_table.sql on your GNAF and Geoscape Buildings data to create the
+   address_principals_buildings table below
 
 
 
