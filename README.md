@@ -49,7 +49,7 @@ A high average concordance indicates your data can be converted to the new bound
 
 ![pc_vs_lga.png](https://github.com/iag-geo/concord/blob/main/pc_vs_lga.png "ABS 2016 Postcodes (grey) vs LGAs (red)")
 
-
+ABS 2016 Postcodes (grey) vs LGAs (red)
 
 notes:
  - the benefits of using Geoscape Buildings is minimal due to ~2.3m addresses not having a planning zone
