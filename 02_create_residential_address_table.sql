@@ -33,7 +33,12 @@ from gnaf_202202.address_principals as gnaf
 ;
 analyse geoscape_202203.address_principals_buildings;
 
--- flag residential addreses based on planning zone
+-- reset -- testing only
+update geoscape_202203.address_principals_buildings
+set is_residential = null
+;
+
+-- flag residential addresses based on planning zone -- 9,373,554 rows affected in 47 s 74 ms
 update geoscape_202203.address_principals_buildings
 set is_residential = true
 where planning_zone like '%residential%'
@@ -54,7 +59,7 @@ analyse geoscape_202203.address_principals_buildings;
 update geoscape_202203.address_principals_buildings as gnaf
     set is_residential = true
 where is_residential is null
-  and mb_category_2021 = 'residential'
+  and mb_category_2016 = 'residential'
 ;
 analyse geoscape_202203.address_principals_buildings;
 
@@ -62,7 +67,7 @@ analyse geoscape_202203.address_principals_buildings;
 update geoscape_202203.address_principals_buildings as gnaf
 set is_residential = false
 where is_residential is null
-  and mb_category_2021 <> 'residential'
+  and mb_category_2016 <> 'residential'
 ;
 analyse geoscape_202203.address_principals_buildings;
 

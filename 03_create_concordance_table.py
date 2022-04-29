@@ -193,7 +193,7 @@ def add_concordances(bdys, pg_cur):
         if "sa2" in [from_bdy, to_bdy]:
             query = query.replace("sa2_16code", "sa2_16main")
 
-        print(query)
+        # print(query)
         pg_cur.execute(query)
 
         logger.info(f"\t - {from_source} {from_bdy} to {to_source} {to_bdy} records added : {datetime.now() - start_time}")
