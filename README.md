@@ -19,7 +19,7 @@ Using this file comes with the following caveats:
 - Only works with data related to residents, citizens & consumers. In other words - industrial, commercial & special use data isn't suited to conversion using the concordance file provided;
 - The % overlaps between boundaries are a best estimate of how data should be apportioned between 2 boundary sets based on residential address counts. Your data may have biases in it that mean this approach doesn't return the best result. e.g. looking at the image below - if your postcode 3127 customers were mostly in the Boroondara Council side - the boundary concordance file would incorrectly put 54% of customers in Whitehorse Council.
 
-![pc_vs_lga.png](pc_vs_lga.png "ABS 2016 Postcodes (pink) vs LGAs (blue)")
+![pc_vs_lga.png](pc_vs_lga.png "ABS 2016 Postcodes (red) vs LGAs (blue)")
 
 <sup>Postcode 3127 split 46%-54% by the Boroondara & Whitehorse council boundary in blue (Credits: boundary data by Australian Bureau of Statistics, under CC BY 4.0; Map tiles by Carto, under CC BY 3.0. Data by OpenStreetMap, under ODbL)</sup>
 
@@ -104,9 +104,17 @@ Running the script requires the following open data, available as Postgres dump 
 5. Add `psycopg2` to your Python 3.x environment
 6. Run the script
 
-#### Note
- - The benefits of using Geoscape planning zone data impacted by ~2.3m addresses not having a planning zone, The code as-is fills this missing data with ABS Census Meshblock categories.
- - you need to run 02_create_residential_address_table.sql on your GNAF and Geoscape Buildings data to create the address_principals_buildings table below
+##### Note
+ - The benefit of using Geoscape planning zone data over the default residential address filter (ABS Census 2021 meshblock categories) is reduced by ~2.3m addresses not having a planning zone, The code as-is fills this missing data with 2021 meshblock categories.
+ 
+### 2. Use the Concordance File
+
+After loading the file into your database/reporting tool of choice - you use it by creating a 3 (or more) table join between the datsets you want to merge and the concordance file table.
+
+Below is a sample script for merging postcode data with LGA data in Postgres:
+
+
+
 
 ## Data Licenses
 
