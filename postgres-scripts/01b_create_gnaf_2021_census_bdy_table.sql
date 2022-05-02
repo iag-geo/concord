@@ -6,7 +6,7 @@
 -- this approach is simpler than downloading & importing ABS correspondence files, which are subject to change
 -- also RA, SED and CED bdys are groups of SA1s; the rest are groups of meshblocks. Meshblocks are used for all bdys to keep the code simple (performance hit is minimal)
 
--- TODO: find out which 6 addresses got NULL bdy IDs
+-- TODO: find out which 6 addresses got NULL bdy IDs and dropped off
 
 -- create temp table of meshblock centroids (ensure centroid is within polygon by using ST_PointOnSurface)
 drop table if exists temp_mb;
@@ -116,6 +116,4 @@ drop table if exists temp_sed_mb;
 
 
 -- select count(*) from gnaf_202202.address_principals; -- 14,451,352
-select count(*) from gnaf_202202.address_principal_census_2021_boundaries; -- 14,451,346
-
--- select * from gnaf_202202.address_principal_census_2021_boundaries where sed_code_2021 is null;
+-- select count(*) from gnaf_202202.address_principal_census_2021_boundaries; -- 14,451,346

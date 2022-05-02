@@ -11,16 +11,17 @@ The concordance file is a CSV file for importing into your database or reporting
 - You have sales data by postcode & competitor data by local government area (LGA) and need to determine market share. Using the [boundary concordance file](/data), you convert the postcode data to LGA and merge both datasets by LGA ID.
 - You have cancer testing rates by ABS Census 2016 SA2 boundaries and cancer case numbers by LGA and need to determine the rate of disease as a % of testing. You use the [file](/data) to convert the SA2 data to LGAs and merge both datasets by LGA ID.
 
-### Important
+### Limitations
 
-Using this file comes with the following caveats - read this entire README file to understand the methodology used & it's accuracy:
- 
-- Only works with data related to residents, citizens & consumers. In other words - industrial, commercial & special use data isn't suited to conversion using the file;
+Read this entire README file to understand the methodology used & it's accuracy.
+
+Using this file comes with the following caveats:
+- Only works with data related to residents, citizens & consumers. In other words - industrial, commercial & special use data isn't suited to conversion using the concordance file provided;
 - The % overlaps between boundaries are a best estimate of how data should be apportioned between 2 boundary sets based on residential address counts. Your data may have biases in it that mean this approach doesn't return the best result. e.g. looking at the image below - if your postcode 3127 customers were mostly in the Boroondara Council side - the boundary concordance file would incorrectly put 54% of customers in Whitehorse Council.
 
 ![pc_vs_lga.png](pc_vs_lga.png "ABS 2016 Postcodes (pink) vs LGAs (blue)")
 
-Postcode 3127 split 46%-54% by the Boroondara & Whitehorse council boundary (in blue)
+Postcode 3127 split 46%-54% by the Boroondara & Whitehorse council boundary in blue (Map tiles by Carto, under CC BY 3.0. Data by OpenStreetMap, under ODbL)
 
 ****
 
@@ -71,22 +72,26 @@ There are 2 options:
 
 ### Run Python Script
 
-This only needs to be done for 3 reasons:
+This requires a knowledge of Python, Postgres & pg_restore.
+
+It only needs to be done for 3 reasons:
 1. The boundary from/to combination you need isn't in the standard [concordances file](/data)
 2. We've been too lazy to update the concordances file with the latest boundary data from the ABS and/or Geoscape
-3. You have a license of [Geoscape Buildings](https://geoscape.com.au/data/buildings/) or [Geoscape Land Parcels](https://geoscape.com.au/data/land-parcels/) and want to use the _planning zone_ data in those product to use:
-    1. A more accurate list of residential addresses to determine the data apportionment percentages (see note below); or
-    2. A different set of addresses to apportion your data by; such as industrial or commercial addresses
+3. You have a license of [Geoscape Buildings](https://geoscape.com.au/data/buildings/) or [Geoscape Land Parcels](https://geoscape.com.au/data/land-parcels/) and want to use the _planning zone_ data in those product to:
+    1. Use a more accurate list of residential addresses to determine the data apportionment percentages (see note below); or
+    2. Use a different set of addresses to apportion your data; e.g. industrial or commercial addresses
 
+Running the script requires the following open data, available as Postgres dump files, as well as the optional licensed Geoscape data mentioned above:
+1. ABS Census 2016 boundaries ([download](https://minus34.com/opendata/census-2016/census_2016_bdys.dmp))
+2. ABS Census 2021 boundaries ([download](https://minus34.com/opendata/census-2021/census_2021_bdys.dmp))
+3. GNAF from gnaf-loader ([download](https://minus34.com/opendata/geoscape-202202/gnaf-202202.dmp))
+4. Geoscape Administrative Boundaries from gnaf-loader ([download](https://minus34.com/opendata/geoscape-202202/admin-bdys-202202.dmp))
 
-Running the script requires the following open data in a Postgres database as well as the optional licensed Geoscape data mentioned above:
-1. ABS Census 2016 boundaries
-2. ABS Census 2021 boundaries
-3. GNAF
-4. Geoscape Administrative Boundaries
+#### Process
 
-These datasets are available as Postgres dump files 
-
+1. Download the above dump files and import them using `pg_restore`
+2. Prep the Census boundary tagged address tables by running `01a_create_gnaf_2016_census_bdy_table.sql` & `01b_create_gnaf_2021_census_bdy_table.sql` in the [postgres-scripts](/postgres-scripts) folder
+3. Review and edit the Python script as required
 
 #### Note
  - The benefits of using Geoscape planning zone data impacted by ~2.3m addresses not having a planning zone, The code as-is fills this missing data with ABS Census Meshblock categories.

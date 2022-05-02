@@ -117,6 +117,4 @@ drop table if exists temp_sed_mb;
 
 
 -- select count(*) from gnaf_202202.address_principals; -- 14,451,352
-select count(*) from gnaf_202202.address_principal_census_2016_boundaries; -- 14,451,352
-
--- select * from gnaf_202202.address_principal_census_2016_boundaries where sed_16code is null;
+-- select count(*) from gnaf_202202.address_principal_census_2016_boundaries; -- 14,451,352
