@@ -2,21 +2,21 @@
 
 A [CSV file](/data) for converting data between Australian census & administrative boundaries.
 
-It allows you to merge data based on different boundaries into a single dataset or report.
+It solves the problem when you need to merge 2 or more datasets that are based on different boundaries (e.g. postcodes & council areas).
 
 The concordance file is a CSV file for importing into your database or reporting tool. A script for importing into Postgres is also provided.
 
-### Examples
+### Example Use Cases
 
-- You have sales data by postcode & competitor data by local government area (LGA) and need to determine market share. Using the boundary concordances CSV file, you convert the postcode data to LGA and merge both datasets by LGA ID.
-- You have cancer testing rates by ABS Census 2016 SA2 boundaries and cancer case numbers by LGA and need to determine the rate of disease as a % of tests. You use the Concord file to convert the SA2 data to LGA and merge both datasets by LGA ID.
+- You have sales data by postcode & competitor data by local government area (LGA) and need to determine market share. Using the [boundary concordance file](/data), you convert the postcode data to LGA and merge both datasets by LGA ID.
+- You have cancer testing rates by ABS Census 2016 SA2 boundaries and cancer case numbers by LGA and need to determine the rate of disease as a % of testing. You use the [file](/data) to convert the SA2 data to LGAs and merge both datasets by LGA ID.
 
 ### Important
 
-Using this file comes with the following caveats - read this entire README file to understand the methodology used and it's limitations.
+Using this file comes with the following caveats - read this entire README file to understand the methodology used and it's limitations:
  
- - Only works with data related to residents, citizens & consumers. In other words - industrial, commercial & special use data isn't suited to conversion.
-- The % overlaps between boundaries are a best estimate of how data should be apportioned between 2 boundary sets. Your data may have biases in it that mean this approach doesn't return the best result. e.g. looking at the image below - if your postcode 3127 customers were mostly in the Boroondara Council side - the boundary concordance file would incorrectly put 54% of customers in the neighbouring council.
+- Only works with data related to residents, citizens & consumers. In other words - industrial, commercial & special use data isn't suited to conversion using the file;
+- The % overlaps between boundaries are a best estimate of how data should be apportioned between 2 boundary sets based on residential address counts. Your data may have biases in it that mean this approach doesn't return the best result. e.g. looking at the image below - if your postcode 3127 customers were mostly in the Boroondara Council side - the boundary concordance file would incorrectly put 54% of customers in Whitehorse Council.
 
 ![pc_vs_lga.png](pc_vs_lga.png "ABS 2016 Postcodes (pink) vs LGAs (blue)")
 
@@ -31,8 +31,9 @@ The concordance file is generated using this approach:
 1. Tag all GNAF addresses with 2016 & 2021 ABS Census boundaries and Geoscape 202202 Administrative boundaries 
 2. Remove all addresses in ABS Census 2021 meshblocks that are non-residential
 3. Aggregate all residential address by the _**from**_ boundary and the _**to**_ boundary
-4. Determine the % overlap of addresses between both boundary types for all boundary combinations
+4. Determine the % overlap of residential addresses between both boundary types for all boundary combinations
 
+****
 
 ## Concordances
 
@@ -58,6 +59,13 @@ A high average concordance indicates your data can be converted to the new bound
 | geoscape 202202 postcode | abs 2016 lga             |         93% |
 | geoscape 202202 postcode | geoscape 202202 lga      |         93% |
 
+****
+
+## Get Started
+
+
+
+Download the concordances file to get started
 
 
 
