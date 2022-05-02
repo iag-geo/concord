@@ -23,9 +23,9 @@ The concordance file is generated using this approach:
 3. Aggregate all residential address by the _**from**_ boundary and the _**to**_ boundary
 4. Determine the % overlap of addresses between both boundary types for all boundary combinations
 
-![pc_vs_lga.png](https://github.com/iag-geo/concord/blob/main/pc_vs_lga.png "ABS 2016 Postcodes (grey) vs LGAs (red) with respect to addresses (blue)")
+![pc_vs_lga.png](https://github.com/iag-geo/concord/blob/main/pc_vs_lga.png "ABS 2016 Postcodes (pink) vs LGAs (blue)")
 
-ABS 2016 Postcodes (grey) vs LGAs (red) with respect to addresses (blue)
+Postcode 3127 (pink) Split in Half by an LGA boundary (blue)
 
 
 ## Concordances
