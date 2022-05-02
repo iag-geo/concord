@@ -60,7 +60,7 @@ boundary_list = [
 # edit output file path
 # ---------------------------------------------------------------------------------------
 
-output_path = os.path.dirname(os.path.realpath(__file__))
+output_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "data")
 
 # ---------------------------------------------------------------------------------------
 
