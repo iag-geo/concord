@@ -32,6 +32,8 @@ source_list = [
 # residential_address_source = {"name": "geoscape", "schema": "geoscape_202203", "table": "address_principals_buildings"}
 residential_address_source = {"name": "abs 2021", "schema": "gnaf_202202",
                               "table": "address_principal_census_2021_boundaries"}
+# residential_address_source = {"name": "abs 2016", "schema": "gnaf_202202",
+#                               "table": "address_principal_census_2016_boundaries"}
 
 # the list of boundary pair to create concordances - from and to sources must match the names of the above sources
 boundary_list = [

@@ -1,12 +1,2 @@
 from_bdy,to_bdy,concordance_percent
-geoscape 202202 postcode,geoscape 202202 lga,93
-abs 2016 sa2,abs 2016 lga,97
-abs 2016 sa2,abs 2016 sa3,100
-geoscape 202202 locality,abs 2016 lga,98
-geoscape 202202 locality,geoscape 202202 lga,98
-geoscape 202202 lga,abs 2016 lga,100
-abs 2016 lga,abs 2016 sa3,74
-abs 2016 sa2,abs 2016 poa,79
 abs 2016 poa,abs 2016 lga,93
-geoscape 202202 postcode,abs 2016 lga,93
-abs 2016 sa3,abs 2016 lga,83
