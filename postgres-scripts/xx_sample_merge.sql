@@ -6,12 +6,12 @@ with pc as (
            con.to_name,
            con.to_source,
            sum(from_bdy.g3::float * con.address_percent / 100.0)::integer as population1
-    from census_2016_data.poa_g01 as from_bdy
+    from census_2016_data.lga_g01 as from_bdy
              inner join gnaf_202202.boundary_concordance as con on from_bdy.region_id = con.from_id
     where from_source = 'abs 2016'
-        and from_type = 'poa'
+        and from_type = 'lga'
         and to_source = 'abs 2016'
-        and to_type = 'lga'
+        and to_type = 'sa3'
     group by con.to_id,
              con.to_name,
              con.to_source
@@ -23,14 +23,43 @@ select to_id,
        g3 as population2,
        g3 - population1 as pop_difference,
        (abs((g3 - population1) / g3) * 100.0)::smallint as pop_diff_percent
-from census_2016_data.lga_g01 as to_bdy
+from census_2016_data.sa3_g01 as to_bdy
 inner join pc on pc.to_id = to_bdy.region_id
 )
 select sum(population1) as population1,
        sum(population2) as population2,
-       sum(abs(pop_difference)) as pop_difference
+       sum(abs(pop_difference)) as pop_difference,
+       (sum(abs(pop_difference)) / sum(population2) * 100.0)::numeric(5, 1) as pop_difference_percent,
+       sqrt(avg(power(population2 - population1, 2)))::smallint  as rmse
 from merge
 ;
+
+
+-- ABS 2016 SA2 to LGA -- 97% concordance
+-- +-----------+-----------+--------------+----------------------+----+
+-- |population1|population2|pop_difference|pop_difference_percent|rmse|
+-- +-----------+-----------+--------------+----------------------+----+
+-- |23355559   |23355534   |122453        |0.5                   |510 |
+-- +-----------+-----------+--------------+----------------------+----+
+
+-- ABS 2016 SA2 to SA3 -- 100% concordance -- should be perfect -- TODO: confirm this is a rounding error
+-- +-----------+-----------+--------------+----------------------+----+
+-- |population1|population2|pop_difference|pop_difference_percent|rmse|
+-- +-----------+-----------+--------------+----------------------+----+
+-- |23355552   |23355479   |1545          |0.0                   |6   |
+-- +-----------+-----------+--------------+----------------------+----+
+
+-- ABS 2016 LGA to SA3 -- 73% concordance
+-- +-----------+-----------+--------------+----------------------+----+
+-- |population1|population2|pop_difference|pop_difference_percent|rmse|
+-- +-----------+-----------+--------------+----------------------+----+
+-- |23355538   |23355479   |1086411       |4.7                   |6901|
+-- +-----------+-----------+--------------+----------------------+----+
+
+
+
+
+-- ABS 2016 POA to LGA -- 94% concordance
 
 -- abs 2016 used for residential addresses
 -- +-----------+-----------+--------------+
@@ -40,13 +69,13 @@ from merge
 -- +-----------+-----------+--------------+
 
 -- abs 2021 used for residential addresses
--- +-----------+-----------+--------------+
--- |population1|population2|pop_difference|
--- +-----------+-----------+--------------+
--- |23352385   |23355534   |322947        |
--- +-----------+-----------+--------------+
+-- +-----------+-----------+--------------+----------------------+----+
+-- |population1|population2|pop_difference|pop_difference_percent|rmse|
+-- +-----------+-----------+--------------+----------------------+----+
+-- |23352385   |23355534   |322947        |1.4                   |1251|
+-- +-----------+-----------+--------------+----------------------+----+
 
--- Geoscape planning zomes with 2021 MBs
+-- Geoscape planning zones with 2021 MBs
 -- +-----------+-----------+--------------+
 -- |population1|population2|pop_difference|
 -- +-----------+-----------+--------------+
