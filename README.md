@@ -21,7 +21,7 @@ Using this file comes with the following caveats:
 
 ![pc_vs_lga.png](pc_vs_lga.png "ABS 2016 Postcodes (pink) vs LGAs (blue)")
 
-Postcode 3127 split 46%-54% by the Boroondara & Whitehorse council boundary in blue (Map tiles by Carto, under CC BY 3.0. Data by OpenStreetMap, under ODbL)
+Postcode 3127 split 46%-54% by the Boroondara & Whitehorse council boundary in blue (Credits: boundary data by Australian Bureau of Statistics, under CC BY 4.0; Map tiles by Carto, under CC BY 3.0. Data by OpenStreetMap, under ODbL)
 
 ****
 
