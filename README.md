@@ -1,8 +1,8 @@
 # Concord
 
-A [CSV file](/data) for converting data between Australian census & administrative boundaries.
+A [CSV file](/data) for converting data between any 2 Australian boundaries.
 
-It solves the problem when you need to merge 2 or more datasets that are based on different boundaries (e.g. postcodes & council areas).
+It solves the problem when you need to merge 2 or more datasets that are based on different boundaries (e.g. postcodes, ABS Census boundaries or council areas).
 
 The concordance file is a CSV file for importing into your database or reporting tool. A script for importing into Postgres is also provided.
 
@@ -13,7 +13,7 @@ The concordance file is a CSV file for importing into your database or reporting
 
 ### Important
 
-Using this file comes with the following caveats - read this entire README file to understand the methodology used and it's limitations:
+Using this file comes with the following caveats - read this entire README file to understand the methodology used & it's accuracy:
  
 - Only works with data related to residents, citizens & consumers. In other words - industrial, commercial & special use data isn't suited to conversion using the file;
 - The % overlaps between boundaries are a best estimate of how data should be apportioned between 2 boundary sets based on residential address counts. Your data may have biases in it that mean this approach doesn't return the best result. e.g. looking at the image below - if your postcode 3127 customers were mostly in the Boroondara Council side - the boundary concordance file would incorrectly put 54% of customers in Whitehorse Council.
@@ -33,9 +33,7 @@ The concordance file is generated using this approach:
 3. Aggregate all residential address by the _**from**_ boundary and the _**to**_ boundary
 4. Determine the % overlap of residential addresses between both boundary types for all boundary combinations
 
-****
-
-## Concordances
+### Accuracy
 
 Below are the average concordances between 2 boundary types, weighted by residential address counts
 
@@ -61,20 +59,45 @@ A high average concordance indicates your data can be converted to the new bound
 
 ****
 
-## Get Started
+## Get started
+
+There are 2 options:
+1. Download the [concordances file](/data)
+2. Run `create_concordance_file.py` yourself
+
+### Download File
 
 
 
-Download the concordances file to get started
+### Run Python Script
+
+This only needs to be done for 3 reasons:
+1. The boundary from/to combination you need isn't in the standard [concordances file](/data)
+2. We've been too lazy to update the concordances file with the latest boundary data from the ABS and/or Geoscape
+3. You have a license of [Geoscape Buildings](https://geoscape.com.au/data/buildings/) or [Geoscape Land Parcels](https://geoscape.com.au/data/land-parcels/) and want to use the _planning zone_ data in those product to use:
+    1. A more accurate list of residential addresses to determine the data apportionment percentages (see note below); or
+    2. A different set of addresses to apportion your data by; such as industrial or commercial addresses
+
+
+Running the script requires the following open data in a Postgres database as well as the optional licensed Geoscape data mentioned above:
+1. ABS Census 2016 boundaries
+2. ABS Census 2021 boundaries
+3. GNAF
+4. Geoscape Administrative Boundaries
+
+These datasets are available as Postgres dump files 
+
+
+#### Note
+ - The benefits of using Geoscape planning zone data impacted by ~2.3m addresses not having a planning zone, The code as-is fills this missing data with ABS Census Meshblock categories.
+ - you need to run 02_create_residential_address_table.sql on your GNAF and Geoscape Buildings data to create the address_principals_buildings table below
 
 
 
+## Data Licenses
 
-notes:
- - the benefits of using Geoscape Buildings is minimal due to ~2.3m addresses not having a planning zone
- - you need to run 02_create_residential_address_table.sql on your GNAF and Geoscape Buildings data to create the
-   address_principals_buildings table below
+Incorporates or developed using G-NAF © [Geoscape Australia](https://geoscape.com.au/legal/data-copyright-and-disclaimer/) licensed by the Commonwealth of Australia under the [Open Geo-coded National Address File (G-NAF) End User Licence Agreement](https://data.gov.au/dataset/ds-dga-19432f89-dc3a-4ef3-b943-5326ef1dbecc/distribution/dist-dga-09f74802-08b1-4214-a6ea-3591b2753d30/details?q=).
 
+Incorporates or developed using Administrative Boundaries © [Geoscape Australia](https://geoscape.com.au/legal/data-copyright-and-disclaimer/) licensed by the Commonwealth of Australia under [Creative Commons Attribution 4.0 International licence (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/).
 
-
-
+Based on [Australian Bureau of Statistics](https://www.abs.gov.au/websitedbs/d3310114.nsf/Home/Attributing+ABS+Material) data, licensed by the Commonwealth of Australia under the [Creative Commons Attribution 4.0 International licence (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/).
