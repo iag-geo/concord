@@ -29,9 +29,9 @@ source_list = [
 # source of residential addresses to filter on - this will either be based on ABS Census 2021 meshblocks
 #   or planning zone data from the Geoscape Buildings datasets (licensed dataset)
 
-# residential_address_source = {"name": "geoscape", "schema": "geoscape_202203", "table": "address_principals_buildings"}
-residential_address_source = {"name": "abs 2021", "schema": "gnaf_202202",
-                              "table": "address_principal_census_2021_boundaries"}
+residential_address_source = {"name": "geoscape", "schema": "geoscape_202203", "table": "address_principals_buildings"}
+# residential_address_source = {"name": "abs 2021", "schema": "gnaf_202202",
+#                               "table": "address_principal_census_2021_boundaries"}
 # residential_address_source = {"name": "abs 2016", "schema": "gnaf_202202",
 #                               "table": "address_principal_census_2016_boundaries"}
 
@@ -39,20 +39,20 @@ residential_address_source = {"name": "abs 2021", "schema": "gnaf_202202",
 boundary_list = [
     # ABS 2016 to ABS 2016 bdys
     {"from": "poa", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
-    {"from": "sa3", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
-    {"from": "lga", "from_source": "abs 2016", "to": "sa3", "to_source": "abs 2016"},
-    {"from": "sa2", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
-    {"from": "sa2", "from_source": "abs 2016", "to": "sa3", "to_source": "abs 2016"},
-    {"from": "sa2", "from_source": "abs 2016", "to": "poa", "to_source": "abs 2016"},
-
-    # Geoscape to ABS 2016 bdys
-    {"from": "locality", "from_source": "geoscape 202202", "to": "lga", "to_source": "abs 2016"},
-    {"from": "postcode", "from_source": "geoscape 202202", "to": "lga", "to_source": "abs 2016"},
-    {"from": "lga", "from_source": "geoscape 202202", "to": "lga", "to_source": "abs 2016"},
-
-    # Geoscape to Geoscape bdys
-    {"from": "locality", "from_source": "geoscape 202202", "to": "lga", "to_source": "geoscape 202202"},
-    {"from": "postcode", "from_source": "geoscape 202202", "to": "lga", "to_source": "geoscape 202202"}
+    # {"from": "sa3", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
+    # {"from": "lga", "from_source": "abs 2016", "to": "sa3", "to_source": "abs 2016"},
+    # {"from": "sa2", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
+    # {"from": "sa2", "from_source": "abs 2016", "to": "sa3", "to_source": "abs 2016"},
+    # {"from": "sa2", "from_source": "abs 2016", "to": "poa", "to_source": "abs 2016"},
+    # 
+    # # Geoscape to ABS 2016 bdys
+    # {"from": "locality", "from_source": "geoscape 202202", "to": "lga", "to_source": "abs 2016"},
+    # {"from": "postcode", "from_source": "geoscape 202202", "to": "lga", "to_source": "abs 2016"},
+    # {"from": "lga", "from_source": "geoscape 202202", "to": "lga", "to_source": "abs 2016"},
+    # 
+    # # Geoscape to Geoscape bdys
+    # {"from": "locality", "from_source": "geoscape 202202", "to": "lga", "to_source": "geoscape 202202"},
+    # {"from": "postcode", "from_source": "geoscape 202202", "to": "lga", "to_source": "geoscape 202202"}
 
     # # test concordance for measuring reliability against known differences
     # {"from": "sa2", "from_source": "abs 2016", "to": "sa2", "to_source": "abs 2021"}
@@ -138,6 +138,10 @@ def add_concordances(bdys, pg_cur):
             to_table = get_source_table(to_source)
             input_tables += f"\n\t\t\t\t\t\tinner join {to_table} as t on t.gnaf_pid = f.gnaf_pid"""
 
+        # set the code and name field names
+        from_id_field, from_name_field = get_field_names(from_bdy, from_source, "from", input_tables)
+        to_id_field, to_name_field = get_field_names(to_bdy, to_source, "to", input_tables)
+
         # add the residential address table join and filter
         residential_filter = ""
         if residential_address_source["name"] == 'geoscape':
@@ -152,10 +156,6 @@ def add_concordances(bdys, pg_cur):
         #     residential_filter = "and f.mb_category = 'RESIDENTIAL'"
         # elif to_source == "abs 2016":
         #     residential_filter = "and t.mb_category = 'RESIDENTIAL'"
-
-        # set the code and name field names
-        from_id_field, from_name_field = get_field_names(from_bdy, from_source, "from", input_tables)
-        to_id_field, to_name_field = get_field_names(to_bdy, to_source, "to", input_tables)
 
         # build the query
         query = f"""insert into {output_schema}.{output_table}
@@ -196,7 +196,7 @@ def add_concordances(bdys, pg_cur):
         if "sa2" in [from_bdy, to_bdy]:
             query = query.replace("sa2_16code", "sa2_16main")
 
-        # print(query)
+        print(query)
         pg_cur.execute(query)
 
         logger.info(f"\t - {from_source} {from_bdy} to {to_source} {to_bdy} records added : {datetime.now() - start_time}")
