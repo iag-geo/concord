@@ -62,15 +62,20 @@ A high average concordance indicates your data can be converted to the new bound
 
 ## Get started
 
-There are 2 options:
-1. Download the [concordances file](/data)
-2. Run `create_concordance_file.py` yourself
+### 1. Get the Concordance File
 
-### Download File
+There are 2 options to get it:
+1. Download and import the file 
+2. Run `create_concordance_file.py` to create it yourself
 
+#### Download and Import
 
+1. Download the [concordance file](/data)
+2. Import it into your database/reporting tool of choice. If using Postgres:
+    1. Edit the file path, schema name & table owner in `00_import_concordance_file.sql` in the [postgres-scripts](/postgres-scripts) folder
+    2. Run the SQL script to import the file  
 
-### Run Python Script
+#### Run Python Script
 
 This requires a knowledge of Python, Postgres & pg_restore.
 
@@ -87,17 +92,21 @@ Running the script requires the following open data, available as Postgres dump 
 3. GNAF from gnaf-loader ([download](https://minus34.com/opendata/geoscape-202202/gnaf-202202.dmp))
 4. Geoscape Administrative Boundaries from gnaf-loader ([download](https://minus34.com/opendata/geoscape-202202/admin-bdys-202202.dmp))
 
-#### Process
+###### Process
 
 1. Download the above dump files and import them using `pg_restore`
 2. Prep the Census boundary tagged address tables by running `01a_create_gnaf_2016_census_bdy_table.sql` & `01b_create_gnaf_2021_census_bdy_table.sql` in the [postgres-scripts](/postgres-scripts) folder
-3. Review and edit the Python script as required
+3. OPTIONAL: If you have access to Geoscape Buildings or Land Parcels data:
+    1. import it into Postgres
+    2. Edit the `02_create_residential_address_table.sql` in the [postgres-scripts](/postgres-scripts) folder to suit your dataset and schema name
+    3. Run the above SQL script
+4. Review the Python script as required - makes any required changes in the sections marked for editing
+5. Add `psycopg2` to your Python 3.x environment
+6. Run the script
 
 #### Note
  - The benefits of using Geoscape planning zone data impacted by ~2.3m addresses not having a planning zone, The code as-is fills this missing data with ABS Census Meshblock categories.
  - you need to run 02_create_residential_address_table.sql on your GNAF and Geoscape Buildings data to create the address_principals_buildings table below
-
-
 
 ## Data Licenses
 
