@@ -143,7 +143,8 @@ from final
 
 
 select *
-from testing.boundary_concordance;
+from gnaf_202202.boundary_concordance
+where from_id ='POA3127';
 
 
 
