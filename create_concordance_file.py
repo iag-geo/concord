@@ -76,17 +76,15 @@ def main():
     # create table
     create_table(pg_cur)
 
-    # add concordances and get average error where bdys are both in the ABS 2016 Census
-    average_error_list = list()
+    # add concordances
     for bdys in boundary_list:
-        average_error_dict = add_concordances(bdys, pg_cur)
-        average_error_list.append(average_error_dict)
+        add_concordances(bdys, pg_cur)
 
     # analyse and index table
     index_table(pg_cur)
 
     # get weighted scores as % concordance
-    score_results(pg_cur, average_error_list)
+    score_results(pg_cur)
 
     # # export results to csv
     export_to_csv(pg_cur, f"{output_schema}.{output_table}", output_table + ".csv")
@@ -203,24 +201,8 @@ def add_concordances(bdys, pg_cur):
 
         logger.info(f"\t - {from_source} {from_bdy} to {to_source} {to_bdy} records added : {datetime.now() - start_time}")
 
-        # calculate average error for ABS Census 2016 bdys - using total population for QA
-        if from_source == "abs 2016" and to_source == "abs 2016":
-            average_error_dict = dict()
-            average_error_dict["from_source"] =
-            average_error_dict[""] =
-
-
-
-
-
-        else:
-            average_error_dict = None
-
     else:
-        average_error_dict = None
         logger.fatal(f"\t - {from_source} not in sources!")
-
-    return average_error_dict
 
 
 def get_field_names(bdy, source, type, sql):
@@ -267,7 +249,7 @@ def index_table(pg_cur):
     logger.info(f"\t - primary key added : {datetime.now() - start_time}")
 
 
-def score_results(pg_cur, average_error_list):
+def score_results(pg_cur):
     start_time = datetime.now()
 
     # calculate concordance score (weighted by address count)
@@ -293,7 +275,7 @@ def score_results(pg_cur, average_error_list):
                        to_source,
                        to_bdy,
                        (sum(weighted_address_count) / sum(address_count)::float)::smallint as concordance_percent,
-                       0.0::float as avg_error_percent
+                       null::numeric(5, 1) as error_percent
                 from cnt
                 group by from_source,
                          from_bdy,
@@ -309,8 +291,7 @@ def score_results(pg_cur, average_error_list):
 
     pg_cur.execute(query)
 
-    # # add average expected error using population data from the 2016 census
-    # for average_error_dict in average_error_list:
+
 
 
 
@@ -320,15 +301,71 @@ def score_results(pg_cur, average_error_list):
     pg_cur.execute(f"select * from {output_schema}.{output_score_table} order by from_bdy, to_bdy")
     rows = pg_cur.fetchall()
 
+
+
+
     logger.info(f"\t - results scored : {datetime.now() - start_time}")
-    logger.info("\t\t---------------------------------------------------------------------")
-    logger.info("\t\t| {:24} | {:24} | {:11} |".format("from", "to", "concordance"))
-    logger.info("\t\t---------------------------------------------------------------------")
+    logger.info("\t\t---------------------------------------------------------------------------------")
+    logger.info("\t\t| {:24} | {:24} | {:11} | {:9} |".format("from", "to", "concordance", "avg error"))
+    logger.info("\t\t---------------------------------------------------------------------------------")
 
+    # add average errors for ABS 2016 bdys and log QA metrics
     for row in rows:
-        logger.info("\t\t| {:24} | {:24} | {:10}% |".format(row[0], row[1], row[2]))
+        from_source = row[0]
+        from_bdy = row[1]
+        to_source = row[2]
+        to_bdy = row[3]
 
-    logger.info("\t\t---------------------------------------------------------------------")
+        concordance = row[4]
+
+        # add average expected error using population data from the 2016 census
+        if from_source == "abs 2016" and to_source == "abs 2016":
+            query = f"""with pc as (
+                            select con.to_id,
+                                   con.to_name,
+                                   con.to_source,
+                                   sum(from_bdy.g3::float * con.address_percent / 100.0)::integer as population1
+                            from census_2016_data.{from_bdy}_g01 as from_bdy
+                                     inner join {output_schema}.{output_table} as con on from_bdy.region_id = con.from_id
+                            where from_source = '{from_source}'
+                                and from_bdy = '{from_bdy}'
+                                and to_source = '{to_source}'
+                                and to_bdy = '{to_bdy}'
+                            group by con.to_id,
+                                     con.to_name,
+                                     con.to_source
+                        ), merge as (
+                            select to_id,
+                                   to_name,
+                                   to_source,
+                                   population1,
+                                   g3 as population2
+    --                                g3 - population1 as pop_difference,
+    --                                (abs((g3 - population1) / g3) * 100.0)::smallint as pop_diff_percent
+                            from census_2016_data.{to_bdy}_g01 as to_bdy
+                            inner join pc on pc.to_id = to_bdy.region_id
+                        )
+                        select (sum(abs(population2 - population1)) / sum(population2) * 100.0)::numeric(5, 1) as error_percent
+--                                sum(population1) as population1,
+--                                sum(population2) as population2,
+--                                sum(abs(pop_difference)) as pop_difference,
+--                                sqrt(avg(power(population2 - population1, 2)))::smallint as rmse
+                        from merge"""
+
+            pg_cur.execute(query)
+            error_percent = str(pg_cur.fetchone()[0])
+
+        else:
+            error_percent = "N/A"
+
+        # add error to score table
+
+
+
+
+        logger.info(f"\t\t| {from_source + ' ' + from_bdy:24} | {to_source + ' ' + to_bdy:24} | {concordance:10}% | {error_percent:8}% |")
+
+    logger.info("\t\t---------------------------------------------------------------------------------")
 
 
 def export_to_csv(pg_cur, table, file_name):

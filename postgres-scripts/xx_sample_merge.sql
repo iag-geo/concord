@@ -29,8 +29,8 @@ inner join pc on pc.to_id = to_bdy.region_id
 select sum(population1) as population1,
        sum(population2) as population2,
        sum(abs(pop_difference)) as pop_difference,
-       (sum(abs(pop_difference)) / sum(population2) * 100.0)::numeric(5, 1) as pop_difference_percent,
-       sqrt(avg(power(population2 - population1, 2)))::smallint  as rmse
+       (sum(abs(pop_difference)) / sum(population2) * 100.0)::numeric(5, 1) as error_percent,
+       sqrt(avg(power(population2 - population1, 2)))::smallint as rmse
 from merge
 ;
 

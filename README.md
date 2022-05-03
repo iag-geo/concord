@@ -91,6 +91,7 @@ Running the script requires the following open data, available as Postgres dump 
 2. ABS Census 2021 boundaries ([download](https://minus34.com/opendata/census-2021/census_2021_bdys.dmp))
 3. GNAF from gnaf-loader ([download](https://minus34.com/opendata/geoscape-202202/gnaf-202202.dmp))
 4. Geoscape Administrative Boundaries from gnaf-loader ([download](https://minus34.com/opendata/geoscape-202202/admin-bdys-202202.dmp))
+5. ABS Census 2016 data - for QA only ([download](https://minus34.com/opendata/census-2016/census_2016_data.dmp))
 
 ###### Process
 
