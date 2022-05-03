@@ -64,11 +64,9 @@ create table gnaf_202202.address_principal_census_2016_boundaries as
 with abs as (
     select mb.mb_16code,
            mb_category,
-
-           sa1_16main,
-           sa1_16_7cd,
-           sa2_16main,
-           sa2_16_5cd,
+           sa1_16main as sa1_16code,
+           sa1_16_7cd as sa1_16name,
+           sa2_16main as sa2_16code,
            sa2_16name,
            sa3_16code,
            sa3_16name,

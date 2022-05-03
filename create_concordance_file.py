@@ -36,6 +36,7 @@ residential_address_source = {"name": "abs 2021", "schema": "gnaf_202202",
 #                               "table": "address_principal_census_2016_boundaries"}
 
 # the list of boundary pair to create concordances - from and to sources must match the names of the above sources
+# list doesn't include ABS boundary pairs that are nested (e.g. SA2 > SA3) and have their own lookup table
 boundary_list = [
     # ABS 2016 to ABS 2016 bdys
     {"from": "poa", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
@@ -43,7 +44,6 @@ boundary_list = [
     {"from": "lga", "from_source": "abs 2016", "to": "sa3", "to_source": "abs 2016"},
     {"from": "sa2", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
     {"from": "sa2", "from_source": "abs 2016", "to": "poa", "to_source": "abs 2016"},
-    {"from": "ssc", "from_source": "abs 2016", "to": "poa", "to_source": "abs 2016"},
 
     # Geoscape to ABS 2016 bdys
     {"from": "locality", "from_source": "geoscape 202202", "to": "sa2", "to_source": "abs 2016"},
@@ -193,12 +193,12 @@ def add_concordances(bdys, pg_cur):
                     )
                     select * from final where percent > 0.0;"""
 
-        # hardcode fixes for SA1 and SA2 oddities
-        if "sa1" in [from_bdy, to_bdy]:
-            query = query.replace("sa1_16code", "sa1_16main").replace("sa1_16name", "sa1_16_7cd")
-
-        if "sa2" in [from_bdy, to_bdy]:
-            query = query.replace("sa2_16code", "sa2_16main")
+        # # hardcode fixes for SA1 and SA2 oddities
+        # if "sa1" in [from_bdy, to_bdy]:
+        #     query = query.replace("sa1_16code", "sa1_16main").replace("sa1_16name", "sa1_16_7cd")
+        #
+        # if "sa2" in [from_bdy, to_bdy]:
+        #     query = query.replace("sa2_16code", "sa2_16main")
 
         # print(query)
         pg_cur.execute(query)
