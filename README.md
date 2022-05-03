@@ -1,10 +1,10 @@
 # Concord
 
-A [CSV file](/data) for converting data between any 2 Australian boundaries.
+A [CSV file](/data) and supporting scripts for converting data between any 2 Australian boundaries.
 
-It solves the problem when you need to merge 2 or more datasets that are based on different boundaries (e.g. postcodes, ABS Census boundaries or council areas).
+It solves the problem of trying to merge 2 or more datasets based on different census or administrative boundaries such as statistical areas or postcodes.
 
-The concordance file is a CSV file for importing into your database or reporting tool. A script for importing into Postgres is also provided.
+Download & import the [concordance file](/data) into your database or reporting tool to get started. A script for importing into Postgres is also provided.
 
 ### Example Use Cases
 

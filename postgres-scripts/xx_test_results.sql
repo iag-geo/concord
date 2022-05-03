@@ -1,4 +1,16 @@
 
+
+
+
+
+-- alter table gnaf_202202.address_principal_admin_boundaries cluster on address_principal_admin_boundaries_gnaf_pid_idx;
+
+
+
+
+
+
+
 -- compare ABS correspondences with address count correspondences
 select count(*) as bdy_pair_count,
        sqrt(avg(power(cor.ratio_from_to * 100.0 - bdy.address_percent, 2)))::smallint  as rmse,
