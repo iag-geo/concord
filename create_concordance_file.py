@@ -368,7 +368,18 @@ def score_results(pg_cur):
 
 def export_to_csv(pg_cur, table, file_name):
 
-    query = f"COPY (select * from {table}) TO STDOUT WITH CSV HEADER"
+    query = f"""COPY (
+                    select * 
+                    from {table} 
+                    order by from_source, 
+                        from_bdy, 
+                        to_source, 
+                        to_bdy, 
+                        to_state, 
+                        to_name, 
+                        from_state, 
+                        from_name
+                ) TO STDOUT WITH CSV HEADER"""
     with open(os.path.join(output_path, file_name), "w") as f:
         pg_cur.copy_expert(query, f)
 
