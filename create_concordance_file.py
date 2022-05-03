@@ -39,20 +39,20 @@ residential_address_source = {"name": "abs 2021", "schema": "gnaf_202202",
 boundary_list = [
     # ABS 2016 to ABS 2016 bdys
     {"from": "poa", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
-    # {"from": "sa3", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
-    # {"from": "lga", "from_source": "abs 2016", "to": "sa3", "to_source": "abs 2016"},
-    # {"from": "sa2", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
-    # {"from": "sa2", "from_source": "abs 2016", "to": "sa3", "to_source": "abs 2016"},
-    # {"from": "sa2", "from_source": "abs 2016", "to": "poa", "to_source": "abs 2016"},
+    {"from": "sa3", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
+    {"from": "lga", "from_source": "abs 2016", "to": "sa3", "to_source": "abs 2016"},
+    {"from": "sa2", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
+    {"from": "sa2", "from_source": "abs 2016", "to": "sa3", "to_source": "abs 2016"},
+    {"from": "sa2", "from_source": "abs 2016", "to": "poa", "to_source": "abs 2016"},
 
     # Geoscape to ABS 2016 bdys
     {"from": "locality", "from_source": "geoscape 202202", "to": "lga", "to_source": "abs 2016"},
-    # {"from": "postcode", "from_source": "geoscape 202202", "to": "lga", "to_source": "abs 2016"},
-    # {"from": "lga", "from_source": "geoscape 202202", "to": "lga", "to_source": "abs 2016"},
+    {"from": "postcode", "from_source": "geoscape 202202", "to": "lga", "to_source": "abs 2016"},
+    {"from": "lga", "from_source": "geoscape 202202", "to": "lga", "to_source": "abs 2016"},
 
     # Geoscape to Geoscape bdys
     {"from": "locality", "from_source": "geoscape 202202", "to": "lga", "to_source": "geoscape 202202"},
-    # {"from": "postcode", "from_source": "geoscape 202202", "to": "lga", "to_source": "geoscape 202202"}
+    {"from": "postcode", "from_source": "geoscape 202202", "to": "lga", "to_source": "geoscape 202202"}
 
     # # test concordance for measuring reliability against known differences
     # {"from": "sa2", "from_source": "abs 2016", "to": "sa2", "to_source": "abs 2021"}
@@ -291,18 +291,9 @@ def score_results(pg_cur):
 
     pg_cur.execute(query)
 
-
-
-
-
-
-
     # log results
     pg_cur.execute(f"select * from {output_schema}.{output_score_table} order by from_bdy, to_bdy")
     rows = pg_cur.fetchall()
-
-
-
 
     logger.info(f"\t - results scored : {datetime.now() - start_time}")
     logger.info("\t\t---------------------------------------------------------------------------------")
@@ -354,16 +345,19 @@ def score_results(pg_cur):
 
             pg_cur.execute(query)
             error_percent = pg_cur.fetchone()[0]
+            error_percent_str = str(error_percent) + "%"
 
         else:
             error_percent = None
+            error_percent_str = "N/A"
 
         # add error to score table
 
 
 
 
-        logger.info(f"\t\t| {from_source + ' ' + from_bdy:24} | {to_source + ' ' + to_bdy:24} | {concordance:10}% | {float(error_percent):8}% |")
+        logger.info(f"\t\t| {from_source + ' ' + from_bdy:24} | {to_source + ' ' + to_bdy:24} "
+                    f"| {concordance:10}% | {error_percent_str:>9} |")
 
     logger.info("\t\t---------------------------------------------------------------------------------")
 
