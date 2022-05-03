@@ -39,19 +39,19 @@ residential_address_source = {"name": "abs 2021", "schema": "gnaf_202202",
 boundary_list = [
     # ABS 2016 to ABS 2016 bdys
     {"from": "poa", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
-    {"from": "sa3", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
-    {"from": "lga", "from_source": "abs 2016", "to": "sa3", "to_source": "abs 2016"},
-    {"from": "sa2", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
-    {"from": "sa2", "from_source": "abs 2016", "to": "sa3", "to_source": "abs 2016"},
-    {"from": "sa2", "from_source": "abs 2016", "to": "poa", "to_source": "abs 2016"},
-    # 
-    # # Geoscape to ABS 2016 bdys
-    # {"from": "locality", "from_source": "geoscape 202202", "to": "lga", "to_source": "abs 2016"},
+    # {"from": "sa3", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
+    # {"from": "lga", "from_source": "abs 2016", "to": "sa3", "to_source": "abs 2016"},
+    # {"from": "sa2", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
+    # {"from": "sa2", "from_source": "abs 2016", "to": "sa3", "to_source": "abs 2016"},
+    # {"from": "sa2", "from_source": "abs 2016", "to": "poa", "to_source": "abs 2016"},
+
+    # Geoscape to ABS 2016 bdys
+    {"from": "locality", "from_source": "geoscape 202202", "to": "lga", "to_source": "abs 2016"},
     # {"from": "postcode", "from_source": "geoscape 202202", "to": "lga", "to_source": "abs 2016"},
     # {"from": "lga", "from_source": "geoscape 202202", "to": "lga", "to_source": "abs 2016"},
-    # 
-    # # Geoscape to Geoscape bdys
-    # {"from": "locality", "from_source": "geoscape 202202", "to": "lga", "to_source": "geoscape 202202"},
+
+    # Geoscape to Geoscape bdys
+    {"from": "locality", "from_source": "geoscape 202202", "to": "lga", "to_source": "geoscape 202202"},
     # {"from": "postcode", "from_source": "geoscape 202202", "to": "lga", "to_source": "geoscape 202202"}
 
     # # test concordance for measuring reliability against known differences
@@ -287,7 +287,7 @@ def score_results(pg_cur):
                          to_bdy;
                 analyse {output_schema}.{output_score_table};
                 alter table {output_schema}.{output_score_table} 
-                    add constraint {output_score_table}_pkey primary key (from_bdy, to_bdy);"""
+                    add constraint {output_score_table}_pkey primary key (from_source, from_bdy, to_source, to_bdy);"""
 
     pg_cur.execute(query)
 
@@ -353,17 +353,17 @@ def score_results(pg_cur):
                         from merge"""
 
             pg_cur.execute(query)
-            error_percent = str(pg_cur.fetchone()[0])
+            error_percent = pg_cur.fetchone()[0]
 
         else:
-            error_percent = "N/A"
+            error_percent = None
 
         # add error to score table
 
 
 
 
-        logger.info(f"\t\t| {from_source + ' ' + from_bdy:24} | {to_source + ' ' + to_bdy:24} | {concordance:10}% | {error_percent:8}% |")
+        logger.info(f"\t\t| {from_source + ' ' + from_bdy:24} | {to_source + ' ' + to_bdy:24} | {concordance:10}% | {float(error_percent):8}% |")
 
     logger.info("\t\t---------------------------------------------------------------------------------")
 
