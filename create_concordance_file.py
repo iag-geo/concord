@@ -292,7 +292,7 @@ def score_results(pg_cur):
     pg_cur.execute(query)
 
     # log results
-    pg_cur.execute(f"select * from {output_schema}.{output_score_table} order by from_bdy, to_bdy")
+    pg_cur.execute(f"select * from {output_schema}.{output_score_table} order by from_source, from_bdy, to_source, to_bdy")
     rows = pg_cur.fetchall()
 
     logger.info(f"\t - results scored : {datetime.now() - start_time}")
@@ -347,14 +347,18 @@ def score_results(pg_cur):
             error_percent = pg_cur.fetchone()[0]
             error_percent_str = str(error_percent) + "%"
 
+            # update score table
+            query = f"""update {output_schema}.{output_score_table}
+                            set error_percent = {error_percent}
+                        where from_source = {from_source}
+                            and from_bdy = {from_bdy}
+                            and to_source = {to_source}
+                            and to_bdy = {to_bdy}"""
+            pg_cur.execute(query)
+
         else:
             error_percent = None
             error_percent_str = "N/A"
-
-        # add error to score table
-
-
-
 
         logger.info(f"\t\t| {from_source + ' ' + from_bdy:24} | {to_source + ' ' + to_bdy:24} "
                     f"| {concordance:10}% | {error_percent_str:>9} |")
