@@ -73,15 +73,15 @@ def main():
     pg_conn.autocommit = True
     pg_cur = pg_conn.cursor()
 
-    # create table
-    create_table(pg_cur)
-
-    # add concordances
-    for bdys in boundary_list:
-        add_concordances(bdys, pg_cur)
-
-    # analyse and index table
-    index_table(pg_cur)
+    # # create table
+    # create_table(pg_cur)
+    #
+    # # add concordances
+    # for bdys in boundary_list:
+    #     add_concordances(bdys, pg_cur)
+    #
+    # # analyse and index table
+    # index_table(pg_cur)
 
     # get weighted scores as % concordance
     score_results(pg_cur)
@@ -350,10 +350,10 @@ def score_results(pg_cur):
             # update score table
             query = f"""update {output_schema}.{output_score_table}
                             set error_percent = {error_percent}
-                        where from_source = {from_source}
-                            and from_bdy = {from_bdy}
-                            and to_source = {to_source}
-                            and to_bdy = {to_bdy}"""
+                        where from_source = '{from_source}'
+                            and from_bdy = '{from_bdy}'
+                            and to_source = '{to_source}'
+                            and to_bdy = '{to_bdy}'"""
             pg_cur.execute(query)
 
         else:
@@ -372,13 +372,9 @@ def export_to_csv(pg_cur, table, file_name):
                     select * 
                     from {table} 
                     order by from_source, 
-                        from_bdy, 
-                        to_source, 
-                        to_bdy, 
-                        to_state, 
-                        to_name, 
-                        from_state, 
-                        from_name
+                             from_bdy, 
+                             to_source, 
+                             to_bdy
                 ) TO STDOUT WITH CSV HEADER"""
     with open(os.path.join(output_path, file_name), "w") as f:
         pg_cur.copy_expert(query, f)
