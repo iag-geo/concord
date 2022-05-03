@@ -5,34 +5,34 @@ select from_id,
        sum(address_count) as address_count,
        sum(address_count::float * address_percent)  / sum(address_count)::float as weighted_percent
 from testing.boundary_concordance
-where from_type = 'poa'
-  and to_type = 'lga'
+where from_bdy = 'poa'
+  and to_bdy = 'lga'
 group by from_id
 ;
 
 with cnt as (
-    select from_type,
+    select from_bdy,
            from_id,
-           to_type,
+           to_bdy,
            sum(address_count::float * address_percent) as weighted_address_count,
            sum(address_count) as address_count
     from testing.boundary_concordance
-    group by from_type,
+    group by from_bdy,
              from_id,
-             to_type
+             to_bdy
 )
-select from_type,
-       to_type,
+select from_bdy,
+       to_bdy,
        (sum(weighted_address_count) / sum(address_count)::float)::smallint as concordance_percent
 from cnt
-group by from_type,
-         to_type
+group by from_bdy,
+         to_bdy
 ;
 
 
 select * from testing.boundary_concordance as con
-where from_type = 'sa2'
-    and to_type = 'sa2'
+where from_bdy = 'sa2'
+    and to_bdy = 'sa2'
     and address_percent < 100
 order by from_id,
          address_percent

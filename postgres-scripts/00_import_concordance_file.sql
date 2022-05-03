@@ -4,11 +4,11 @@ drop table if exists gnaf_202202.boundary_concordance;
 create table gnaf_202202.boundary_concordance
 (
     from_source     text not null,
-    from_type       text not null,
+    from_bdy       text not null,
     from_id         text not null,
     from_name       text not null,
     to_source       text not null,
-    to_type         text not null,
+    to_bdy         text not null,
     to_id           text not null,
     to_name         text not null,
     address_count   integer,

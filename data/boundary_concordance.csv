@@ -1,4 +1,4 @@
-from_source,from_type,from_id,from_name,to_source,to_type,to_id,to_name,address_count,address_percent
+from_source,from_bdy,from_id,from_name,to_source,to_bdy,to_id,to_name,address_count,address_percent
 abs 2016,poa,POA0800,0800,abs 2016,lga,LGA71000,Darwin (C),7077,93.80965005302227
 abs 2016,poa,POA0800,0800,abs 2016,lga,LGA79399,Unincorporated NT,467,6.190349946977731
 abs 2016,poa,POA0810,0810,abs 2016,lga,LGA71000,Darwin (C),16184,100

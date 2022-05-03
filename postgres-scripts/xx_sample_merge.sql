@@ -9,9 +9,9 @@ with pc as (
     from census_2016_data.lga_g01 as from_bdy
              inner join gnaf_202202.boundary_concordance as con on from_bdy.region_id = con.from_id
     where from_source = 'abs 2016'
-        and from_type = 'lga'
+        and from_bdy = 'lga'
         and to_source = 'abs 2016'
-        and to_type = 'sa3'
+        and to_bdy = 'sa3'
     group by con.to_id,
              con.to_name,
              con.to_source

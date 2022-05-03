@@ -76,15 +76,17 @@ def main():
     # create table
     create_table(pg_cur)
 
-    # add concordances
+    # add concordances and get average error where bdys are both in the ABS 2016 Census
+    average_error_list = list()
     for bdys in boundary_list:
-        add_concordances(bdys, pg_cur)
+        average_error_dict = add_concordances(bdys, pg_cur)
+        average_error_list.append(average_error_dict)
 
     # analyse and index table
     index_table(pg_cur)
 
     # get weighted scores as % concordance
-    score_results(pg_cur)
+    score_results(pg_cur, average_error_list)
 
     # # export results to csv
     export_to_csv(pg_cur, f"{output_schema}.{output_table}", output_table + ".csv")
@@ -102,11 +104,11 @@ def create_table(pg_cur):
                 create table {output_schema}.{output_table}
                 (
                     from_source     text not null,
-                    from_type       text not null,
+                    from_bdy       text not null,
                     from_id         text not null,
                     from_name       text not null,
                     to_source       text not null,
-                    to_type         text not null,
+                    to_bdy         text not null,
                     to_id           text not null,
                     to_name         text not null,
                     address_count   integer,
@@ -201,8 +203,24 @@ def add_concordances(bdys, pg_cur):
 
         logger.info(f"\t - {from_source} {from_bdy} to {to_source} {to_bdy} records added : {datetime.now() - start_time}")
 
+        # calculate average error for ABS Census 2016 bdys - using total population for QA
+        if from_source == "abs 2016" and to_source == "abs 2016":
+            average_error_dict = dict()
+            average_error_dict["from_source"] =
+            average_error_dict[""] =
+
+
+
+
+
+        else:
+            average_error_dict = None
+
     else:
+        average_error_dict = None
         logger.fatal(f"\t - {from_source} not in sources!")
+
+    return average_error_dict
 
 
 def get_field_names(bdy, source, type, sql):
@@ -249,35 +267,54 @@ def index_table(pg_cur):
     logger.info(f"\t - primary key added : {datetime.now() - start_time}")
 
 
-def score_results(pg_cur):
+def score_results(pg_cur, average_error_list):
     start_time = datetime.now()
 
     # calculate concordance score (weighted by address count)
     query = f"""drop table if exists {output_schema}.{output_score_table};
                 create table {output_schema}.{output_score_table} as
                 with cnt as (
-                    select concat(from_source, ' ', from_type) as from_bdy,
+                    select from_source,
+                           from_bdy,
                            from_id,
-                           concat(to_source, ' ', to_type) as to_bdy,
+                           to_source,
+                           to_bdy,
                            sum(address_count::float * address_percent) as weighted_address_count,
                            sum(address_count) as address_count
                     from {output_schema}.{output_table}
-                    group by from_bdy,
+                    group by from_source,
+                             from_bdy,
                              from_id,
+                             to_source,
                              to_bdy
                 )
-                select from_bdy,
+                select from_source,
+                       from_bdy,
+                       to_source,
                        to_bdy,
                        (sum(weighted_address_count) / sum(address_count)::float)::smallint as concordance_percent,
                        0.0::float as avg_error_percent
                 from cnt
-                group by from_bdy,
+                group by from_source,
+                         from_bdy,
+                         to_source,
+                         to_bdy
+                order by from_source,
+                         from_bdy,
+                         to_source,
                          to_bdy;
                 analyse {output_schema}.{output_score_table};
                 alter table {output_schema}.{output_score_table} 
                     add constraint {output_score_table}_pkey primary key (from_bdy, to_bdy);"""
 
     pg_cur.execute(query)
+
+    # # add average expected error using population data from the 2016 census
+    # for average_error_dict in average_error_list:
+
+
+
+
 
     # log results
     pg_cur.execute(f"select * from {output_schema}.{output_score_table} order by from_bdy, to_bdy")

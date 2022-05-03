@@ -2,10 +2,10 @@
 -- drop table if exists testing.census_2016_bdy_concordance;
 -- create table testing.census_2016_bdy_concordance
 -- (
---     from_type       text not null,
+--     from_bdy       text not null,
 --     from_id         text not null,
 --     from_name       text not null,
---     to_type         text not null,
+--     to_bdy         text not null,
 --     to_id           text not null,
 --     to_name         text not null,
 --     address_count   integer,
@@ -36,11 +36,11 @@ with agg as (
              to_name
 --              to_state
 ), final as (
-    select 'abs 2016 postcode'::text as from_type,
+    select 'abs 2016 postcode'::text as from_bdy,
            agg.from_id,
            agg.from_name,
 --            agg.from_state,
-           'abs 2016 lga'::text as to_type,
+           'abs 2016 lga'::text as to_bdy,
            agg.to_id,
            agg.to_name,
 --            agg.to_state,
