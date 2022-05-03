@@ -46,17 +46,19 @@ A high average concordance indicates your data can be converted to the new bound
 
 | from                     | to                       | concordance | avg error       |
 |:-------------------------| :----------------------- | ----------: |----------------:|
-| abs 2016 lga             | abs 2016 sa3             |                 74% |            4.7% |
-| abs 2016 poa             | abs 2016 lga             |                 93% |            1.4% |
-| abs 2016 sa2             | abs 2016 lga             |                 97% |            0.5% |
-| abs 2016 sa2             | abs 2016 poa             |                 79% |            4.2% |
-| abs 2016 sa2             | abs 2016 sa3             |                100% |            0.0% |
-| abs 2016 sa3             | abs 2016 lga             |                 83% |            2.9% |
-| geoscape 202202 lga      | abs 2016 lga             |                100% |             N/A |
-| geoscape 202202 locality | abs 2016 lga             |                 98% |             N/A |
-| geoscape 202202 locality | geoscape 202202 lga      |                 98% |             N/A |
-| geoscape 202202 postcode | abs 2016 lga             |                 93% |             N/A |
-| geoscape 202202 postcode | geoscape 202202 lga      |                 93% |             N/A |
+| abs 2016 lga             | abs 2016 sa3             |         74% |      4.7% |
+| abs 2016 poa             | abs 2016 lga             |         93% |      1.4% |
+| abs 2016 sa2             | abs 2016 lga             |         97% |      0.5% |
+| abs 2016 sa2             | abs 2016 poa             |         79% |      4.2% |
+| abs 2016 sa3             | abs 2016 lga             |         83% |      2.9% |
+| geoscape 202202 lga      | abs 2016 lga             |        100% |       N/A |
+| geoscape 202202 locality | abs 2016 lga             |         98% |       N/A |
+| geoscape 202202 locality | abs 2016 sa2             |         94% |       N/A |
+| geoscape 202202 locality | abs 2016 sa3             |         99% |       N/A |
+| geoscape 202202 locality | geoscape 202202 lga      |         98% |       N/A |
+| geoscape 202202 postcode | abs 2016 lga             |         93% |       N/A |
+| geoscape 202202 postcode | abs 2016 sa3             |         92% |       N/A |
+| geoscape 202202 postcode | geoscape 202202 lga      |         93% |       N/A |
 
 ****
 

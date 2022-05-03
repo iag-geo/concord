@@ -49,7 +49,6 @@ boundary_list = [
     {"from": "locality", "from_source": "geoscape 202202", "to": "sa2", "to_source": "abs 2016"},
     {"from": "locality", "from_source": "geoscape 202202", "to": "sa3", "to_source": "abs 2016"},
     {"from": "locality", "from_source": "geoscape 202202", "to": "lga", "to_source": "abs 2016"},
-    {"from": "postcode", "from_source": "geoscape 202202", "to": "sa2", "to_source": "abs 2016"},
     {"from": "postcode", "from_source": "geoscape 202202", "to": "sa3", "to_source": "abs 2016"},
     {"from": "postcode", "from_source": "geoscape 202202", "to": "lga", "to_source": "abs 2016"},
     {"from": "lga", "from_source": "geoscape 202202", "to": "lga", "to_source": "abs 2016"},
