@@ -73,15 +73,15 @@ def main():
     pg_conn.autocommit = True
     pg_cur = pg_conn.cursor()
 
-    # # create table
-    # create_table(pg_cur)
-    #
-    # # add concordances
-    # for bdys in boundary_list:
-    #     add_concordances(bdys, pg_cur)
-    #
-    # # analyse and index table
-    # index_table(pg_cur)
+    # create table
+    create_table(pg_cur)
+
+    # add concordances
+    for bdys in boundary_list:
+        add_concordances(bdys, pg_cur)
+
+    # analyse and index table
+    index_table(pg_cur)
 
     # get weighted scores as % concordance
     score_results(pg_cur)
