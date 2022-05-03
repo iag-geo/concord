@@ -42,7 +42,9 @@ Concordance describes what % of residential addresses in the "from" boundary fit
 
 _e.g. 100% of postcode 3126 fits within the Boroondara LGA. However, only ~46% of postcode 3127 fits within that LGA (see image above)._
 
-A high average concordance indicates your data can be converted to the new boundary reliability. The lower the concordance the more inaccurate the data conversion may be. 
+A high average concordance indicates your data can be converted to the new boundary reliability. The lower the concordance the more inaccurate the data conversion may be.
+
+Concordances only work when going from a smaller boundary to a similar sized or larger one. This is evidenced in the table below.
 
 | from                     | to                       | concordance | avg error       |
 |:-------------------------| :----------------------- | ----------: |----------------:|
