@@ -199,81 +199,99 @@ def add_concordances(bdys, pg_cur):
         # print(query)
         pg_cur.execute(query)
 
-        logger.info(f"\t - {from_source} {from_bdy} to {to_source} {to_bdy} records added : {datetime.now() - start_time}")
+        if from_source == to_source:
+            logger.info(f"\t - {from_source} {from_bdy} to {to_bdy} records added : {datetime.now() - start_time}")
+        else:
+            logger.info(f"\t - {from_source} {from_bdy} to {to_source} {to_bdy} records added : "
+                        f"{datetime.now() - start_time}")
 
     else:
         logger.fatal(f"\t - {from_source} not in sources!")
 
 
 def add_asgs_concordances(pg_cur):
-    # adds ABS Census concordances for ASGS boundaries
+    # adds ABS Census concordances for ASGS boundaries (ordered by increasing size)
+    asgs_concordance_list = ['mb', 'sa1', 'sa2', 'sa3', 'sa4', 'gcc']
 
-    asgs_concordance_list = ['sa2', 'sa2', 'sa3', 'sa4', 'gcc']
-    # asgs_concordance_list = ['sa2', 'sa2', 'sa3', 'sa4', 'gcc', 'state']
+    # add ABS Census concordances for ASGS boundaries, one census at a time
+    source = "abs 2016"
 
-    # add ABS Census 206 concordances for ASGS boundaries, one census at a time
+    for from_bdy in asgs_concordance_list:
+        from_index = asgs_concordance_list.index("from_bdy")
 
-    start_time = datetime.now()
+        for to_bdy in asgs_concordance_list:
+            start_time = datetime.now()
+            to_index = asgs_concordance_list.index("to_bdy")
 
-    abs_census = 2016
+            if to_index > from_index:
+                query = f"""insert into {output_schema}.{output_table}
+                            select '{source}' as from_source,
+                                   '{from_bdy}' as from_bdy,
+                                   {from_bdy}_16code as from_id,
+                                   {from_bdy}_16name as to_name,
+                                   '{source}' as to_source,
+                                   '{to_bdy}' as to_bdy,
+                                   {to_bdy}_16code as to_id,
+                                   {to_bdy}_16name as to_name,
+                                   count(*) as address_count,
+                                   100.0 as address_percent
+                            from admin_bdys_202202.abs_2016_mb as mb
+                            inner join gnaf_202202.address_principals as gnaf on gnaf.mb_2016_code = mb.mb_16code
+                            group by from_id,
+                                     from_name,
+                                     to_id,
+                                     to_name"""
 
-    for to_bdy in asgs_concordance_list:
-        query = f"""insert into {output_schema}.{output_table}
-                    select 'abs 2016' as from_source,
-                           'mb' as from_bdy,
-                           mb_16code as from_id,
-                           mb_category as from_name,
-                           'abs 2016' as to_source,
-                           'sa1' as to_bdy,
-                           {to_bdy}_16code as to_id,
-                           {to_bdy}_16name as to_name,
-                           count(*) as address_count,
-                           100.0 as address_percent
-                    from admin_bdys_202202.abs_2016_mb as mb
-                    inner join gnaf_202202.address_principals as gnaf on gnaf.mb_2016_code = mb.mb_16code
-                    group by from_id,
-                             from_name,
-                             to_id,
-                             to_name"""
+                # hardcode fixes for inconsistent meshblock, sa1 and sa2 fieldnames
+                if to_bdy == "mb":
+                    query = query.replace("mb_16name", "mb_category")
 
-        # hardcode fixes for inconsistent SA1 and SA2 fieldnames
-        if to_bdy == "sa1":
-            query = query.replace("sa1_16code", "sa1_16main").replace("sa1_16name", "sa1_16_7cd")
+                if to_bdy == "sa1":
+                    query = query.replace("sa1_16code", "sa1_16main").replace("sa1_16name", "sa1_16_7cd")
 
-        if to_bdy == "sa2":
-            query = query.replace("sa2_16code", "sa2_16main")
+                if to_bdy == "sa2":
+                    query = query.replace("sa2_16code", "sa2_16main")
 
-        # print(query)
-        pg_cur.execute(query)
+                # print(query)
+                pg_cur.execute(query)
 
-        logger.info(f"\t - {abs_census} meshblock to {abs_census} {to_bdy} records added : "
-                    f"{datetime.now() - start_time}")
+                logger.info(f"\t - {source} meshblock to {to_bdy} records added : {datetime.now() - start_time}")
 
-
-
-
-# query = f"""select 'abs 2021' as from_source,
-#        'mb' as from_bdy,
-#        mb21_code as from_id,
-#        mb_cat as from_name,
-#        'abs 2021' as to_source,
-#        'sa1' as to_bdy,
-#        sa1_21code as to_id,
-#        sa1_21pid as to_name,
-#        count(*) as address_count,
-#        100.0 as address_percent
-# from admin_bdys_202202.abs_2021_mb as mb
-#          inner join gnaf_202202.address_principals as gnaf on gnaf.mb_2021_code = mb.mb21_code
-# group by from_id,
-#          from_name,
-#          to_id,
-#          to_name"""
-
-
-
-
-
-
+    # source = "abs 2021"
+    #
+    # for to_bdy in asgs_concordance_list:
+    #     start_time = datetime.now()
+    #
+    #     query = f"""insert into {output_schema}.{output_table}
+    #                 select '{source}' as from_source,
+    #                        'mb' as from_bdy,
+    #                        mb21_code as from_id,
+    #                        mb_cat as from_name,
+    #                        '{source}' as to_source,
+    #                        '{to_bdy}' as to_bdy,
+    #                        {to_bdy}_21code as to_id,
+    #                        {to_bdy}_21name as to_name,
+    #                        count(*) as address_count,
+    #                        100.0 as address_percent
+    #                 from admin_bdys_202202.abs_2021_mb as mb
+    #                          inner join gnaf_202202.address_principals as gnaf on gnaf.mb_2021_code = mb.mb21_code
+    #                 group by from_id,
+    #                          from_name,
+    #                          to_id,
+    #                          to_name"""
+    #
+    #     # hardcode fixes for inconsistent meshblock, sa1 and sa2 fieldnames
+    #     if to_bdy == "mb":
+    #         query = query.replace("mb_21name", "mb_cat")
+    #
+    #
+    #     if to_bdy == "sa1":
+    #         query = query.replace("sa1_21name", "sa1_21pid")
+    #
+    #     # print(query)
+    #     pg_cur.execute(query)
+    #
+    #     logger.info(f"\t - {source} meshblock to {to_bdy} records added : {datetime.now() - start_time}")
 
 
 def get_field_names(bdy, source, type, sql):
@@ -313,7 +331,8 @@ def index_table(pg_cur):
 
     query = f"""analyse {output_schema}.{output_table};
                 alter table {output_schema}.{output_table} 
-                    add constraint {output_table}_pkey primary key (from_id, to_id);"""
+                    add constraint {output_table}_pkey 
+                    primary key (from_source, from_bdy, from_id, to_source, to_bdy, to_id);"""
 
     pg_cur.execute(query)
 
@@ -382,40 +401,45 @@ def score_results(pg_cur):
 
         # add average expected error using population data from the 2016 census
         if from_source == "abs 2016" and to_source == "abs 2016":
-            query = f"""with pc as (
-                            select con.to_id,
-                                   con.to_name,
-                                   con.to_source,
-                                   sum(from_bdy.g3::float * con.address_percent / 100.0)::integer as population1
-                            from census_2016_data.{from_bdy}_g01 as from_bdy
-                                     inner join {output_schema}.{output_table} as con on from_bdy.region_id = con.from_id
-                            where from_source = '{from_source}'
-                                and from_bdy = '{from_bdy}'
-                                and to_source = '{to_source}'
-                                and to_bdy = '{to_bdy}'
-                            group by con.to_id,
-                                     con.to_name,
-                                     con.to_source
-                        ), merge as (
-                            select to_id,
-                                   to_name,
-                                   to_source,
-                                   population1,
-                                   g3 as population2
-    --                                g3 - population1 as pop_difference,
-    --                                (abs((g3 - population1) / g3) * 100.0)::smallint as pop_diff_percent
-                            from census_2016_data.{to_bdy}_g01 as to_bdy
-                            inner join pc on pc.to_id = to_bdy.region_id
-                        )
-                        select (sum(abs(population2 - population1)) / sum(population2) * 100.0)::numeric(5, 1) as error_percent
---                                sum(population1) as population1,
---                                sum(population2) as population2,
---                                sum(abs(pop_difference)) as pop_difference,
---                                sqrt(avg(power(population2 - population1, 2)))::smallint as rmse
-                        from merge"""
+            if from_bdy != "mb":
+                query = f"""with pc as (
+                                select con.to_id,
+                                       con.to_name,
+                                       con.to_source,
+                                       sum(from_bdy.g3::float * con.address_percent / 100.0)::integer as population1
+                                from census_2016_data.{from_bdy}_g01 as from_bdy
+                                         inner join {output_schema}.{output_table} as con on from_bdy.region_id = con.from_id
+                                where from_source = '{from_source}'
+                                    and from_bdy = '{from_bdy}'
+                                    and to_source = '{to_source}'
+                                    and to_bdy = '{to_bdy}'
+                                group by con.to_id,
+                                         con.to_name,
+                                         con.to_source
+                            ), merge as (
+                                select to_id,
+                                       to_name,
+                                       to_source,
+                                       population1,
+                                       g3 as population2
+        --                                g3 - population1 as pop_difference,
+        --                                (abs((g3 - population1) / g3) * 100.0)::smallint as pop_diff_percent
+                                from census_2016_data.{to_bdy}_g01 as to_bdy
+                                inner join pc on pc.to_id = to_bdy.region_id
+                            )
+                            select (sum(abs(population2 - population1)) / sum(population2) * 100.0)::numeric(5, 1) as error_percent
+    --                                sum(population1) as population1,
+    --                                sum(population2) as population2,
+    --                                sum(abs(pop_difference)) as pop_difference,
+    --                                sqrt(avg(power(population2 - population1, 2)))::smallint as rmse
+                            from merge"""
 
-            pg_cur.execute(query)
-            error_percent = pg_cur.fetchone()[0]
+                pg_cur.execute(query)
+                error_percent = pg_cur.fetchone()[0]
+
+            else:
+                error_percent = 0.0
+
             error_percent_str = str(error_percent) + "%"
 
             # update score table
