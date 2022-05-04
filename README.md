@@ -70,7 +70,7 @@ Concordances only work when going from a smaller boundary to a similar sized or 
 
 There are 2 options to get it:
 1. Download and import the file 
-2. Run `create_concordance_file.py` to create it yourself
+2. Run `01_create_concordance_file.py` to create it yourself
 
 #### Download and Import
 
@@ -81,7 +81,9 @@ There are 2 options to get it:
 
 #### Run Python Script
 
-This requires a knowledge of Python, Postgres & pg_restore.
+This requires a knowledge of Python, Postgres & pg_restore. The Python script doesn't currently take any arguments; input parameters are hardcoded and require edits to change.
+
+If the boundary combination you want isn't in the default concordance file and running the script is too hard - raise an issue and we'll what we can do.
 
 It only needs to be done for 3 reasons:
 1. The boundary from/to combination you need isn't in the standard [concordances file](/data)
@@ -105,7 +107,7 @@ Running the script requires the following open data, available as Postgres dump 
     1. import it into Postgres
     2. Edit the `02_create_residential_address_table.sql` in the [postgres-scripts](/postgres-scripts) folder to suit your dataset and schema name
     3. Run the above SQL script
-4. Review the Python script as required - makes any required changes in the sections marked for editing
+4. Review & edit `01_create_concordance_file.py` as required - make any required changes in the sections marked for editing
 5. Add `psycopg2` to your Python 3.x environment
 6. Run the script
 
@@ -118,7 +120,7 @@ After loading the file into your database/reporting tool of choice - you use it 
 
 Below is a sample script for merging postcode data with LGA data in Postgres:
 
-
+TODO
 
 
 ## Data Licenses
