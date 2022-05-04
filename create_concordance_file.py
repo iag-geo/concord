@@ -35,8 +35,9 @@ residential_address_source = {"name": "abs 2021", "schema": "gnaf_202202",
 # residential_address_source = {"name": "abs 2016", "schema": "gnaf_202202",
 #                               "table": "address_principal_census_2016_boundaries"}
 
-# the list of boundary pair to create concordances - from and to sources must match the names of the above sources
-# list doesn't include ABS boundary pairs that are nested (e.g. SA2 > SA3) and have their own lookup table
+# the list of boundary pairs to create concordances - from and to sources must match the names of the above sources
+# don't include ASGS ABS boundary pairs that are nested (e.g. SA2 > SA3) and have their own lookup table
+# these are added automatically
 boundary_list = [
     # ABS 2016 to ABS 2016 bdys
     {"from": "sa2", "from_source": "abs 2016", "to": "poa", "to_source": "abs 2016"},
@@ -79,9 +80,12 @@ def main():
     # create table
     create_table(pg_cur)
 
-    # add concordances
+    # add requested concordances
     for bdys in boundary_list:
         add_concordances(bdys, pg_cur)
+
+    # add all ASGS concordances
+    add_asgs_concordances(pg_cur)
 
     # analyse and index table
     index_table(pg_cur)
@@ -199,6 +203,62 @@ def add_concordances(bdys, pg_cur):
 
     else:
         logger.fatal(f"\t - {from_source} not in sources!")
+
+
+def add_asgs_concordances(pg_cur):
+    # adds ABS Census concordances for ASGS boundaries
+
+    asgs_concordance_list = ['sa2', 'sa2', 'sa3', 'sa4', 'gcc', 'state']
+
+    #add ABS Census 206 concordances for ASGS boundaries
+
+    abs_census = 2016
+
+    for
+
+    query = f"""
+select 'abs 2016' as from_source,
+       'mb' as from_bdy,
+       mb_16code as from_id,
+       mb_category as from_name,
+       'abs 2016' as to_source,
+       'sa1' as to_bdy,
+       sa1_16main as to_id,
+       sa1_16_7cd as to_name,
+       count(*) as address_count,
+       100.0 as address_percent
+from admin_bdys_202202.abs_2016_mb as mb
+inner join gnaf_202202.address_principals as gnaf on gnaf.mb_2016_code = mb.mb_16code
+group by from_id,
+         from_name,
+         to_id,
+         to_name"""
+
+
+
+
+query = f"""select 'abs 2021' as from_source,
+       'mb' as from_bdy,
+       mb21_code as from_id,
+       mb_cat as from_name,
+       'abs 2021' as to_source,
+       'sa1' as to_bdy,
+       sa1_21code as to_id,
+       sa1_21pid as to_name,
+       count(*) as address_count,
+       100.0 as address_percent
+from admin_bdys_202202.abs_2021_mb as mb
+         inner join gnaf_202202.address_principals as gnaf on gnaf.mb_2021_code = mb.mb21_code
+group by from_id,
+         from_name,
+         to_id,
+         to_name"""
+
+
+
+
+
+
 
 
 def get_field_names(bdy, source, type, sql):
