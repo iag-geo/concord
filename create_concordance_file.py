@@ -211,7 +211,8 @@ def add_concordances(bdys, pg_cur):
 
 def add_asgs_concordances(pg_cur):
     # adds ABS Census concordances for ASGS boundaries (ordered by increasing size)
-    asgs_concordance_list = ['mb', 'sa1', 'sa2', 'sa3', 'sa4', 'gcc']
+    asgs_concordance_list = ['sa1', 'sa2', 'sa3', 'sa4', 'gcc']
+    # asgs_concordance_list = ['mb', 'sa1', 'sa2', 'sa3', 'sa4', 'gcc', 'state']
 
     # add ABS Census concordances for ASGS boundaries, one census at a time
     source = "abs 2016"
@@ -257,41 +258,45 @@ def add_asgs_concordances(pg_cur):
 
                 logger.info(f"\t - {source} {from_bdy} to {to_bdy} records added : {datetime.now() - start_time}")
 
-    # source = "abs 2021"
-    #
-    # for to_bdy in asgs_concordance_list:
-    #     start_time = datetime.now()
-    #
-    #     query = f"""insert into {output_schema}.{output_table}
-    #                 select '{source}' as from_source,
-    #                        'mb' as from_bdy,
-    #                        mb21_code as from_id,
-    #                        mb_cat as from_name,
-    #                        '{source}' as to_source,
-    #                        '{to_bdy}' as to_bdy,
-    #                        {to_bdy}_21code as to_id,
-    #                        {to_bdy}_21name as to_name,
-    #                        count(*) as address_count,
-    #                        100.0 as address_percent
-    #                 from admin_bdys_202202.abs_2021_mb as mb
-    #                          inner join gnaf_202202.address_principals as gnaf on gnaf.mb_2021_code = mb.mb21_code
-    #                 group by from_id,
-    #                          from_name,
-    #                          to_id,
-    #                          to_name"""
-    #
-            # # hardcode fixes for inconsistent meshblock, sa1 and sa2 fieldnames
-            # if from_bdy == "mb":
-            #     query = query.replace("mb_21name", "mb_cat")
-            #
-            # if from_bdy == "sa1" or to_bdy == "sa1":
-            #
-    #         query = query.replace("sa1_21name", "sa1_21pid")
-    #
-    #     # print(query)
-    #     pg_cur.execute(query)
-    #
-    #     logger.info(f"\t - {source} {from_bdy} to {to_bdy} records added : {datetime.now() - start_time}")
+    source = "abs 2021"
+
+    for from_bdy in asgs_concordance_list:
+        from_index = asgs_concordance_list.index(from_bdy)
+
+        for to_bdy in asgs_concordance_list:
+            start_time = datetime.now()
+            to_index = asgs_concordance_list.index(to_bdy)
+
+            if to_index > from_index:
+                query = f"""insert into {output_schema}.{output_table}
+                            select '{source}' as from_source,
+                                   'mb' as from_bdy,
+                                   mb21_code as from_id,
+                                   mb_cat as from_name,
+                                   '{source}' as to_source,
+                                   '{to_bdy}' as to_bdy,
+                                   {to_bdy}_21code as to_id,
+                                   {to_bdy}_21name as to_name,
+                                   count(*) as address_count,
+                                   100.0 as address_percent
+                            from admin_bdys_202202.abs_2021_mb as mb
+                                     inner join gnaf_202202.address_principals as gnaf on gnaf.mb_2021_code = mb.mb21_code
+                            group by from_id,
+                                     from_name,
+                                     to_id,
+                                     to_name"""
+
+                # hardcode fixes for inconsistent meshblock, sa1 and sa2 fieldnames
+                if from_bdy == "mb":
+                    query = query.replace("mb_21name", "mb_cat")
+
+                if from_bdy == "sa1" or to_bdy == "sa1":
+                    query = query.replace("sa1_21name", "sa1_21pid")
+
+                    # print(query)
+                    pg_cur.execute(query)
+
+                    logger.info(f"\t - {source} {from_bdy} to {to_bdy} records added : {datetime.now() - start_time}")
 
 
 def get_field_names(bdy, source, type, sql):
@@ -401,7 +406,7 @@ def score_results(pg_cur):
 
         # add average expected error using population data from the 2016 census
         if from_source == "abs 2016" and to_source == "abs 2016":
-            if from_bdy != "mb" and from_bdy != "gcc":
+            if from_bdy != "mb" and from_bdy != "gcc" and to_bdy != "gcc":
                 query = f"""with pc as (
                                 select con.to_id,
                                        con.to_name,

@@ -19,6 +19,8 @@ select mb_16code,
 from admin_bdys_202202.abs_2016_mb
 ;
 
+select *
+from admin_bdys_202202.abs_2016_sa1;
 
 
 select 'abs 2016' as from_source,
