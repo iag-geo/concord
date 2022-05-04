@@ -41,6 +41,27 @@ group by from_id,
 
 
 
+select 'abs 2021' as from_source,
+       'mb' as from_bdy,
+       mb21_code as from_id,
+       mb_cat as from_name,
+       'abs 2021' as to_source,
+       'sa1' as to_bdy,
+       sa1_21code as to_id,
+       sa1_21pid as to_name,
+       count(*) as address_count,
+       100.0 as address_percent
+from admin_bdys_202202.abs_2021_mb as mb
+         inner join gnaf_202202.address_principals as gnaf on gnaf.mb_2021_code = mb.mb21_code
+group by from_id,
+         from_name,
+         to_id,
+         to_name
+;
+
+
+
+
 
 select from_source,
        from_bdy,
