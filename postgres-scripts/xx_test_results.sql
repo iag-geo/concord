@@ -6,7 +6,8 @@
 -- alter table gnaf_202202.address_principal_admin_boundaries cluster on address_principal_admin_boundaries_gnaf_pid_idx;
 
 
-
+select count(*)
+from gnaf_202202.boundary_concordance;
 
 
 

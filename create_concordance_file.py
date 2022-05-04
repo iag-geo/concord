@@ -70,6 +70,10 @@ output_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "data")
 
 # ---------------------------------------------------------------------------------------
 
+# ABS ASGS boundaries that align 100% - do not edit
+asgs_concordance_list = ['sa1', 'sa2', 'sa3', 'sa4', 'gcc']
+# asgs_concordance_list = ['mb', 'sa1', 'sa2', 'sa3', 'sa4', 'gcc', 'state']
+
 
 def main():
     # connect to Postgres database
@@ -80,9 +84,9 @@ def main():
     # create table
     create_table(pg_cur)
 
-    # # add requested concordances
-    # for bdys in boundary_list:
-    #     add_concordances(bdys, pg_cur)
+    # add requested concordances
+    for bdys in boundary_list:
+        add_concordances(bdys, pg_cur)
 
     # add all ASGS concordances
     add_asgs_concordances(pg_cur)
@@ -211,8 +215,6 @@ def add_concordances(bdys, pg_cur):
 
 def add_asgs_concordances(pg_cur):
     # adds ABS Census concordances for ASGS boundaries (ordered by increasing size)
-    asgs_concordance_list = ['sa1', 'sa2', 'sa3', 'sa4', 'gcc']
-    # asgs_concordance_list = ['mb', 'sa1', 'sa2', 'sa3', 'sa4', 'gcc', 'state']
 
     # add ABS Census concordances for ASGS boundaries, one census at a time
     source = "abs 2016"
@@ -243,9 +245,10 @@ def add_asgs_concordances(pg_cur):
                                      to_id,
                                      to_name"""
 
-                # hardcode fixes for inconsistent meshblock, sa1 and sa2 fieldnames
-                if from_bdy == "mb":
-                    query = query.replace("mb_16name", "mb_category")
+                # hardcode fixes for inconsistent meshblock, sa1, sa2 and state field names
+
+                # if from_bdy == "mb":
+                #     query = query.replace("mb_16name", "mb_category")
 
                 if from_bdy == "sa1" or to_bdy == "sa1":
                     query = query.replace("sa1_16code", "sa1_16main").replace("sa1_16name", "sa1_16_7cd")
@@ -270,9 +273,9 @@ def add_asgs_concordances(pg_cur):
             if to_index > from_index:
                 query = f"""insert into {output_schema}.{output_table}
                             select '{source}' as from_source,
-                                   'mb' as from_bdy,
-                                   mb21_code as from_id,
-                                   mb_cat as from_name,
+                                   '{from_bdy}' as from_bdy,
+                                   {from_bdy}_21code as from_id,
+                                   {from_bdy}_21name as from_name,
                                    '{source}' as to_source,
                                    '{to_bdy}' as to_bdy,
                                    {to_bdy}_21code as to_id,
@@ -286,17 +289,18 @@ def add_asgs_concordances(pg_cur):
                                      to_id,
                                      to_name"""
 
-                # hardcode fixes for inconsistent meshblock, sa1 and sa2 fieldnames
-                if from_bdy == "mb":
-                    query = query.replace("mb_21name", "mb_cat")
+                # hardcode fixes for inconsistent meshblock, sa1, sa2 and state field names
+
+                # if from_bdy == "mb":
+                #     query = query.replace("mb_21name", "mb_cat")
 
                 if from_bdy == "sa1" or to_bdy == "sa1":
                     query = query.replace("sa1_21name", "sa1_21pid")
 
-                    # print(query)
-                    pg_cur.execute(query)
+                # print(query)
+                pg_cur.execute(query)
 
-                    logger.info(f"\t - {source} {from_bdy} to {to_bdy} records added : {datetime.now() - start_time}")
+                logger.info(f"\t - {source} {from_bdy} to {to_bdy} records added : {datetime.now() - start_time}")
 
 
 def get_field_names(bdy, source, type, sql):
@@ -406,7 +410,10 @@ def score_results(pg_cur):
 
         # add average expected error using population data from the 2016 census
         if from_source == "abs 2016" and to_source == "abs 2016":
-            if from_bdy != "mb" and from_bdy != "gcc" and to_bdy != "gcc":
+            if from_bdy in asgs_concordance_list and to_bdy in asgs_concordance_list:
+                # don't calculate error - it's zero!
+                error_percent = 0.0
+            else:
                 query = f"""with pc as (
                                 select con.to_id,
                                        con.to_name,
@@ -441,9 +448,6 @@ def score_results(pg_cur):
 
                 pg_cur.execute(query)
                 error_percent = pg_cur.fetchone()[0]
-
-            else:
-                error_percent = 0.0
 
             error_percent_str = str(error_percent) + "%"
 
