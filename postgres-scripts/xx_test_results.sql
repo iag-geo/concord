@@ -6,24 +6,6 @@
 -- alter table gnaf_202202.address_principal_admin_boundaries cluster on address_principal_admin_boundaries_gnaf_pid_idx;
 
 
-select mb_16code,
-       mb_category,
-       sa1_16main as sa1_16code,
-       sa1_16_7cd as sa1_16name,
-       sa2_16main as sa2_16code,
-       sa2_16name,
-       sa3_16code,
-       sa3_16name,
-       sa4_16code,
-       sa4_16name,
-       gcc_16code,
-       gcc_16name,
-       state,
-       area_sqm,
-       mb16_pop,
-       mb16_dwell
-from admin_bdys_202202.abs_2016_mb
-;
 
 
 
