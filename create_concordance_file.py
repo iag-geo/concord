@@ -210,31 +210,35 @@ def add_asgs_concordances(pg_cur):
 
     asgs_concordance_list = ['sa2', 'sa2', 'sa3', 'sa4', 'gcc', 'state']
 
-    #add ABS Census 206 concordances for ASGS boundaries
+    # add ABS Census 206 concordances for ASGS boundaries, one census at a time
 
     abs_census = 2016
 
-    for
+    for bdy in asgs_concordance_list:
+        query = f"""insert into {output_schema}.{output_table}
+                    select 'abs 2016' as from_source,
+                           'mb' as from_bdy,
+                           mb_16code as from_id,
+                           mb_category as from_name,
+                           'abs 2016' as to_source,
+                           'sa1' as to_bdy,
+                           {bdy}_16code as to_id,
+                           {bdy}_16name as to_name,
+                           count(*) as address_count,
+                           100.0 as address_percent
+                    from admin_bdys_202202.abs_2016_mb as mb
+                    inner join gnaf_202202.address_principals as gnaf on gnaf.mb_2016_code = mb.mb_16code
+                    group by from_id,
+                             from_name,
+                             to_id,
+                             to_name"""
 
-    query = f"""
-select 'abs 2016' as from_source,
-       'mb' as from_bdy,
-       mb_16code as from_id,
-       mb_category as from_name,
-       'abs 2016' as to_source,
-       'sa1' as to_bdy,
-       sa1_16main as to_id,
-       sa1_16_7cd as to_name,
-       count(*) as address_count,
-       100.0 as address_percent
-from admin_bdys_202202.abs_2016_mb as mb
-inner join gnaf_202202.address_principals as gnaf on gnaf.mb_2016_code = mb.mb_16code
-group by from_id,
-         from_name,
-         to_id,
-         to_name"""
+        # hardcode fixes for inconsistent SA1 and SA2 fieldnames
+        if bdy == "sa1":
+            query = query.replace("sa1_16code", "sa1_16main").replace("sa1_16name", "sa1_16_7cd")
 
-
+        if bdy == "sa2":
+            query = query.replace("sa2_16code", "sa2_16main")
 
 
 query = f"""select 'abs 2021' as from_source,
