@@ -53,8 +53,7 @@ boundary_list = [
     {"from": "locality", "from_source": "geoscape 202202", "to": "sa3", "to_source": "abs 2016"},
     {"from": "locality", "from_source": "geoscape 202202", "to": "lga", "to_source": "abs 2016"},
     {"from": "postcode", "from_source": "geoscape 202202", "to": "sa3", "to_source": "abs 2016"},
-    {"from": "postcode", "from_source": "geoscape 202202", "to": "lga", "to_source": "abs 2016"},
-    {"from": "postcode", "from_source": "geoscape 202202", "to": "poa", "to_source": "abs 2016"},
+    # {"from": "postcode", "from_source": "geoscape 202202", "to": "poa", "to_source": "abs 2016"}, # TODO: handle duplicate PCs that go over state borders
     {"from": "lga", "from_source": "geoscape 202202", "to": "lga", "to_source": "abs 2016"},
 
     # Geoscape to Geoscape bdys
@@ -91,8 +90,8 @@ def main():
     for bdys in boundary_list:
         add_concordances(bdys, pg_cur)
 
-    # # add all ASGS concordances
-    # add_asgs_concordances(pg_cur)
+    # add all ASGS concordances
+    add_asgs_concordances(pg_cur)
 
     # analyse and index table
     index_table(pg_cur)

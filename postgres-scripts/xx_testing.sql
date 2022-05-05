@@ -1,7 +1,10 @@
 select count(*)
 from admin_bdys_202202.abs_2021_sa2;
 
-
+select *
+from gnaf_202202.boundary_concordance
+where from_bdy = 'postcode'
+and to_bdy = 'poa';
 
 select mb_16code,
        mb_category,
