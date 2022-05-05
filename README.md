@@ -8,8 +8,8 @@ Download & import the [concordance file](https://minus34.com/opendata/geoscape-2
 
 ### Example Use Cases
 
-- You have sales data by postcode & competitor data by local government area (LGA) and need to determine market share. Using the [boundary concordance file](https://minus34.com/opendata/geoscape-202202/boundary_concordance.csv), you convert the postcode data to LGA and merge both datasets by LGA ID.
-- You have cancer testing rates by ABS Census 2016 SA2 boundaries and cancer case numbers by LGA and need to determine the rate of disease as a % of testing. You use the [file](https://minus34.com/opendata/geoscape-202202/boundary_concordance.csv) to convert the SA2 data to LGAs and merge both datasets by LGA ID.
+- You have sales data by ABS Census 2016 SA2 boundaries & competitor data by local government area (LGA) and need to determine market share. Using the [boundary concordance file](https://minus34.com/opendata/geoscape-202202/boundary_concordance.csv), you convert the SA2 data to LGA and merge both datasets by LGA ID.
+- You have Covid 19 cases by postcode and tsting numbers by LGA and need to determine the rate of infection as a % of testing. You use the [file](https://minus34.com/opendata/geoscape-202202/boundary_concordance.csv) to convert the postcode data to LGAs and merge both datasets by LGA ID.
 
 ### Limitations
 

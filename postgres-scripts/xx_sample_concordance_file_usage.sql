@@ -1,5 +1,18 @@
 
-
+-- Usage example:
+--    Purpose:
+--      - You need to determine the rate of infection as a % of testing
+--
+--    Input data:
+--      - Covid 19 cases by postcode
+--      - Covid 19 test numbers by LGA
+--
+--    Output data:
+--      - A dataset containing the rate of infection at the LGA level
+--
+--    NOTE:
+--      - Don't use the output data! It's just a sample use case
+--      - The rate of infection is incorrect as the data doesn't contain RAT test numbers, only PCR testing
 
 with pc as (
     select con.to_id,
