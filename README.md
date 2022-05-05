@@ -21,8 +21,8 @@ Download & import the [concordance file](https://minus34.com/opendata/geoscape-2
 Read this entire README file to understand the methodology used & it's accuracy.
 
 Using this file comes with the following caveats:
-- Only works with data related to residents, citizens & consumers. In other words - industrial, commercial & special use data isn't suited to conversion using the concordance file provided;
-- The % overlaps between boundaries are a best estimate of how data should be apportioned between 2 boundary sets based on residential address counts. Your data may have biases in it that mean this approach doesn't return the best result. e.g. looking at the image below - if your postcode 3127 customers were mostly on the Boroondara Council side - the boundary concordance file would incorrectly put 54% of customers in Whitehorse Council.
+- It only works with data related to residents, citizens & consumers. In other words - industrial, commercial & special use data isn't suited to conversion using the concordance file provided;
+- The data represents % overlaps between boundaries that are a _best estimate_ of how data should be apportioned between 2 boundary sets based on residential address counts. Your data may have biases in it that mean this approach doesn't return the best result. e.g. looking at the image below - if your postcode 3127 customers were mostly on the Boroondara Council side - the boundary concordance file would incorrectly put 54% of customers in Whitehorse Council.
 
 ![pc_vs_lga.png](pc_vs_lga.png "ABS 2016 Postcodes (red) vs LGAs (blue)")
 
