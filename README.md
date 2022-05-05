@@ -150,3 +150,5 @@ Incorporates or developed using G-NAF © [Geoscape Australia](https://geoscape.c
 Incorporates or developed using Administrative Boundaries © [Geoscape Australia](https://geoscape.com.au/legalhttps://minus34.com/opendata/geoscape-202202/boundary_concordance.csv-copyright-and-disclaimer/) licensed by the Commonwealth of Australia under [Creative Commons Attribution 4.0 International licence (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/).
 
 Based on [Australian Bureau of Statistics](https://www.abs.gov.au/websitedbs/d3310114.nsf/Home/Attributing+ABS+Material) data, licensed by the Commonwealth of Australia under the [Creative Commons Attribution 4.0 International licence (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/).
+
+Sample Covid 19 Data: © NSW Ministry of Health, licensed by the NSW Government under [Creative Commons Attribution 4.0 International licence (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/).
