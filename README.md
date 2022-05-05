@@ -88,20 +88,20 @@ Also, concordances are only reliable when going from a smaller boundary to a sim
 
 ## Get started
 
-### 1. Get the Concordance File
+### STEP 1 - Get the Concordance File
 
-There are 2 options to get it:
+There are 2 options to get the data:
 1. Download and import the file 
-2. Run `01_create_concordance_file.py` to create it yourself
+2. Run `01_create_concordance_file.py` to create the Postgres table & CSV file yourself
 
-#### Download and Import
+#### 1. Download and Import
 
 1. Download the [concordance file](https://minus34.com/opendata/geoscape-202202/boundary_concordance.csv)
 2. Import it into your database/reporting tool of choice. If using Postgres:
     1. Edit the file path, schema name & table owner in `00_import_concordance_file.sql` in the [postgres-scripts](/postgres-scripts) folder
     2. Run the SQL script to import the file  
 
-#### Run Python Script
+#### 2. Run Python Script
 
 This requires a knowledge of Python, Postgres & pg_restore. The Python script doesn't currently take any arguments; input parameters are hardcoded and require edits to change.
 
@@ -121,7 +121,7 @@ Running the script requires the following open data, available as Postgres dump 
 4. Geoscape Administrative Boundaries from gnaf-loader ([download](https://minus34.com/opendata/geoscape-202202/admin-bdys-202202.dmp))
 5. ABS Census 2016 data - for QA only ([download](https://minus34.com/opendata/census-2016/census_2016_data.dmp))
 
-###### Process
+###### 3. Process
 
 1. Download the above dump files and import them using `pg_restore`
 2. Prep the Census boundary tagged address tables by running `01a_create_gnaf_2016_census_bdy_table.sql` & `01b_create_gnaf_2021_census_bdy_table.sql` in the [postgres-scripts](/postgres-scripts) folder
@@ -136,7 +136,7 @@ Running the script requires the following open data, available as Postgres dump 
 ##### Note
  - The benefit of using Geoscape planning zone data over the default residential address filter (ABS Census 2021 meshblock categories) is reduced by ~2.3m addresses not having a planning zone, The code as-is fills this missing data with 2021 meshblock categories.
  
-### 2. Use the Concordance File
+### STEP 2 - Use the Concordance File
 
 After loading the file into your database/reporting tool of choice - you use it by creating a 3 (or more) table join between the datsets you want to merge and the concordance file table.
 
