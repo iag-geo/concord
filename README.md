@@ -140,7 +140,7 @@ The benefit of using Geoscape planning zone data over the default residential ad
 
 After loading the file into your database/reporting tool of choice - you use it by creating a 3 (or more) table join between the datasets you want to merge and the concordance file/table.
 
-Below is a sample script for above Covid 19 example use case - merging postcode & LGA data in Postgres:
+Below is the [sample PostgreSQL script](/postgres-scripts/xx_sample_concordance_file_usage.sql) for the abovementioned Covid 19 example - merging postcode & LGA data:
 
 ```sql
 WITH from_bdy AS (
@@ -162,7 +162,7 @@ SELECT from_bdy.to_id AS lga_id,
        from_bdy.cases,
        (from_bdy.cases::float / lga.tests::float * 100.0)::numeric(4,1) AS infection_rate_percent
 FROM testing.nsw_covid_tests_20220503_lga AS lga
-INNER JOIN from_bdy on from_bdy.to_id = concat('LGA', lga.lga_code19);  -- note: NSW Covid data is missing LGA prefix in IDs
+INNER JOIN from_bdy on from_bdy.to_id = concat('LGA', lga.lga_code19); -- note: NSW Covid data is missing LGA prefix in IDs
 ```
 
 
