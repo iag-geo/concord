@@ -124,14 +124,15 @@ Running the script requires the following open data, available as Postgres dump 
 ##### 3. Process
 
 1. Download the above dump files and import them using `pg_restore`
-2. Prep the census boundary tagged address tables by running `01a_create_gnaf_2016_census_bdy_table.sql` & `01b_create_gnaf_2021_census_bdy_table.sql` in the [postgres-scripts](/postgres-scripts) folder
-3. OPTIONAL: If you have access to Geoscape Buildings or Land Parcels data:
+2. Edit `01a_create_gnaf_2016_census_bdy_table.sql` & `01b_create_gnaf_2021_census_bdy_table.sql` in the [postgres-scripts](/postgres-scripts) folder for your schema names & table owner
+3. Run them to prep the census boundary tagged address tables
+4. OPTIONAL: If you have access to Geoscape Buildings or Land Parcels data:
     1. import it into Postgres
     2. Edit the `02_create_residential_address_table.sql` in the [postgres-scripts](/postgres-scripts) folder to suit your dataset and schema name
     3. Run the above SQL script
-4. Review & edit `01_create_concordance_file.py` as required - make any required changes in the sections marked for editing
-5. Add `psycopg2` to your Python 3.x environment
-6. Run the script
+5. Review & edit `01_create_concordance_file.py` as required - make any required changes in the sections marked for editing
+6. Add `psycopg2` to your Python 3.x environment
+7. Run the script
 
 #### Note
 The benefit of using Geoscape planning zone data over the default residential address filter (ABS Census 2021 meshblock categories) is limited due to ~2.3m addresses not having a planning zone, The code as-is fills this missing data with ABS Census 2021 meshblock categories.
@@ -140,7 +141,17 @@ The benefit of using Geoscape planning zone data over the default residential ad
 
 After loading the file into your database/reporting tool of choice - you use it by creating a 3 (or more) table join between the datasets you want to merge and the concordance file/table.
 
-Below is the [sample PostgreSQL script](/postgres-scripts/xx_sample_concordance_file_usage.sql) for the abovementioned Covid 19 example - merging postcode & LGA data:
+#### Example Script
+
+A Postgres SQL script (below) for the abovementioned Covid 19 postcode to LGA example is included.
+
+To run the example:
+1. Edit the file path, schema name & table owner in `01_import_nsw_covid_data.sql` in the [postgres-scripts/example-usage](/postgres-scripts/example-usage) folder as required
+2. Run the script to import the NSW Covid 19 data
+3. Edit the schema name & table owner in `02_join_pc_and_lga_data.sql` as required
+4. Run the script
+
+Below is the [sample PostgreSQL script](/postgres-scripts/example-usage/02_join_pc_and_lga_data.sql) for the abovementioned Covid 19 example - merging postcode & LGA data:
 
 ```sql
 WITH from_bdy AS (
