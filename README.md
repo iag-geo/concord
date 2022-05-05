@@ -81,6 +81,7 @@ Also, concordances are only reliable when going from a smaller boundary to a sim
 | geoscape 202202 postcode | abs 2016 lga             |         93% |                   N/A |
 | geoscape 202202 postcode | abs 2016 sa3             |         92% |                   N/A |
 | geoscape 202202 postcode | geoscape 202202 lga      |         93% |                   N/A |
+
 <sup>*</sup>average errors are only available for ABS 2016 from/to boundaries as the error check requires authoritative population data
 
 ****
