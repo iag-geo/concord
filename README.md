@@ -1,15 +1,15 @@
 # Concord
 
-A [CSV file](/data) and supporting scripts for converting data between any 2 Australian boundaries.
+A [CSV file](https://minus34.com/opendata/geoscape-202202/boundary_concordance.csv) and supporting scripts for converting data between any 2 Australian boundaries.
 
 It solves the problem of trying to merge 2 or more datasets based on different census or administrative boundaries such as statistical areas or postcodes.
 
-Download & import the [concordance file](/data) into your database or reporting tool to get started. A script for importing into Postgres is also provided.
+Download & import the [concordance file](https://minus34.com/opendata/geoscape-202202/boundary_concordance.csv) into your database or reporting tool to get started. A script for importing into Postgres is also provided.
 
 ### Example Use Cases
 
-- You have sales data by postcode & competitor data by local government area (LGA) and need to determine market share. Using the [boundary concordance file](/data), you convert the postcode data to LGA and merge both datasets by LGA ID.
-- You have cancer testing rates by ABS Census 2016 SA2 boundaries and cancer case numbers by LGA and need to determine the rate of disease as a % of testing. You use the [file](/data) to convert the SA2 data to LGAs and merge both datasets by LGA ID.
+- You have sales data by postcode & competitor data by local government area (LGA) and need to determine market share. Using the [boundary concordance file](https://minus34.com/opendata/geoscape-202202/boundary_concordance.csv), you convert the postcode data to LGA and merge both datasets by LGA ID.
+- You have cancer testing rates by ABS Census 2016 SA2 boundaries and cancer case numbers by LGA and need to determine the rate of disease as a % of testing. You use the [file](https://minus34.com/opendata/geoscape-202202/boundary_concordance.csv) to convert the SA2 data to LGAs and merge both datasets by LGA ID.
 
 ### Limitations
 
@@ -94,7 +94,7 @@ There are 2 options to get it:
 
 #### Download and Import
 
-1. Download the [concordance file](/data)
+1. Download the [concordance file](https://minus34.com/opendata/geoscape-202202/boundary_concordance.csv)
 2. Import it into your database/reporting tool of choice. If using Postgres:
     1. Edit the file path, schema name & table owner in `00_import_concordance_file.sql` in the [postgres-scripts](/postgres-scripts) folder
     2. Run the SQL script to import the file  
@@ -106,9 +106,9 @@ This requires a knowledge of Python, Postgres & pg_restore. The Python script do
 If the boundary combination you want isn't in the default concordance file and running the script is too hard - raise an issue and we'll what we can do.
 
 It only needs to be done for 3 reasons:
-1. The boundary from/to combination you need isn't in the standard [concordances file](/data)
+1. The boundary from/to combination you need isn't in the standard [concordances file](https://minus34.com/opendata/geoscape-202202/boundary_concordance.csv)
 2. We've been too lazy to update the concordances file with the latest boundary data from the ABS and/or Geoscape
-3. You have a license of [Geoscape Buildings](https://geoscape.com.au/data/buildings/) or [Geoscape Land Parcels](https://geoscape.com.au/data/land-parcels/) and want to use the _planning zone_ data in those product to:
+3. You have a license of [Geoscape Buildings](https://geoscape.com.auhttps://minus34.com/opendata/geoscape-202202/boundary_concordance.csv/buildings/) or [Geoscape Land Parcels](https://geoscape.com.auhttps://minus34.com/opendata/geoscape-202202/boundary_concordance.csv/land-parcels/) and want to use the _planning zone_ data in those product to:
     1. Use a more accurate list of residential addresses to determine the data apportionment percentages (see note below); or
     2. Use a different set of addresses to apportion your data; e.g. industrial or commercial addresses
 
@@ -145,8 +145,8 @@ TODO
 
 ## Data Licenses
 
-Incorporates or developed using G-NAF © [Geoscape Australia](https://geoscape.com.au/legal/data-copyright-and-disclaimer/) licensed by the Commonwealth of Australia under the [Open Geo-coded National Address File (G-NAF) End User Licence Agreement](https://data.gov.au/dataset/ds-dga-19432f89-dc3a-4ef3-b943-5326ef1dbecc/distribution/dist-dga-09f74802-08b1-4214-a6ea-3591b2753d30/details?q=).
+Incorporates or developed using G-NAF © [Geoscape Australia](https://geoscape.com.au/legalhttps://minus34.com/opendata/geoscape-202202/boundary_concordance.csv-copyright-and-disclaimer/) licensed by the Commonwealth of Australia under the [Open Geo-coded National Address File (G-NAF) End User Licence Agreement](https:/https://minus34.com/opendata/geoscape-202202/boundary_concordance.csv.gov.auhttps://minus34.com/opendata/geoscape-202202/boundary_concordance.csvset/ds-dga-19432f89-dc3a-4ef3-b943-5326ef1dbecc/distribution/dist-dga-09f74802-08b1-4214-a6ea-3591b2753d30/details?q=).
 
-Incorporates or developed using Administrative Boundaries © [Geoscape Australia](https://geoscape.com.au/legal/data-copyright-and-disclaimer/) licensed by the Commonwealth of Australia under [Creative Commons Attribution 4.0 International licence (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/).
+Incorporates or developed using Administrative Boundaries © [Geoscape Australia](https://geoscape.com.au/legalhttps://minus34.com/opendata/geoscape-202202/boundary_concordance.csv-copyright-and-disclaimer/) licensed by the Commonwealth of Australia under [Creative Commons Attribution 4.0 International licence (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/).
 
 Based on [Australian Bureau of Statistics](https://www.abs.gov.au/websitedbs/d3310114.nsf/Home/Attributing+ABS+Material) data, licensed by the Commonwealth of Australia under the [Creative Commons Attribution 4.0 International licence (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/).
