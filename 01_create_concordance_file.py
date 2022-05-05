@@ -42,8 +42,10 @@ boundary_list = [
     # ABS 2016 to ABS 2016 bdys
     {"from": "sa2", "from_source": "abs 2016", "to": "poa", "to_source": "abs 2016"},
     {"from": "sa2", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
+    {"from": "poa", "from_source": "abs 2016", "to": "sa2", "to_source": "abs 2016"},
     {"from": "poa", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
     {"from": "sa3", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
+    # {"from": "lga", "from_source": "abs 2016", "to": "poa", "to_source": "abs 2016"}, # only 25% concordance with a ~14% error
     {"from": "lga", "from_source": "abs 2016", "to": "sa3", "to_source": "abs 2016"},
 
     # Geoscape to ABS 2016 bdys
@@ -52,6 +54,7 @@ boundary_list = [
     {"from": "locality", "from_source": "geoscape 202202", "to": "lga", "to_source": "abs 2016"},
     {"from": "postcode", "from_source": "geoscape 202202", "to": "sa3", "to_source": "abs 2016"},
     {"from": "postcode", "from_source": "geoscape 202202", "to": "lga", "to_source": "abs 2016"},
+    {"from": "postcode", "from_source": "geoscape 202202", "to": "poa", "to_source": "abs 2016"},
     {"from": "lga", "from_source": "geoscape 202202", "to": "lga", "to_source": "abs 2016"},
 
     # Geoscape to Geoscape bdys
@@ -88,8 +91,8 @@ def main():
     for bdys in boundary_list:
         add_concordances(bdys, pg_cur)
 
-    # add all ASGS concordances
-    add_asgs_concordances(pg_cur)
+    # # add all ASGS concordances
+    # add_asgs_concordances(pg_cur)
 
     # analyse and index table
     index_table(pg_cur)

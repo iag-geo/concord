@@ -1,7 +1,7 @@
 
 -- Usage example:
 --    Purpose:
---      - You need to determine the rate of infection as a % of testing
+--      - Determine the rate of Covid 19 infection as a % of testing
 --
 --    Input data:
 --      - Covid 19 cases by postcode
@@ -10,21 +10,26 @@
 --    Output data:
 --      - A dataset containing the rate of infection at the LGA level
 --
---    NOTE:
---      - Don't use the output data! It's just a sample use case
---      - The rate of infection is incorrect as the data doesn't contain RAT test numbers, only PCR testing
+--    NOTE: Don't use the output data other than for testing!
+--      - The rate of infection will be incorrect as the data doesn't contain RAT test numbers, only PCR testing.
+
+
+select *
+from testing.nsw_covid_cases_20220503_postcode;
+
+
 
 with pc as (
     select con.to_id,
            con.to_name,
            con.to_source,
-           sum(from_bdy.g3::float * con.address_percent / 100.0)::integer as population1
-    from census_2016_data.lga_g01 as from_bdy
-             inner join gnaf_202202.boundary_concordance as con on from_bdy.region_id = con.from_id
-    where from_source = 'abs 2016'
-        and from_bdy = 'lga'
-        and to_source = 'abs 2016'
-        and to_bdy = 'sa3'
+           sum(from_bdy.cases::float * con.address_percent / 100.0)::integer as cases
+    from testing.nsw_covid_cases_20220503_postcode as from_bdy
+             inner join gnaf_202202.boundary_concordance as con on from_bdy.postcode = con.from_id
+--     where from_source = 'abs 2016'
+--         and from_bdy = 'poa'
+--         and to_source = 'abs 2016'
+--         and to_bdy = 'lga'
     group by con.to_id,
              con.to_name,
              con.to_source

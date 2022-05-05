@@ -1,3 +1,6 @@
+select count(*)
+from admin_bdys_202202.abs_2021_sa2;
+
 
 
 select mb_16code,
@@ -77,3 +80,4 @@ select from_source,
        address_percent
 from gnaf_202202.boundary_concordance
 ;
+
