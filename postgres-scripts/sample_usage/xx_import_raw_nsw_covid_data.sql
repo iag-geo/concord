@@ -18,7 +18,7 @@ alter table testing.nsw_raw_covid_cases_20220503 owner to postgres;
 
 -- import CSV file -- 142,390 rows affected in 336 ms
 COPY testing.nsw_raw_covid_cases_20220503
-    FROM '/Users/s57405/git/iag_geo/concord/data/confirmed_cases_table1_location_agg.csv'
+    FROM '/Users/minus34/git/iag_geo/concord/data/confirmed_cases_table1_location_agg.csv'
     WITH (HEADER, DELIMITER ',', FORMAT CSV);
 
 analyse testing.nsw_raw_covid_cases_20220503;
@@ -57,11 +57,11 @@ alter table testing.nsw_covid_cases_20220503_lga add constraint nsw_covid_cases_
 
 -- export cases tables
 COPY testing.nsw_covid_cases_20220503_postcode
-    to '/Users/s57405/git/iag_geo/concord/data/nsw_covid_cases_20220503_postcode.csv'
+    to '/Users/minus34/git/iag_geo/concord/data/nsw_covid_cases_20220503_postcode.csv'
     WITH (HEADER, DELIMITER ',', FORMAT CSV);
 
 COPY testing.nsw_covid_cases_20220503_lga
-    to '/Users/s57405/git/iag_geo/concord/data/nsw_covid_cases_20220503_lga.csv'
+    to '/Users/minus34/git/iag_geo/concord/data/nsw_covid_cases_20220503_lga.csv'
     WITH (HEADER, DELIMITER ',', FORMAT CSV);
 
 
@@ -83,7 +83,7 @@ alter table testing.nsw_raw_covid_tests_20220503 owner to postgres;
 
 -- import CSV file -- 142,390 rows affected in 336 ms
 COPY testing.nsw_raw_covid_tests_20220503
-    FROM '/Users/s57405/git/iag_geo/concord/data/pcr_testing_table1_location_agg.csv'
+    FROM '/Users/minus34/git/iag_geo/concord/data/pcr_testing_table1_location_agg.csv'
     WITH (HEADER, DELIMITER ',', FORMAT CSV);
 
 analyse testing.nsw_raw_covid_tests_20220503;
@@ -122,9 +122,9 @@ alter table testing.nsw_covid_tests_20220503_lga add constraint nsw_covid_tests_
 
 -- export tests tables
 COPY testing.nsw_covid_tests_20220503_postcode
-    to '/Users/s57405/git/iag_geo/concord/data/nsw_covid_tests_20220503_postcode.csv'
+    to '/Users/minus34/git/iag_geo/concord/data/nsw_covid_tests_20220503_postcode.csv'
     WITH (HEADER, DELIMITER ',', FORMAT CSV);
 
 COPY testing.nsw_covid_tests_20220503_lga
-    to '/Users/s57405/git/iag_geo/concord/data/nsw_covid_tests_20220503_lga.csv'
+    to '/Users/minus34/git/iag_geo/concord/data/nsw_covid_tests_20220503_lga.csv'
     WITH (HEADER, DELIMITER ',', FORMAT CSV);

@@ -13,7 +13,7 @@ alter table testing.nsw_covid_cases_20220503_postcode owner to postgres;
 
 -- import postcode CSV file
 COPY testing.nsw_covid_cases_20220503_postcode
-    FROM '/Users/s57405/git/iag_geo/concord/data/nsw_covid_cases_20220503_postcode.csv'
+    FROM '/Users/minus34/git/iag_geo/concord/data/nsw_covid_cases_20220503_postcode.csv'
     WITH (HEADER, DELIMITER ',', FORMAT CSV);
 analyse testing.nsw_covid_cases_20220503_postcode;
 
@@ -33,7 +33,7 @@ alter table testing.nsw_covid_cases_20220503_lga owner to postgres;
 
 -- import LGA CSV file
 COPY testing.nsw_covid_cases_20220503_lga
-    FROM '/Users/s57405/git/iag_geo/concord/data/nsw_covid_cases_20220503_lga.csv'
+    FROM '/Users/minus34/git/iag_geo/concord/data/nsw_covid_cases_20220503_lga.csv'
     WITH (HEADER, DELIMITER ',', FORMAT CSV);
 analyse testing.nsw_covid_cases_20220503_lga;
 
@@ -56,7 +56,7 @@ alter table testing.nsw_covid_tests_20220503_postcode owner to postgres;
 
 -- import postcode CSV file
 COPY testing.nsw_covid_tests_20220503_postcode
-    FROM '/Users/s57405/git/iag_geo/concord/data/nsw_covid_tests_20220503_postcode.csv'
+    FROM '/Users/minus34/git/iag_geo/concord/data/nsw_covid_tests_20220503_postcode.csv'
     WITH (HEADER, DELIMITER ',', FORMAT CSV);
 analyse testing.nsw_covid_tests_20220503_postcode;
 
@@ -76,7 +76,7 @@ alter table testing.nsw_covid_tests_20220503_lga owner to postgres;
 
 -- import LGA CSV file
 COPY testing.nsw_covid_tests_20220503_lga
-    FROM '/Users/s57405/git/iag_geo/concord/data/nsw_covid_tests_20220503_lga.csv'
+    FROM '/Users/minus34/git/iag_geo/concord/data/nsw_covid_tests_20220503_lga.csv'
     WITH (HEADER, DELIMITER ',', FORMAT CSV);
 analyse testing.nsw_covid_tests_20220503_lga;
 

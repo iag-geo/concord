@@ -17,7 +17,7 @@ ALTER TABLE census_2021_bdys.correspondences_sa2 OWNER to postgres;
 
 -- one sample file
 COPY census_2021_bdys.correspondences_sa2
-    FROM '/Users/s57405/tmp/CG_SA2_2016_SA2_2021.csv' WITH (HEADER, DELIMITER ',', FORMAT CSV);
+    FROM '/Users/minus34/tmp/CG_SA2_2016_SA2_2021.csv' WITH (HEADER, DELIMITER ',', FORMAT CSV);
 
 ANALYSE census_2021_bdys.correspondences_sa2;
 
