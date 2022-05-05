@@ -32,17 +32,15 @@ Using this file comes with the following caveats:
 
 ## Accuracy
 
-Below are the average concordances between each boundary pair.
+The list of boundary pairs in the file with their concordances & average error rates is in [the boundary concordance score CSV file](/data/boundary_concordance_score.csv). Note: average error rates are only available for ABS 2016 from/to boundaries as the error check requires census population data.
 
-Concordance describes what % of residential addresses in the "from" boundary fit within a "to" boundary.
+**_Concordance_** describes what % of residential addresses in the "from" boundary fit within a "to" boundary.
 
 _e.g. As per the image above: 100% of postcode 3126 fits within the Boroondara LGA. However, only ~46% of postcode 3127 fits within that LGA._
 
-A high average concordance indicates your data can be reliability converted to the new boundary. The lower the concordance the more inaccurate the data conversion will be.
+A high average concordance indicates your data can be reliability converted to the new boundary. The lower the concordance the more inaccurate the data conversion will be. Also, concordances are only reliable when going from a smaller boundary to a similar sized or larger one. Hence such conversions are not included in the supplied file. e.g. Going from LGAs to postcodes has a concordance of only 25% with an average error of ~14%.
 
-Also, concordances are only reliable when going from a smaller boundary to a similar sized or larger one. Hence such conversions are not included in the supplied file. e.g. Going from LGAs to postcodes has a concordance of only 25% with an average error of ~14%.
-
-The list of boundary pairs in the file with their concordances & average error rates is in [the boundary concordance score CSV file](/data/boundary_concordance_score.csv). Note: average error rates are only available for ABS 2016 from/to boundaries as the error check requires census population data.
+**_error rate_** identifies what proportion of data is placed in the wrong boundary when converting a common statistic like population from postcode to LGA and back to postcode, for example.
 
 ## Methodology
 
