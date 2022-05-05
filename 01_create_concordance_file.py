@@ -116,15 +116,15 @@ def create_table(pg_cur):
                 create table {output_schema}.{output_table}
                 (
                     from_source     text not null,
-                    from_bdy       text not null,
+                    from_bdy        text not null,
                     from_id         text not null,
                     from_name       text not null,
                     to_source       text not null,
-                    to_bdy         text not null,
+                    to_bdy          text not null,
                     to_id           text not null,
                     to_name         text not null,
                     address_count   integer,
-                    address_percent double precision
+                    address_percent numeric(4, 1)
                 );
                 alter table {output_schema}.{output_table} owner to postgres;"""
 

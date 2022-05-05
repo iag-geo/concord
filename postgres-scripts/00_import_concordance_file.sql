@@ -12,13 +12,13 @@ create table gnaf_202202.boundary_concordance
     to_id           text not null,
     to_name         text not null,
     address_count   integer,
-    address_percent double precision
+    address_percent numeric(4, 1)
 );
 alter table gnaf_202202.boundary_concordance owner to postgres;
 
 -- import CSV file -- 586,977 rows affected in 1 s 365 ms
 COPY gnaf_202202.boundary_concordance
-    FROM '/Users/minus34/Downloads/boundary_concordance.csv'
+    FROM '/Users/s57405/Downloads/boundary_concordance.csv'
     WITH (HEADER, DELIMITER ',', FORMAT CSV);
 
 analyse gnaf_202202.boundary_concordance;
