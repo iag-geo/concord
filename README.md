@@ -1,10 +1,10 @@
 # Concord
 
-A [CSV file](https://minus34.com/opendata/geoscape-202202/boundary_concordance.csv) and supporting scripts for converting data between any 2 Australian boundaries.
+A [CSV file](https://minus34.com/opendata/geoscape-202202/boundary_concordance.csv) and supporting scripts for converting data between Australian boundaries.
 
 It solves the problem of trying to merge 2 or more datasets based on different census or administrative boundaries such as statistical areas or postcodes.
 
-Download & import the [concordance file](https://minus34.com/opendata/geoscape-202202/boundary_concordance.csv) into your database or reporting tool to get started. A script for importing into Postgres is also provided.
+Download & import the [concordance file](https://minus34.com/opendata/geoscape-202202/boundary_concordance.csv) into your database or reporting tool to get started. A [script](/postgres-scripts/00_import_concordance_file.sql) for importing into Postgres is also provided.
 
 ### Example Use Cases
 
