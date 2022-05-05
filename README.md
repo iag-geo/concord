@@ -151,8 +151,6 @@ To run the example:
 3. Edit the schema name & table owner in `02_join_pc_and_lga_data.sql` as required
 4. Run the script
 
-Below is the [sample PostgreSQL script](/postgres-scripts/example-usage/02_join_pc_and_lga_data.sql) for the abovementioned Covid 19 example - merging postcode & LGA data:
-
 ```sql
 WITH from_bdy AS (
     SELECT con.to_id,
@@ -175,7 +173,6 @@ SELECT from_bdy.to_id AS lga_id,
 FROM testing.nsw_covid_tests_20220503_lga AS lga
 INNER JOIN from_bdy on from_bdy.to_id = concat('LGA', lga.lga_code19); -- note: NSW Covid data is missing LGA prefix in IDs
 ```
-
 
 ## Data Licenses
 
