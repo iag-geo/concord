@@ -7,10 +7,11 @@
 
 A [CSV file](https://minus34.com/opendata/geoscape-202202/boundary_concordance.csv) and supporting scripts for converting data between Australian boundaries.
 
-It solves the problem of trying to merge 2 or more datasets based on different census or administrative boundaries such as statistical areas or postcodes. It does this by providing a list of **_concordances_** between pairs of boundaries.  _e.g. In the image below: 100% of postcode 3126 fits within the Boroondara LGA. However, only ~46% of postcode 3127 fits within that LGA._
+It solves the problem of trying to merge 2 or more datasets based on different census or administrative boundaries such as statistical areas or postcodes.
+
+It does this by providing a list of **_concordances_** between pairs of boundaries.  _e.g. In the image below: 100% of postcode 3126 fits within the Boroondara LGA. However, only ~46% of postcode 3127 fits within that LGA._
 
 In this context, **_concordance_** describes what % of residential addresses in a "from" boundary fit within a "to" boundary.
-
 
 Download & import the ~50Mb [concordance file](https://minus34.com/opendata/geoscape-202202/boundary_concordance.csv) into your database or reporting tool to [get started](#get-started). A [script](/postgres-scripts/00_import_concordance_file.sql) for importing into Postgres is also provided.
 
