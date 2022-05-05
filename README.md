@@ -1,3 +1,8 @@
+
+
+
+
+
 # Concord
 
 A [CSV file](https://minus34.com/opendata/geoscape-202202/boundary_concordance.csv) and supporting scripts for converting data between Australian boundaries.
@@ -88,7 +93,9 @@ Also, concordances are only reliable when going from a smaller boundary to a sim
 
 ## Get started
 
-### STEP 1 - Get the Concordance File
+### STEP 1 - Read the [Limitations](#Limitations)
+
+### STEP 2 - Get the Concordance File
 
 There are 2 options to get the data:
 1. Download and import the file 
@@ -137,7 +144,7 @@ Running the script requires the following open data, available as Postgres dump 
 #### Note
 The benefit of using Geoscape planning zone data over the default residential address filter (ABS Census 2021 meshblock categories) is limited due to ~2.3m addresses not having a planning zone, The code as-is fills this missing data with ABS Census 2021 meshblock categories.
  
-### STEP 2 - Use the Concordance File
+### STEP 3 - Use the Concordance File
 
 After loading the file into your database/reporting tool of choice - you use it by creating a 3 (or more) table join between the datasets you want to merge and the concordance file/table.
 
