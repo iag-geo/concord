@@ -7,9 +7,9 @@
 
 A [CSV file](https://minus34.com/opendata/geoscape-202202/boundary_concordance.csv) and supporting scripts for converting data between Australian boundaries.
 
-It solves the problem of trying to merge 2 or more datasets based on different census or administrative boundaries such as statistical areas or postcodes. it does this by provide a list of **_concordances_** between pairs of boundaries.
+It solves the problem of trying to merge 2 or more datasets based on different census or administrative boundaries such as statistical areas or postcodes. it does this by providing a list of **_concordances_** between pairs of boundaries.
 
-**_Concordance_** describes what % of residential addresses in the "from" boundary fit within a "to" boundary.
+In this context, **_concordance_** describes what % of residential addresses in a "from" boundary fit within a "to" boundary.
 
 Download & import the [concordance file](https://minus34.com/opendata/geoscape-202202/boundary_concordance.csv) into your database or reporting tool to get started. A [script](/postgres-scripts/00_import_concordance_file.sql) for importing into Postgres is also provided.
 
@@ -34,14 +34,13 @@ Using this file comes with the following caveats:
 
 ## Accuracy
 
-The list of boundary pairs in the file with their overall concordance & average error is in [the boundary concordance score CSV file](/data/boundary_concordance_score.csv). _Note: average error rates are only available for ABS 2016 from/to boundaries as the error check requires census population data._
+The list of boundary pairs in the file with their overall concordance & average error is in [the boundary concordance score CSV file](/data/boundary_concordance_score.csv).
 
-A high overall concordance indicates your data can be reliability converted to the new boundary. The lower the concordance the more inaccurate the data conversion will be. Also, concordances are only reliable when going from a smaller boundary to a similar sized or larger one. _e.g. Going from LGAs to postcodes has a concordance of only 25% with an average error of ~14%._
+A high overall concordance indicates your data can be reliability converted to the new boundary. The lower the concordance the more inaccurate the data conversion will be. Also, concordances are only reliable when going from a smaller boundary to a similar sized or larger one.
 
 _e.g. As per the image above: 100% of postcode 3126 fits within the Boroondara LGA. However, only ~46% of postcode 3127 fits within that LGA._
 
-
-**_Average Error_** identifies what proportion of data is placed in the wrong boundary when converting a common statistic like population from postcode to LGA and back to postcode, for example.
+In the [score](/data/boundary_concordance_score.csv) file, the **_error_** measures what proportion of data is placed in the wrong boundary when converting a common statistic like population from postcode to LGA and back to postcode, for example. _Note: error rates are only available for ABS 2016 from/to boundaries as the error check requires census data._
 
 ## Methodology
 
