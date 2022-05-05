@@ -105,7 +105,7 @@ There are 2 options to get the data:
 
 This requires a knowledge of Python, Postgres & pg_restore. The Python script doesn't currently take any arguments; input parameters are hardcoded and require edits to change.
 
-If the boundary combination you want isn't in the default concordance file and running the script is too hard - raise an issue and we'll what we can do.
+If the boundary combination you want isn't in the default concordance file and running the script is too hard - raise an [issue](https://github.com/iag-geo/concord/issues) and we should be able to generate it fo you; noting you shouldn't convert data to a smaller boundary due to the increase in data errors.
 
 It only needs to be done for 3 reasons:
 1. The boundary from/to combination you need isn't in the standard [concordances file](https://minus34.com/opendata/geoscape-202202/boundary_concordance.csv)
