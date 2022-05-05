@@ -46,43 +46,43 @@ A high average concordance indicates your data can be reliability converted to t
 
 Also, concordances are only reliable when going from a smaller boundary to a similar sized or larger one. Hence such conversions are not included in the supplied file. e.g. Going from LGAs to postcodes has a concordance of only 25% with an average error of ~14%.
 
-| from                     | to                       | concordance | avg error<sup>*</sup> |
-|:-------------------------| :----------------------- | ----------: |----------------------:|
-| abs 2016 lga             | abs 2016 sa3             |         74% |                  4.7% |
-| abs 2016 poa             | abs 2016 lga             |         93% |                  1.4% |
-| abs 2016 sa1             | abs 2016 gcc             |        100% |                  0.0% |
-| abs 2016 sa1             | abs 2016 sa2             |        100% |                  0.0% |
-| abs 2016 sa1             | abs 2016 sa3             |        100% |                  0.0% |
-| abs 2016 sa1             | abs 2016 sa4             |        100% |                  0.0% |
-| abs 2016 sa2             | abs 2016 gcc             |        100% |                  0.0% |
-| abs 2016 sa2             | abs 2016 lga             |         97% |                  0.5% |
-| abs 2016 sa2             | abs 2016 poa             |         79% |                  4.2% |
-| abs 2016 sa2             | abs 2016 sa3             |        100% |                  0.0% |
-| abs 2016 sa2             | abs 2016 sa4             |        100% |                  0.0% |
-| abs 2016 sa3             | abs 2016 gcc             |        100% |                  0.0% |
-| abs 2016 sa3             | abs 2016 lga             |         83% |                  2.9% |
-| abs 2016 sa3             | abs 2016 sa4             |        100% |                  0.0% |
-| abs 2016 sa4             | abs 2016 gcc             |        100% |                  0.0% |
-| abs 2021 sa1             | abs 2021 gcc             |        100% |                   N/A |
-| abs 2021 sa1             | abs 2021 sa2             |        100% |                   N/A |
-| abs 2021 sa1             | abs 2021 sa3             |        100% |                   N/A |
-| abs 2021 sa1             | abs 2021 sa4             |        100% |                   N/A |
-| abs 2021 sa2             | abs 2021 gcc             |        100% |                   N/A |
-| abs 2021 sa2             | abs 2021 sa3             |        100% |                   N/A |
-| abs 2021 sa2             | abs 2021 sa4             |        100% |                   N/A |
-| abs 2021 sa3             | abs 2021 gcc             |        100% |                   N/A |
-| abs 2021 sa3             | abs 2021 sa4             |        100% |                   N/A |
-| abs 2021 sa4             | abs 2021 gcc             |        100% |                   N/A |
-| geoscape 202202 lga      | abs 2016 lga             |        100% |                   N/A |
-| geoscape 202202 locality | abs 2016 lga             |         98% |                   N/A |
-| geoscape 202202 locality | abs 2016 sa2             |         94% |                   N/A |
-| geoscape 202202 locality | abs 2016 sa3             |         99% |                   N/A |
-| geoscape 202202 locality | geoscape 202202 lga      |         98% |                   N/A |
-| geoscape 202202 postcode | abs 2016 lga             |         93% |                   N/A |
-| geoscape 202202 postcode | abs 2016 sa3             |         92% |                   N/A |
-| geoscape 202202 postcode | geoscape 202202 lga      |         93% |                   N/A |
+| from                     | to                       | concordance | avg error <sup>*</sup> |
+|:-------------------------| :----------------------- | ----------: |-----------------------:|
+| abs 2016 lga             | abs 2016 sa3             |         74% |                   4.7% |
+| abs 2016 poa             | abs 2016 lga             |         93% |                   1.4% |
+| abs 2016 sa1             | abs 2016 gcc             |        100% |                   0.0% |
+| abs 2016 sa1             | abs 2016 sa2             |        100% |                   0.0% |
+| abs 2016 sa1             | abs 2016 sa3             |        100% |                   0.0% |
+| abs 2016 sa1             | abs 2016 sa4             |        100% |                   0.0% |
+| abs 2016 sa2             | abs 2016 gcc             |        100% |                   0.0% |
+| abs 2016 sa2             | abs 2016 lga             |         97% |                   0.5% |
+| abs 2016 sa2             | abs 2016 poa             |         79% |                   4.2% |
+| abs 2016 sa2             | abs 2016 sa3             |        100% |                   0.0% |
+| abs 2016 sa2             | abs 2016 sa4             |        100% |                   0.0% |
+| abs 2016 sa3             | abs 2016 gcc             |        100% |                   0.0% |
+| abs 2016 sa3             | abs 2016 lga             |         83% |                   2.9% |
+| abs 2016 sa3             | abs 2016 sa4             |        100% |                   0.0% |
+| abs 2016 sa4             | abs 2016 gcc             |        100% |                   0.0% |
+| abs 2021 sa1             | abs 2021 gcc             |        100% |                    N/A |
+| abs 2021 sa1             | abs 2021 sa2             |        100% |                    N/A |
+| abs 2021 sa1             | abs 2021 sa3             |        100% |                    N/A |
+| abs 2021 sa1             | abs 2021 sa4             |        100% |                    N/A |
+| abs 2021 sa2             | abs 2021 gcc             |        100% |                    N/A |
+| abs 2021 sa2             | abs 2021 sa3             |        100% |                    N/A |
+| abs 2021 sa2             | abs 2021 sa4             |        100% |                    N/A |
+| abs 2021 sa3             | abs 2021 gcc             |        100% |                    N/A |
+| abs 2021 sa3             | abs 2021 sa4             |        100% |                    N/A |
+| abs 2021 sa4             | abs 2021 gcc             |        100% |                    N/A |
+| geoscape 202202 lga      | abs 2016 lga             |        100% |                    N/A |
+| geoscape 202202 locality | abs 2016 lga             |         98% |                    N/A |
+| geoscape 202202 locality | abs 2016 sa2             |         94% |                    N/A |
+| geoscape 202202 locality | abs 2016 sa3             |         99% |                    N/A |
+| geoscape 202202 locality | geoscape 202202 lga      |         98% |                    N/A |
+| geoscape 202202 postcode | abs 2016 lga             |         93% |                    N/A |
+| geoscape 202202 postcode | abs 2016 sa3             |         92% |                    N/A |
+| geoscape 202202 postcode | geoscape 202202 lga      |         93% |                    N/A |
 
-<sup>*</sup>average errors are only available for ABS 2016 from/to boundaries as the error check requires authoritative population data
+<sup>*</sup> average errors are only available for ABS 2016 from/to boundaries as the error check requires authoritative population data
 
 ****
 
