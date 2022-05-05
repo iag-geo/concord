@@ -46,8 +46,8 @@ A high average concordance indicates your data can be converted to the new bound
 
 Concordances only work when going from a smaller boundary to a similar sized or larger one. This is evidenced in the table below.
 
-| from                     | to                       | concordance | avg error       |
-|:-------------------------| :----------------------- | ----------: |----------------:|
+| from                     | to                       | concordance | avg error |
+|:-------------------------| :----------------------- | ----------: |----------:|
 | abs 2016 lga             | abs 2016 sa3             |         74% |      4.7% |
 | abs 2016 poa             | abs 2016 lga             |         93% |      1.4% |
 | abs 2016 sa1             | abs 2016 gcc             |        100% |      0.0% |

@@ -18,7 +18,7 @@ alter table gnaf_202202.boundary_concordance owner to postgres;
 
 -- import CSV file -- 586,977 rows affected in 1 s 365 ms
 COPY gnaf_202202.boundary_concordance
-    FROM '/Users/s57405/git/iag_geo/concord/data/boundary_concordance.csv'
+    FROM '/Users/minus34/Downloads/boundary_concordance.csv'
     WITH (HEADER, DELIMITER ',', FORMAT CSV);
 
 analyse gnaf_202202.boundary_concordance;
