@@ -40,7 +40,7 @@ The list of boundary pairs in the file with their overall concordance & average 
 
 A high overall concordance indicates your data can be reliability converted to the new boundary. The lower the concordance the more inaccurate the data conversion will be. Also, concordances are only reliable when going from a smaller boundary to a similar sized or larger one. Conversions from larger to smaller boundaries aren't supplied because of this.
 
-In the [score](/data/boundary_concordance_score.csv) file, the **_error_** measures what proportion of data is placed in the wrong boundary when converting a common statistic like population from postcode to LGA and back to postcode, for example. _Note: error rates are only available for ABS 2016 from/to boundaries as the error check requires census data._
+In the [score](/data/boundary_concordance_score.csv) file, the **_error_** measures what proportion of data is placed in the wrong boundary when converting a statistic common to both boundaries, like population, from postcode to LGA (for example). _Note: error rates are only available for ABS 2016 from/to boundaries as the error check requires census data._
 
 ## Methodology
 
