@@ -1,28 +1,85 @@
 
--- create table
-drop table if exists testing.nsw_covid_cases_20220503;
-create table testing.nsw_covid_cases_20220503
+
+-- NSW COVID CASE DATA
+
+-- create postcode table
+drop table if exists testing.nsw_covid_cases_20220503_postcode;
+create table testing.nsw_covid_cases_20220503_postcode
 (
-    from_source     text not null,
-    from_bdy        text not null,
-    from_id         text not null,
-    from_name       text not null,
-    to_source       text not null,
-    to_bdy          text not null,
-    to_id           text not null,
-    to_name         text not null,
-    address_count   integer,
-    address_percent double precision
+    postcode text    not null,
+    cases    integer not null
 );
-alter table testing.nsw_covid_cases_20220503 owner to postgres;
+alter table testing.nsw_covid_cases_20220503_postcode owner to postgres;
 
--- import CSV file -- 586,977 rows affected in 1 s 365 ms
-COPY testing.nsw_covid_cases_20220503
-    FROM '/Users/s57405/git/iag_geo/concord/data/nsw_covid_cases_20220503.csv'
+-- import postcode CSV file
+COPY testing.nsw_covid_cases_20220503_postcode
+    FROM '/Users/s57405/git/iag_geo/concord/data/nsw_covid_cases_20220503_postcode.csv'
     WITH (HEADER, DELIMITER ',', FORMAT CSV);
+analyse testing.nsw_covid_cases_20220503_postcode;
 
-analyse testing.nsw_covid_cases_20220503;
+-- add postcode primary key
+alter table testing.nsw_covid_cases_20220503_postcode add constraint nsw_covid_cases_20220503_postcode_pkey
+    primary key (postcode);
 
--- add primary key (faster if done after import) -- completed in 8 s 496 ms
-alter table testing.nsw_covid_cases_20220503 add constraint nsw_covid_cases_20220503_pkey
-    primary key (from_source, from_bdy, from_id, to_source, to_bdy, to_id);
+
+-- create LGA table
+drop table if exists testing.nsw_covid_cases_20220503_lga;
+create table testing.nsw_covid_cases_20220503_lga
+(
+    lga_code19 text    not null,
+    cases    integer not null
+);
+alter table testing.nsw_covid_cases_20220503_lga owner to postgres;
+
+-- import LGA CSV file
+COPY testing.nsw_covid_cases_20220503_lga
+    to '/Users/s57405/git/iag_geo/concord/data/nsw_covid_cases_20220503_lga.csv'
+    WITH (HEADER, DELIMITER ',', FORMAT CSV);
+analyse testing.nsw_covid_cases_20220503_lga;
+
+-- add LGA primary key
+alter table testing.nsw_covid_cases_20220503_lga add constraint nsw_covid_cases_20220503_lga_pkey
+    primary key (lga_code19);
+
+
+
+-- NSW COVID TEST DATA
+
+-- create postcode table
+drop table if exists testing.nsw_covid_tests_20220503_postcode;
+create table testing.nsw_covid_tests_20220503_postcode
+(
+    postcode text    not null,
+    tests    integer not null
+);
+alter table testing.nsw_covid_tests_20220503_postcode owner to postgres;
+
+-- import postcode CSV file
+COPY testing.nsw_covid_tests_20220503_postcode
+    FROM '/Users/s57405/git/iag_geo/concord/data/nsw_covid_tests_20220503_postcode.csv'
+    WITH (HEADER, DELIMITER ',', FORMAT CSV);
+analyse testing.nsw_covid_tests_20220503_postcode;
+
+-- add postcode primary key
+alter table testing.nsw_covid_tests_20220503_postcode add constraint nsw_covid_tests_20220503_postcode_pkey
+    primary key (postcode);
+
+
+-- create LGA table
+drop table if exists testing.nsw_covid_tests_20220503_lga;
+create table testing.nsw_covid_tests_20220503_lga
+(
+    lga_code19 text    not null,
+    tests    integer not null
+);
+alter table testing.nsw_covid_tests_20220503_lga owner to postgres;
+
+-- import LGA CSV file
+COPY testing.nsw_covid_tests_20220503_lga
+    to '/Users/s57405/git/iag_geo/concord/data/nsw_covid_tests_20220503_lga.csv'
+    WITH (HEADER, DELIMITER ',', FORMAT CSV);
+analyse testing.nsw_covid_tests_20220503_lga;
+
+-- add LGA primary key
+alter table testing.nsw_covid_tests_20220503_lga add constraint nsw_covid_tests_20220503_lga_pkey
+    primary key (lga_code19);
