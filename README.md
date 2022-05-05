@@ -101,16 +101,16 @@ There are 2 options to get the data:
     1. Edit the file path, schema name & table owner in `00_import_concordance_file.sql` in the [postgres-scripts](/postgres-scripts) folder
     2. Run the SQL script to import the file  
 
-#### 2. Run Python Script
+#### 2. Run the Python Script
 
 This requires a knowledge of Python, Postgres & pg_restore. The Python script doesn't currently take any arguments; input parameters are hardcoded and require edits to change.
 
 If the boundary combination you want isn't in the default concordance file and running the script is too hard - raise an [issue](https://github.com/iag-geo/concord/issues) and we should be able to generate it fo you; noting you shouldn't convert data to a smaller boundary due to the increase in data errors.
 
-It only needs to be done for 3 reasons:
+Running the script yourself only needs to be done for 3 reasons:
 1. The boundary from/to combination you need isn't in the standard [concordances file](https://minus34.com/opendata/geoscape-202202/boundary_concordance.csv)
 2. We've been too lazy to update the concordances file with the latest boundary data from the ABS and/or Geoscape
-3. You have a license of [Geoscape Buildings](https://geoscape.com.auhttps://minus34.com/opendata/geoscape-202202/boundary_concordance.csv/buildings/) or [Geoscape Land Parcels](https://geoscape.com.auhttps://minus34.com/opendata/geoscape-202202/boundary_concordance.csv/land-parcels/) and want to use the _planning zone_ data in those product to:
+3. You have a license of [Geoscape Buildings](https://geoscape.com.auhttps://minus34.com/opendata/geoscape-202202/boundary_concordance.csv/buildings/) or [Geoscape Land Parcels](https://geoscape.com.auhttps://minus34.com/opendata/geoscape-202202/boundary_concordance.csv/land-parcels/) and want to use the _planning zone_ data in those products to:
     1. Use a more accurate list of residential addresses to determine the data apportionment percentages (see note below); or
     2. Use a different set of addresses to apportion your data; e.g. industrial or commercial addresses
 
@@ -119,12 +119,12 @@ Running the script requires the following open data, available as Postgres dump 
 2. ABS Census 2021 boundaries ([download](https://minus34.com/opendata/census-2021/census_2021_bdys.dmp))
 3. GNAF from gnaf-loader ([download](https://minus34.com/opendata/geoscape-202202/gnaf-202202.dmp))
 4. Geoscape Administrative Boundaries from gnaf-loader ([download](https://minus34.com/opendata/geoscape-202202/admin-bdys-202202.dmp))
-5. ABS Census 2016 data - for QA only ([download](https://minus34.com/opendata/census-2016/census_2016_data.dmp))
+5. ABS Census 2016 data - used to generate error rates only ([download](https://minus34.com/opendata/census-2016/census_2016_data.dmp))
 
-###### 3. Process
+##### 3. Process
 
 1. Download the above dump files and import them using `pg_restore`
-2. Prep the Census boundary tagged address tables by running `01a_create_gnaf_2016_census_bdy_table.sql` & `01b_create_gnaf_2021_census_bdy_table.sql` in the [postgres-scripts](/postgres-scripts) folder
+2. Prep the census boundary tagged address tables by running `01a_create_gnaf_2016_census_bdy_table.sql` & `01b_create_gnaf_2021_census_bdy_table.sql` in the [postgres-scripts](/postgres-scripts) folder
 3. OPTIONAL: If you have access to Geoscape Buildings or Land Parcels data:
     1. import it into Postgres
     2. Edit the `02_create_residential_address_table.sql` in the [postgres-scripts](/postgres-scripts) folder to suit your dataset and schema name
@@ -133,16 +133,37 @@ Running the script requires the following open data, available as Postgres dump 
 5. Add `psycopg2` to your Python 3.x environment
 6. Run the script
 
-##### Note
- - The benefit of using Geoscape planning zone data over the default residential address filter (ABS Census 2021 meshblock categories) is reduced by ~2.3m addresses not having a planning zone, The code as-is fills this missing data with 2021 meshblock categories.
+#### Note
+The benefit of using Geoscape planning zone data over the default residential address filter (ABS Census 2021 meshblock categories) is limited due to ~2.3m addresses not having a planning zone, The code as-is fills this missing data with ABS Census 2021 meshblock categories.
  
 ### STEP 2 - Use the Concordance File
 
-After loading the file into your database/reporting tool of choice - you use it by creating a 3 (or more) table join between the datsets you want to merge and the concordance file table.
+After loading the file into your database/reporting tool of choice - you use it by creating a 3 (or more) table join between the datasets you want to merge and the concordance file/table.
 
-Below is a sample script for merging postcode data with LGA data in Postgres:
+Below is a sample script for above Covid 19 example use case - merging postcode & LGA data in Postgres:
 
-TODO
+```sql
+WITH from_bdy AS (
+    SELECT con.to_id,
+           con.to_name,
+           sum(pc.cases::float * con.address_percent / 100.0)::integer AS cases
+    FROM testing.nsw_covid_cases_20220503_postcode AS pc
+    INNER JOIN gnaf_202202.boundary_concordance AS con ON pc.postcode = con.from_id
+    WHERE con.from_source = 'geoscape 202202'
+      AND con.from_bdy = 'postcode'
+      AND con.to_source = 'abs 2016'
+      AND con.to_bdy = 'lga'
+    GROUP BY con.to_id,
+             con.to_name
+)
+SELECT from_bdy.to_id AS lga_id,
+       from_bdy.to_name AS lga_name,
+       lga.tests,
+       from_bdy.cases,
+       (from_bdy.cases::float / lga.tests::float * 100.0)::numeric(4,1) AS infection_rate_percent
+FROM testing.nsw_covid_tests_20220503_lga AS lga
+INNER JOIN from_bdy on from_bdy.to_id = concat('LGA', lga.lga_code19);  -- note: NSW Covid data is missing LGA prefix in IDs
+```
 
 
 ## Data Licenses
