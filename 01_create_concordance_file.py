@@ -63,6 +63,8 @@ boundary_list = [
 
     # # test concordance for measuring reliability against known differences
     # {"from": "sa2", "from_source": "abs 2016", "to": "sa2", "to_source": "abs 2021"}
+
+    # TODO: add ABS Census 2016 to 2021 correspondences using official ABS files (assuming there's a demand)
 ]
 
 # ---------------------------------------------------------------------------------------
