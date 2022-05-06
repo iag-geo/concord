@@ -99,7 +99,7 @@ Running the script requires the following open data, available as Postgres dump 
     3. Run the above SQL script
 5. Review & edit `01_create_concordance_file.py` as required - make any required changes in the sections marked for editing
 6. Add `psycopg2` to your Python 3.x environment
-7. Run the script
+7. Run the script (takes ~30 mins on a 2017 MacBook Pro with 16Gb of RAM and 4 cores)
  
 ### STEP 3 - Use the Concordance File
 
