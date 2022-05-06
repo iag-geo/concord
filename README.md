@@ -116,26 +116,26 @@ To run the example:
 4. Run the script
 
 ```sql
-WITH from_bdy AS (
-    SELECT con.to_id,
-           con.to_name,
-           sum(pc.cases::float * con.address_percent / 100.0)::integer AS cases
-    FROM testing.nsw_covid_cases_20220503_postcode AS pc
-    INNER JOIN gnaf_202202.boundary_concordance AS con ON pc.postcode = con.from_id
-    WHERE con.from_source = 'geoscape 202202'
-      AND con.from_bdy = 'postcode'
-      AND con.to_source = 'abs 2016'
-      AND con.to_bdy = 'lga'
-    GROUP BY con.to_id,
-             con.to_name
+WITH pc_data AS (
+   SELECT con.to_id AS lga_id,
+          con.to_name AS lga_name,
+          sum(pc.cases::float * con.address_percent / 100.0)::integer AS cases
+   FROM testing.nsw_covid_cases_20220503_postcode AS pc
+           INNER JOIN gnaf_202202.boundary_concordance AS con ON pc.postcode = con.from_id
+   WHERE con.from_source = 'geoscape 202202'
+     AND con.from_bdy = 'postcode'
+     AND con.to_source = 'abs 2016'
+     AND con.to_bdy = 'lga'
+   GROUP BY lga_id,
+            lga_name
 )
-SELECT from_bdy.to_id AS lga_id,
-       from_bdy.to_name AS lga_name,
+SELECT pc_data.lga_id,
+       pc_data.lga_name,
        lga.tests,
-       from_bdy.cases,
-       (from_bdy.cases::float / lga.tests::float * 100.0)::numeric(4,1) AS infection_rate_percent
+       pc_data.cases,
+       (pc_data.cases::float / lga.tests::float * 100.0)::numeric(4,1) AS infection_rate_percent
 FROM testing.nsw_covid_tests_20220503_lga AS lga
-INNER JOIN from_bdy on from_bdy.to_id = concat('LGA', lga.lga_code19); -- note: NSW Covid data is missing LGA prefix in IDs
+        INNER JOIN pc_data on pc_data.lga_id = lga.lga_code19;
 ```
 <sup>Example concordance file join to convert postcode level data to LGA and then join with LGA level data</sup>
 

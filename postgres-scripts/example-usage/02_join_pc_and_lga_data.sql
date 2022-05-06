@@ -14,7 +14,7 @@
 --      - The rates of infection are incorrect as the data doesn't contain RAT test numbers, only PCR testing.
 --      - Also, 6 LGAs are not in the results due to the age of the ABS Census 2016 LGAs used versus the more recent Covid data.
 
-WITH from_pc AS (
+WITH pc_data AS (
     SELECT con.to_id AS lga_id,
            con.to_name AS lga_name,
            sum(pc.cases::float * con.address_percent / 100.0)::integer AS cases
@@ -27,19 +27,10 @@ WITH from_pc AS (
     GROUP BY lga_id,
              lga_name
 )
-SELECT from_pc.lga_id,
-       from_pc.lga_name,
+SELECT pc_data.lga_id,
+       pc_data.lga_name,
        lga.tests,
-       from_pc.cases,
-       (from_pc.cases::float / lga.tests::float * 100.0)::numeric(4,1) AS infection_rate_percent
+       pc_data.cases,
+       (pc_data.cases::float / lga.tests::float * 100.0)::numeric(4,1) AS infection_rate_percent
 FROM testing.nsw_covid_tests_20220503_lga AS lga
-INNER JOIN from_pc on from_pc.lga_id = lga.lga_code19;
-
-
-
-select *
-from gnaf_202202.boundary_concordance AS con
-WHERE con.from_source = 'geoscape 202202'
-  AND con.from_bdy = 'postcode'
-  AND con.to_source = 'abs 2016'
-  AND con.to_bdy = 'lga';
+INNER JOIN pc_data on pc_data.lga_id = lga.lga_code19;
