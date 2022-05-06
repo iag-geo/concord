@@ -26,3 +26,9 @@ analyse gnaf_202202.boundary_concordance;
 -- add primary key (faster if done after import) -- completed in 8 s 496 ms
 alter table gnaf_202202.boundary_concordance add constraint boundary_concordance_pkey
     primary key (from_source, from_bdy, from_id, to_source, to_bdy, to_id);
+
+-- add index on required fields for converting data
+create index boundary_concordance_combo_idx on gnaf_202202.boundary_concordance
+    using btree (from_source, from_bdy, to_source, to_bdy);
+
+alter table gnaf_202202.boundary_concordance cluster on boundary_concordance_combo_idx;

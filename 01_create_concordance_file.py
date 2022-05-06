@@ -341,14 +341,17 @@ def get_source_table(name):
 def index_table(pg_cur):
     start_time = datetime.now()
 
+    # analyse table and add primary key & index
     query = f"""analyse {output_schema}.{output_table};
                 alter table {output_schema}.{output_table} 
                     add constraint {output_table}_pkey 
-                    primary key (from_source, from_bdy, from_id, to_source, to_bdy, to_id);"""
-
+                    primary key (from_source, from_bdy, from_id, to_source, to_bdy, to_id);
+                create index {output_table}_combo_idx on {output_schema}.{output_table}
+                    using btree (from_source, from_bdy, to_source, to_bdy);
+                alter table {output_schema}.{output_table} cluster on {output_table}_combo_idx;"""
     pg_cur.execute(query)
 
-    logger.info(f"\t - primary key added : {datetime.now() - start_time}")
+    logger.info(f"\t - table analysed, primary key & index added : {datetime.now() - start_time}")
 
 
 def score_results(pg_cur):
