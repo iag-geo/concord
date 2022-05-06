@@ -53,7 +53,8 @@ boundary_list = [
     {"from": "locality", "from_source": "geoscape 202202", "to": "sa3", "to_source": "abs 2016"},
     {"from": "locality", "from_source": "geoscape 202202", "to": "lga", "to_source": "abs 2016"},
     {"from": "postcode", "from_source": "geoscape 202202", "to": "sa3", "to_source": "abs 2016"},
-    # {"from": "postcode", "from_source": "geoscape 202202", "to": "poa", "to_source": "abs 2016"}, # TODO: handle duplicate PCs that go over state borders
+    # {"from": "postcode", "from_source": "geoscape 202202", "to": "poa", "to_source": "abs 2016"}, # TODO: handle the "duplicate" postcodes that go over state borders
+    {"from": "postcode", "from_source": "geoscape 202202", "to": "lga", "to_source": "abs 2016"},
     {"from": "lga", "from_source": "geoscape 202202", "to": "lga", "to_source": "abs 2016"},
 
     # Geoscape to Geoscape bdys
