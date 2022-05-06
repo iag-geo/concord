@@ -91,11 +91,11 @@ Running the script requires the following open data, available as Postgres dump 
 ##### Process
 
 1. Download the above dump files and import them using `pg_restore`
-2. Edit `01a_create_gnaf_2016_census_bdy_table.sql` & `01b_create_gnaf_2021_census_bdy_table.sql` in the [postgres-scripts](/postgres-scripts) folder for your schema names & table owner
+2. Edit `01a_create_gnaf_2016_census_bdy_table.sql` & `01b_create_gnaf_2021_census_bdy_table.sql` in the [postgres-scripts](/postgres-scripts/data-prep) folder for your schema names & table owner
 3. Run them to prep the census boundary tagged address tables
 4. OPTIONAL: If you have access to Geoscape Buildings or Land Parcels data:
     1. import it into Postgres
-    2. Edit the `02_create_residential_address_table.sql` in the [postgres-scripts](/postgres-scripts) folder to suit your dataset and schema name
+    2. Edit the `02_create_residential_address_table.sql` in the [postgres-scripts](/postgres-scripts/data-prep) folder to suit your dataset and schema name
     3. Run the above SQL script
 5. Review & edit `01_create_concordance_file.py` as required - make any required changes in the sections marked for editing
 6. Add `psycopg2` to your Python 3.x environment

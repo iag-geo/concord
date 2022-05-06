@@ -1,5 +1,5 @@
 
--- import ABS SA2 correspondence table
+-- import ABS SA2 correspondence table from downloaded CSV
 
 DROP TABLE IF EXISTS census_2021_bdys.correspondences_sa2;
 CREATE TABLE census_2021_bdys.correspondences_sa2
