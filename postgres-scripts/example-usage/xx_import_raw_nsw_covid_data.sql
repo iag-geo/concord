@@ -44,7 +44,7 @@ alter table testing.nsw_covid_cases_20220503_postcode add constraint nsw_covid_c
 -- create aggregated cases by LGA table for testing concordance file -- 131 rows affected in 104 ms
 drop table if exists testing.nsw_covid_cases_20220503_lga;
 create table testing.nsw_covid_cases_20220503_lga as
-select lga_code19,
+select concat('LGA', lga_code19) as lga_code19,  -- note: NSW Covid data is missing LGA prefix in IDs
        sum(confirmed_cases_count) as cases
 from testing.nsw_raw_covid_cases_20220503
 group by lga_code19
@@ -109,7 +109,7 @@ alter table testing.nsw_covid_tests_20220503_postcode add constraint nsw_covid_t
 -- create aggregated tests by LGA table for testing concordance file -- 129 rows affected in 594 ms
 drop table if exists testing.nsw_covid_tests_20220503_lga;
 create table testing.nsw_covid_tests_20220503_lga as
-select lga_code19,
+select concat('LGA', lga_code19) as lga_code19,  -- note: NSW Covid data is missing LGA prefix in IDs
        sum(test_count) as tests
 from testing.nsw_raw_covid_tests_20220503
 group by lga_code19
