@@ -13,6 +13,13 @@
 --    IMPORTANT: the output data is for testing only!
 --      - The rates of infection are incorrect as the data doesn't contain RAT test numbers, only PCR testing.
 --      - Also, 6 LGAs are not in the results due to the age of the ABS Census 2016 LGAs used versus the more recent Covid data.
+--
+-- -- input tables
+-- select * from testing.nsw_covid_cases_20220503_postcode;
+-- select * from testing.nsw_covid_tests_20220503_lga;
+--
+-- -- concordance table
+-- select * from gnaf_202202.boundary_concordance;
 
 WITH pc_data AS (
     SELECT con.to_id AS lga_id,
