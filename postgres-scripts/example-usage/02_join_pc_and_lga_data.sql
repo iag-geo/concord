@@ -25,7 +25,8 @@ WITH pc_data AS (
     SELECT con.to_id AS lga_id,
            con.to_name AS lga_name,
            sum(pc.cases::float * con.address_percent / 100.0)::integer AS cases,
-           sum(pc.cases) as qa_count
+           sum(pc.cases) as qa_count,
+           count(*) as postcode_count
     FROM testing.nsw_covid_cases_20220503_postcode AS pc
     INNER JOIN gnaf_202202.boundary_concordance AS con ON pc.postcode = con.from_id
     WHERE con.from_source = 'geoscape 202202'
@@ -40,12 +41,13 @@ SELECT pc_data.lga_id,
        lga.tests,
        pc_data.cases,
        (pc_data.cases::float / lga.tests::float * 100.0)::numeric(4,1) AS infection_rate_percent,
-       (pc_data.cases::float / pc_data.qa_count::float * 100.0)::smallint as concordance_percent
+       (pc_data.cases::float / pc_data.qa_count::float * 100.0)::smallint as concordance_percent,
+       pc_data.postcode_count
 FROM testing.nsw_covid_tests_20220503_lga AS lga
 INNER JOIN pc_data on pc_data.lga_id = lga.lga_code19;
 
 
--- example of poor concordance due to number of postcodes in one LGA
+-- example of poor concordance due to number of partial postcodes that intersect with one LGA
 select *
 from gnaf_202202.boundary_concordance
 WHERE from_source = 'geoscape 202202'
@@ -53,3 +55,4 @@ WHERE from_source = 'geoscape 202202'
   AND to_source = 'abs 2016'
   AND to_bdy = 'lga'
   and to_name = 'Dungog (A)';
+
