@@ -8,17 +8,6 @@ import psycopg2  # need to install package
 from datetime import datetime
 
 # ---------------------------------------------------------------------------------------
-# edit database parameters
-# ---------------------------------------------------------------------------------------
-
-pg_connect_string = "dbname=geo host=localhost port=5432 user=postgres password=password"
-
-output_schema = "gnaf_202202"
-
-output_table = "boundary_concordance"
-output_score_table = "boundary_concordance_score"
-
-# ---------------------------------------------------------------------------------------
 # edit boundary list to find concordances with
 # ---------------------------------------------------------------------------------------
 
@@ -78,6 +67,12 @@ asgs_concordance_list = ['sa1', 'sa2', 'sa3', 'sa4', 'gcc']
 
 
 def main():
+
+    # set command line arguments
+    geoscape_version, args = set_arguments()
+    # get settings from arguments
+    settings = get_settings(geoscape_version, args)
+
     # connect to Postgres database
     pg_conn = psycopg2.connect(pg_connect_string)
     pg_conn.autocommit = True
@@ -524,12 +519,42 @@ def set_arguments():
         help='Destination schema name to store final boundary concordance tables in. Defaults to \'gnaf_'
              + geoscape_version + '\'.')
 
-    # output directory
+    # output file/table name & directory
+    parser.add_argument(
+        '--output-table', required=True,
+        help='Name of both output concordance table and file. Defaults to \'boundary_concordance\'.')
     parser.add_argument(
         '--output-path', required=True,
         help='Local path where the Shapefile and GeoJSON files will be output.')
 
-    return parser.parse_args()
+    return geoscape_version, parser.parse_args()
+
+
+# create the dictionary of settings
+def get_settings(geoscape_version, args):
+    settings = dict()
+
+    settings['admin_bdys_schema'] = args.admin_schema or "admin_bdys_" + geoscape_version
+    settings['output_schema'] = args.output_schema or "gnaf_" + geoscape_version
+    settings['output_path'] = args.output_path
+    settings['output_table'] = args.output_table or "boundary_concordance"
+
+    # create postgres connect string
+    settings['pg_host'] = args.pghost or os.getenv("PGHOST", "localhost")
+    settings['pg_port'] = args.pgport or os.getenv("PGPORT", 5432)
+    settings['pg_db'] = args.pgdb or os.getenv("PGDATABASE", "geo")
+    settings['pg_user'] = args.pguser or os.getenv("PGUSER", "postgres")
+    settings['pg_password'] = args.pgpassword or os.getenv("PGPASSWORD", "password")
+
+    settings['pg_connect_string'] = "dbname='{0}' host='{1}' port='{2}' user='{3}' password='{4}'".format(
+        settings['pg_db'], settings['pg_host'], settings['pg_port'], settings['pg_user'], settings['pg_password'])
+
+    # left over issue with the geoscape.py module - don't edit this
+    settings['gnaf_schema'] = None
+    settings['raw_gnaf_schema'] = None
+    settings['raw_admin_bdys_schema'] = None
+
+    return settings
 
 
 if __name__ == '__main__':
