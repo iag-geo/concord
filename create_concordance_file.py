@@ -1,4 +1,6 @@
 
+import argparse
+import geoscape
 import logging
 import os
 import psycopg2  # need to install package
@@ -12,6 +14,7 @@ from datetime import datetime
 pg_connect_string = "dbname=geo host=localhost port=5432 user=postgres password=password"
 
 output_schema = "gnaf_202202"
+
 output_table = "boundary_concordance"
 output_score_table = "boundary_concordance_score"
 
@@ -66,12 +69,6 @@ boundary_list = [
 
     # TODO: add ABS Census 2016 to 2021 correspondences using official ABS files (assuming there's a demand)
 ]
-
-# ---------------------------------------------------------------------------------------
-# edit output file path
-# ---------------------------------------------------------------------------------------
-
-output_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "data")
 
 # ---------------------------------------------------------------------------------------
 
@@ -490,6 +487,49 @@ def export_to_csv(pg_cur, table, file_name):
                 ) TO STDOUT WITH CSV HEADER"""
     with open(os.path.join(output_path, file_name), "w") as f:
         pg_cur.copy_expert(query, f)
+
+
+# set the command line arguments for the script
+def set_arguments():
+    parser = argparse.ArgumentParser(
+        description='A CSV file and supporting scripts for converting data between Australian boundaries.')
+
+    # PG Options
+    parser.add_argument(
+        '--pghost',
+        help='Host name for Postgres server. Defaults to PGHOST environment variable if set, otherwise localhost.')
+    parser.add_argument(
+        '--pgport', type=int,
+        help='Port number for Postgres server. Defaults to PGPORT environment variable if set, otherwise 5432.')
+    parser.add_argument(
+        '--pgdb',
+        help='Database name for Postgres server. Defaults to PGDATABASE environment variable if set, '
+             'otherwise geo.')
+    parser.add_argument(
+        '--pguser',
+        help='Username for Postgres server. Defaults to PGUSER environment variable if set, otherwise postgres.')
+    parser.add_argument(
+        '--pgpassword',
+        help='Password for Postgres server. Defaults to PGPASSWORD environment variable if set, '
+             'otherwise \'password\'.')
+
+    # schema names
+    geoscape_version = geoscape.get_geoscape_version(datetime.today())
+    parser.add_argument(
+        '--admin-schema', default='admin_bdys_' + geoscape_version,
+        help='Destination schema name to store final admin boundary tables in. Defaults to \'admin_bdys_'
+             + geoscape_version + '\'.')
+    parser.add_argument(
+        '--output-schema', default='gnaf_' + geoscape_version,
+        help='Destination schema name to store final boundary concordance tables in. Defaults to \'gnaf_'
+             + geoscape_version + '\'.')
+
+    # output directory
+    parser.add_argument(
+        '--output-path', required=True,
+        help='Local path where the Shapefile and GeoJSON files will be output.')
+
+    return parser.parse_args()
 
 
 if __name__ == '__main__':
