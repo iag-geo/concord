@@ -1,6 +1,5 @@
 
 import argparse
-import geoscape
 import logging
 import os
 import psycopg2  # need to install package
@@ -521,8 +520,10 @@ def set_arguments():
         help="Password for Postgres server. Defaults to PGPASSWORD environment variable if set, "
              "otherwise \'password\'.")
 
+    # get geoscape release version
+    geoscape_version = get_geoscape_version(datetime.today())
+
     # schema names
-    geoscape_version = geoscape.get_geoscape_version(datetime.today())
     parser.add_argument(
         "--admin-schema", default="admin_bdys_" + geoscape_version,
         help="Destination schema name to store final admin boundary tables in. Defaults to 'admin_bdys_"
@@ -551,10 +552,10 @@ def get_settings(geoscape_version, args):
     settings = dict()
 
     settings["admin_bdys_schema"] = args.admin_schema or "admin_bdys_" + geoscape_version
-    settings["output_schema"] = args.settings["output_schema"] or "gnaf_" + geoscape_version
+    settings["output_schema"] = args.output_schema or "gnaf_" + geoscape_version
     settings["output_path"] = args.output_path
-    settings["output_table"] = args.settings["output_table"] or "boundary_concordance"
-    settings["output_score_table"] = args.settings["output_score_table"] or "boundary_concordance_score"
+    settings["output_table"] = args.output_table or "boundary_concordance"
+    settings["output_score_table"] = args.output_score_table or "boundary_concordance_score"
 
     # create postgres connect string
     settings["pg_host"] = args.pghost or os.getenv("PGHOST", "localhost")
@@ -572,6 +573,23 @@ def get_settings(geoscape_version, args):
     settings["raw_admin_bdys_schema"] = None
 
     return settings
+
+
+# get latest Geoscape release version as YYYYMM, as of the date provided
+def get_geoscape_version(date):
+    month = date.month
+    year = date.year
+
+    if month == 1:
+        return str(year - 1) + '11'
+    elif 2 <= month < 5:
+        return str(year) + '02'
+    elif 5 <= month < 8:
+        return str(year) + '05'
+    elif 8 <= month < 11:
+        return str(year) + '08'
+    else:
+        return str(year) + '11'
 
 
 if __name__ == "__main__":
