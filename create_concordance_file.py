@@ -98,7 +98,8 @@ def add_concordances(bdys, pg_cur):
         # add the residential address table join and filter
         residential_filter = ""
         if settings.residential_address_source["name"] == 'geoscape':
-            res_table = f'{settings.residential_address_source["schema"]}.{settings.residential_address_source["table"]}'
+            res_table = f'{settings.residential_address_source["schema"]}.' \
+                        f'{settings.residential_address_source["table"]}'
             input_tables += f"\n\t\t\t\t\t\tinner join {res_table} as r on r.gnaf_pid = f.gnaf_pid"""
             residential_filter = "and r.is_residential"
         elif from_source == "abs 2021":
