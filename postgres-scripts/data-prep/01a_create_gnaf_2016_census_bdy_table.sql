@@ -10,7 +10,7 @@
 drop table if exists temp_mb;
 create temporary table temp_mb as
 select mb_16code,
-       ST_PointOnSurface(geom) as geom
+       ST_Transform(ST_PointOnSurface(geom), 4283) as geom
 from admin_bdys.abs_2016_mb
 ;
 analyse temp_mb;
