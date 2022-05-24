@@ -15,10 +15,16 @@ def main():
     pg_cur = pg_conn.cursor()
 
     # create Census bdy tag tables for all GNAF addresses
+    start_time = datetime.now()
+
     sql = geoscape.open_sql_file("data-prep/01a_create_gnaf_2016_census_bdy_table.sql")
     pg_cur.execute(sql)
+    logger.info(f'\t - ABS 2016 boundary tag table created : {datetime.now() - start_time}')
+    start_time = datetime.now()
+
     sql = geoscape.open_sql_file("data-prep/01b_create_gnaf_2021_census_bdy_table.sql")
     pg_cur.execute(sql)
+    logger.info(f'\t - ABS 2021 boundary tag table created : {datetime.now() - start_time}')
 
     # create concordance table
     create_table(pg_cur)

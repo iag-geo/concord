@@ -2,13 +2,13 @@
 
 conda activate geo
 
-AWS_PROFILE="default"
+AWS_PROFILE="minus34"
 OUTPUT_FOLDER="/Users/$(whoami)/tmp/geoscape_202205"
 
 mkdir -p "${OUTPUT_FOLDER}"
 
 # Process using GDA94 boundaries
-python3 /Users/$(whoami)/git/iag_geo/concord/create_concordance_file.py --output-path=${OUTPUT_FOLDER}
+python3 /Users/$(whoami)/git/iag_geo/concord/create_concordance_file.py --pgdb=geo --output-path=${OUTPUT_FOLDER}
 # sample arguments
 #python3 /Users/$(whoami)/git/iag_geo/concord/create_concordance_file.py --admin-schema="admin_bdys_202205" --gnaf-schema="gnaf_202205" --output-path=${OUTPUT_FOLDER}
 

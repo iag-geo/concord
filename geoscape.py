@@ -83,10 +83,10 @@ def prep_sql_list(sql_list):
 
 # set schema names in the SQL script
 def prep_sql(sql):
-    if settings.raw_gnaf_schema is not None:
-        sql = sql.replace(" raw_gnaf.", f" {settings.raw_gnaf_schema}.")
-    if settings.raw_admin_bdys_schema is not None:
-        sql = sql.replace(" raw_admin_bdys.", f" {settings.raw_admin_bdys_schema}.")
+    # if settings.raw_gnaf_schema is not None:
+    #     sql = sql.replace(" raw_gnaf.", f" {settings.raw_gnaf_schema}.")
+    # if settings.raw_admin_bdys_schema is not None:
+    #     sql = sql.replace(" raw_admin_bdys.", f" {settings.raw_admin_bdys_schema}.")
     if settings.gnaf_schema is not None:
         sql = sql.replace(" gnaf.", f" {settings.gnaf_schema}.")
     if settings.admin_bdys_schema is not None:
