@@ -97,10 +97,10 @@ with abs as (
     left outer join temp_sed_mb as sed on sed.mb_code_2021 = mb.mb_code_2021
 )
 select gid,
-       gnaf.gnaf_pid,
+       adr.gnaf_pid,
        abs.*
-from gnaf.address_principals as gnaf
-     inner join abs on abs.mb_code_2021 = gnaf.mb_2021_code::varchar(11)
+from gnaf.address_principals as adr
+     inner join abs on abs.mb_code_2021 = adr.mb_2021_code::varchar(11)
 ;
 analyse gnaf.address_principal_census_2021_boundaries;
 

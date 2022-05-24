@@ -22,3 +22,7 @@ from census_2016_bdys.sa2_2016_aust as from_bdy
          inner join census_2016_bdys.lga_2016_aust as to_bdy on st_intersects(from_bdy.geom, to_bdy.geom)
 ;
 
+
+
+select *
+from gnaf_202205;
