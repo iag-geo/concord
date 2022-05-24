@@ -61,8 +61,8 @@ drop table temp_mb;
 
 
 -- step 2 -- get ABS bdy IDs for all addresses -- 14,451,352 rows in 5 mins
-drop table if exists gnaf_202202.address_principal_census_2021_boundaries;
-create table gnaf_202202.address_principal_census_2021_boundaries as
+drop table if exists gnaf.address_principal_census_2021_boundaries;
+create table gnaf.address_principal_census_2021_boundaries as
 with abs as (
     select mb.mb_code_2021,
            mb_category_2021,
@@ -99,13 +99,13 @@ with abs as (
 select gid,
        gnaf.gnaf_pid,
        abs.*
-from gnaf_202202.address_principals as gnaf
+from gnaf.address_principals as gnaf
      inner join abs on abs.mb_code_2021 = gnaf.mb_2021_code::varchar(11)
 ;
-analyse gnaf_202202.address_principal_census_2021_boundaries;
+analyse gnaf.address_principal_census_2021_boundaries;
 
-alter table gnaf_202202.address_principal_census_2021_boundaries add constraint address_principal_census_2021_boundaries_pkey primary key (gnaf_pid);
-alter table gnaf_202202.address_principal_census_2021_boundaries cluster on address_principal_census_2021_boundaries_pkey;
+alter table gnaf.address_principal_census_2021_boundaries add constraint address_principal_census_2021_boundaries_pkey primary key (gnaf_pid);
+alter table gnaf.address_principal_census_2021_boundaries cluster on address_principal_census_2021_boundaries_pkey;
 
 drop table if exists temp_ced_mb;
 drop table if exists temp_lga_mb;
@@ -115,5 +115,5 @@ drop table if exists temp_poa_mb;
 drop table if exists temp_sed_mb;
 
 
--- select count(*) from gnaf_202202.address_principals; -- 14,451,352
--- select count(*) from gnaf_202202.address_principal_census_2021_boundaries; -- 14,451,346
+-- select count(*) from gnaf.address_principals; -- 14,451,352
+-- select count(*) from gnaf.address_principal_census_2021_boundaries; -- 14,451,346

@@ -11,7 +11,7 @@ drop table if exists temp_mb;
 create temporary table temp_mb as
 select mb_16code,
        ST_PointOnSurface(geom) as geom
-from admin_bdys_202202.abs_2016_mb
+from admin_bdys.abs_2016_mb
 ;
 analyse temp_mb;
 create index temp_mb_geom_idx on temp_mb using gist (geom);
@@ -59,8 +59,8 @@ drop table temp_mb;
 
 
 -- step 2 -- get ABS bdy IDs for all addresses -- 14,451,352 rows in 5 mins
-drop table if exists gnaf_202202.address_principal_census_2016_boundaries;
-create table gnaf_202202.address_principal_census_2016_boundaries as
+drop table if exists gnaf.address_principal_census_2016_boundaries;
+create table gnaf.address_principal_census_2016_boundaries as
 with abs as (
     select mb.mb_16code,
            mb_category,
@@ -87,7 +87,7 @@ with abs as (
            ucl_16code,
            ucl_16name,
            mb.state
-    from admin_bdys_202202.abs_2016_mb as mb
+    from admin_bdys.abs_2016_mb as mb
     inner join temp_ced_mb as ced on ced.mb_16code = mb.mb_16code
     inner join temp_lga_mb as lga on lga.mb_16code = mb.mb_16code
     inner join temp_poa_mb as poa on poa.mb_16code = mb.mb_16code
@@ -98,13 +98,13 @@ with abs as (
 select gid,
        gnaf.gnaf_pid,
        abs.*
-from gnaf_202202.address_principals as gnaf
+from gnaf.address_principals as gnaf
      inner join abs on abs.mb_16code = gnaf.mb_2016_code
 ;
-analyse gnaf_202202.address_principal_census_2016_boundaries;
+analyse gnaf.address_principal_census_2016_boundaries;
 
-alter table gnaf_202202.address_principal_census_2016_boundaries add constraint address_principal_census_2016_boundaries_pkey primary key (gnaf_pid);
-alter table gnaf_202202.address_principal_census_2016_boundaries cluster on address_principal_census_2016_boundaries_pkey;
+alter table gnaf.address_principal_census_2016_boundaries add constraint address_principal_census_2016_boundaries_pkey primary key (gnaf_pid);
+alter table gnaf.address_principal_census_2016_boundaries cluster on address_principal_census_2016_boundaries_pkey;
 
 drop table if exists temp_ced_mb;
 drop table if exists temp_lga_mb;
@@ -114,5 +114,5 @@ drop table if exists temp_ucl_mb;
 drop table if exists temp_sed_mb;
 
 
--- select count(*) from gnaf_202202.address_principals; -- 14,451,352
--- select count(*) from gnaf_202202.address_principal_census_2016_boundaries; -- 14,451,352
+-- select count(*) from gnaf.address_principals; -- 14,451,352
+-- select count(*) from gnaf.address_principal_census_2016_boundaries; -- 14,451,352
