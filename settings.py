@@ -118,6 +118,9 @@ pg_password = args.pgpassword or os.getenv("PGPASSWORD", "password")
 
 pg_connect_string = f"dbname='{pg_db}' host='{pg_host}' port='{pg_port}' user='{pg_user}' password='{pg_password}'"
 
+# set postgres script directory
+sql_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "postgres-scripts")
+
 # ABS ASGS boundaries that align 100% - do not edit
 asgs_concordance_list = ["sa1", "sa2", "sa3", "sa4", "gcc"]
 # asgs_concordance_list = ["mb", "sa1", "sa2", "sa3", "sa4", "gcc", "state"]

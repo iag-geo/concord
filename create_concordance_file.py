@@ -15,7 +15,10 @@ def main():
     pg_cur = pg_conn.cursor()
 
     # create Census bdy tag tables for all GNAF addresses
-
+    sql = geoscape.open_sql_file("data-prep/01a_create_gnaf_2016_census_bdy_table.sql")
+    pg_cur.execute(sql)
+    sql = geoscape.open_sql_file("data-prep/01b_create_gnaf_2021_census_bdy_table.sql")
+    pg_cur.execute(sql)
 
     # create concordance table
     create_table(pg_cur)
@@ -177,8 +180,8 @@ def add_asgs_concordances(pg_cur):
                                    {to_bdy}_16name as to_name,
                                    count(*) as address_count,
                                    100.0 as address_percent
-                            from admin_bdys_202202.abs_2016_mb as mb
-                            inner join gnaf_202202.address_principals as gnaf on gnaf.mb_2016_code = mb.mb_16code
+                            from admin_bdys_202205.abs_2016_mb as mb
+                            inner join gnaf_202205.address_principals as gnaf on gnaf.mb_2016_code = mb.mb_16code
                             group by from_id,
                                      from_name,
                                      to_id,
@@ -221,8 +224,8 @@ def add_asgs_concordances(pg_cur):
                                    {to_bdy}_21name as to_name,
                                    count(*) as address_count,
                                    100.0 as address_percent
-                            from admin_bdys_202202.abs_2021_mb as mb
-                                     inner join gnaf_202202.address_principals as gnaf 
+                            from admin_bdys_202205.abs_2021_mb as mb
+                                     inner join gnaf_202205.address_principals as gnaf 
                                          on gnaf.mb_2021_code = mb.mb21_code
                             group by from_id,
                                      from_name,

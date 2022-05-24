@@ -1,16 +1,16 @@
 
 select count(*)
-from admin_bdys_202202.abs_2021_sa2;
+from admin_bdys_202205.abs_2021_sa2;
 
 
 select *
-from gnaf_202202.boundary_concordance
+from gnaf_202205.boundary_concordance
 where from_bdy = 'postcode'
 and to_bdy = 'poa';
 
 
 select *
-from admin_bdys_202202.abs_2016_sa1;
+from admin_bdys_202205.abs_2016_sa1;
 
 
 

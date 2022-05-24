@@ -29,7 +29,7 @@
 -- ), gnaf_2022 as (
 --     select mb_2016_code,
 --            count(*) as address_count
---     from gnaf_202202.address_principals
+--     from gnaf_202205.address_principals
 --     group by mb_2016_code
 -- )
 -- select mb.mb_2016_code,
@@ -39,8 +39,8 @@
 --        person,
 --        mb.address_count,
 --        coalesce(gnaf_2017.address_count, 0) as  address_count_201708,
---        coalesce(gnaf_2022.address_count, 0) as  address_count_202202,
---        0::integer as person_202202,
+--        coalesce(gnaf_2022.address_count, 0) as  address_count_202205,
+--        0::integer as person_202205,
 --        state,
 --        geom
 -- from testing.mb_2016_counts as mb
@@ -51,7 +51,7 @@
 --
 -- -- addd projected population
 -- update testing.mb_2016_counts_2022
---     set person_202202 = ((person::float / address_count_201708::float) * address_count_202202)::integer
+--     set person_202205 = ((person::float / address_count_201708::float) * address_count_202205)::integer
 -- where address_count_201708 > 0
 -- ;
 -- analyse testing.mb_2016_counts_2022;
@@ -67,7 +67,7 @@ create table testing.lga_pop as
 with mb as (
     select mb_2016_code,
            person,
-           person_202202,
+           person_202205,
            ST_PointOnSurface(geom)         as geom
     from testing.mb_2016_counts_2022
 )
@@ -75,7 +75,7 @@ select lga_code16,
        lga_name16,
        ste_code16,
        sum(person) as person,
-       sum(person_202202) as person_202202
+       sum(person_202205) as person_202205
 from mb
 inner join census_2016_bdys.lga_2016_aust as abs_lga on st_intersects(mb.geom, abs_lga.geom)
 group by lga_code16,
@@ -103,7 +103,7 @@ with psma_lga as (
     select lga_pid,
            name as psma_name,
            st_collect(geom) as geom
-    from admin_bdys_202202.local_government_areas
+    from admin_bdys_202205.local_government_areas
     group by lga_pid,
              name
 ), psma_lga_pnt as (
@@ -181,7 +181,7 @@ with psma_lga as (
     select lga_pid,
            name as psma_name,
            sum(st_area(st_transform(geom, 3577))) as area_m2
-    from admin_bdys_202202.local_government_areas
+    from admin_bdys_202205.local_government_areas
     group by lga_pid,
              name
 ), psma_lga_pnt as (
