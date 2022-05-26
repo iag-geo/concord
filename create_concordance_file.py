@@ -1,96 +1,36 @@
 
+import geoscape
 import logging
 import os
 import psycopg2  # need to install package
+import settings  # gets global vars and runtime arguments
 
 from datetime import datetime
-
-# ---------------------------------------------------------------------------------------
-# edit database parameters
-# ---------------------------------------------------------------------------------------
-
-pg_connect_string = "dbname=geo host=localhost port=5432 user=postgres password=password"
-
-output_schema = "gnaf_202202"
-output_table = "boundary_concordance"
-output_score_table = "boundary_concordance_score"
-
-# ---------------------------------------------------------------------------------------
-# edit boundary list to find concordances with
-# ---------------------------------------------------------------------------------------
-
-# sources of address level data with boundary tags - names are hardcoded, don't edit them!
-source_list = [
-    {"name": "abs 2016", "schema": "gnaf_202202", "table": "address_principal_census_2016_boundaries"},
-    {"name": "abs 2021", "schema": "gnaf_202202", "table": "address_principal_census_2021_boundaries"},
-    {"name": "geoscape 202202", "schema": "gnaf_202202", "table": "address_principal_admin_boundaries"}
-]
-
-# source of residential addresses to filter on - this will either be based on ABS Census 2021 meshblocks
-#   or planning zone data from the Geoscape Buildings datasets (licensed dataset)
-
-# residential_address_source = {"name": "geoscape", "schema": "geoscape_202203", "table": "address_principals_buildings"}
-residential_address_source = {"name": "abs 2021", "schema": "gnaf_202202",
-                              "table": "address_principal_census_2021_boundaries"}
-# residential_address_source = {"name": "abs 2016", "schema": "gnaf_202202",
-#                               "table": "address_principal_census_2016_boundaries"}
-
-# the list of boundary pairs to create concordances - from and to sources must match the names of the above sources
-# don't include ASGS ABS boundary pairs that are nested (e.g. SA2 > SA3) and have their own lookup table
-# these are added automatically
-boundary_list = [
-    # ABS 2016 to ABS 2016 bdys
-    {"from": "sa2", "from_source": "abs 2016", "to": "poa", "to_source": "abs 2016"},
-    {"from": "sa2", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
-    {"from": "poa", "from_source": "abs 2016", "to": "sa2", "to_source": "abs 2016"},
-    {"from": "poa", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
-    {"from": "sa3", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
-    # {"from": "lga", "from_source": "abs 2016", "to": "poa", "to_source": "abs 2016"}, # only 25% concordance with a ~14% error
-    {"from": "lga", "from_source": "abs 2016", "to": "sa3", "to_source": "abs 2016"},
-
-    # Geoscape to ABS 2016 bdys
-    {"from": "locality", "from_source": "geoscape 202202", "to": "sa2", "to_source": "abs 2016"},
-    {"from": "locality", "from_source": "geoscape 202202", "to": "sa3", "to_source": "abs 2016"},
-    {"from": "locality", "from_source": "geoscape 202202", "to": "lga", "to_source": "abs 2016"},
-    {"from": "postcode", "from_source": "geoscape 202202", "to": "sa3", "to_source": "abs 2016"},
-    # {"from": "postcode", "from_source": "geoscape 202202", "to": "poa", "to_source": "abs 2016"}, # TODO: handle the "duplicate" postcodes that go over state borders
-    {"from": "postcode", "from_source": "geoscape 202202", "to": "lga", "to_source": "abs 2016"},
-    {"from": "lga", "from_source": "geoscape 202202", "to": "lga", "to_source": "abs 2016"},
-
-    # Geoscape to Geoscape bdys
-    {"from": "locality", "from_source": "geoscape 202202", "to": "lga", "to_source": "geoscape 202202"},
-    {"from": "postcode", "from_source": "geoscape 202202", "to": "lga", "to_source": "geoscape 202202"}
-
-    # # test concordance for measuring reliability against known differences
-    # {"from": "sa2", "from_source": "abs 2016", "to": "sa2", "to_source": "abs 2021"}
-
-    # TODO: add ABS Census 2016 to 2021 correspondences using official ABS files (assuming there's a demand)
-]
-
-# ---------------------------------------------------------------------------------------
-# edit output file path
-# ---------------------------------------------------------------------------------------
-
-output_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "data")
-
-# ---------------------------------------------------------------------------------------
-
-# ABS ASGS boundaries that align 100% - do not edit
-asgs_concordance_list = ['sa1', 'sa2', 'sa3', 'sa4', 'gcc']
-# asgs_concordance_list = ['mb', 'sa1', 'sa2', 'sa3', 'sa4', 'gcc', 'state']
 
 
 def main():
     # connect to Postgres database
-    pg_conn = psycopg2.connect(pg_connect_string)
+    pg_conn = psycopg2.connect(settings.pg_connect_string)
     pg_conn.autocommit = True
     pg_cur = pg_conn.cursor()
 
-    # create table
+    # create Census bdy tag tables for all GNAF addresses
+    start_time = datetime.now()
+
+    sql = geoscape.open_sql_file("data-prep/01a_create_gnaf_2016_census_bdy_table.sql")
+    pg_cur.execute(sql)
+    logger.info(f'\t - ABS 2016 boundary tag table created : {datetime.now() - start_time}')
+    start_time = datetime.now()
+
+    sql = geoscape.open_sql_file("data-prep/01b_create_gnaf_2021_census_bdy_table.sql")
+    pg_cur.execute(sql)
+    logger.info(f'\t - ABS 2021 boundary tag table created : {datetime.now() - start_time}')
+
+    # create concordance table
     create_table(pg_cur)
 
     # add requested concordances
-    for bdys in boundary_list:
+    for bdys in settings.boundary_list:
         add_concordances(bdys, pg_cur)
 
     # add all ASGS concordances
@@ -103,8 +43,10 @@ def main():
     score_results(pg_cur)
 
     # # export results to csv
-    export_to_csv(pg_cur, f"{output_schema}.{output_table}", output_table + ".csv")
-    export_to_csv(pg_cur, f"{output_schema}.{output_score_table}", output_score_table + ".csv")
+    export_to_csv(pg_cur, f'{settings.gnaf_schema}.{settings.output_table}',
+                  settings.output_table + ".csv")
+    export_to_csv(pg_cur, f'{settings.gnaf_schema}.{settings.output_score_table}',
+                  settings.output_score_table + ".csv")
 
     # cleanup
     pg_cur.close()
@@ -114,8 +56,8 @@ def main():
 def create_table(pg_cur):
     start_time = datetime.now()
 
-    query = f"""drop table if exists {output_schema}.{output_table};
-                create table {output_schema}.{output_table}
+    query = f"""drop table if exists {settings.gnaf_schema}.{settings.output_table};
+                create table {settings.gnaf_schema}.{settings.output_table}
                 (
                     from_source     text not null,
                     from_bdy        text not null,
@@ -128,11 +70,12 @@ def create_table(pg_cur):
                     address_count   integer,
                     address_percent numeric(4, 1)
                 );
-                alter table {output_schema}.{output_table} owner to postgres;"""
+                alter table {settings.gnaf_schema}.{settings.output_table} owner to postgres;"""
 
     pg_cur.execute(query)
 
-    logger.info(f"\t - {output_schema}.{output_table} table created : {datetime.now() - start_time}")
+    logger.info(f'\t - {settings.gnaf_schema}.{settings.output_table} table created : '
+                f'{datetime.now() - start_time}')
 
 
 def add_concordances(bdys, pg_cur):
@@ -160,8 +103,9 @@ def add_concordances(bdys, pg_cur):
 
         # add the residential address table join and filter
         residential_filter = ""
-        if residential_address_source["name"] == 'geoscape':
-            res_table = f'{residential_address_source["schema"]}.{residential_address_source["table"]}'
+        if settings.residential_address_source["name"] == 'geoscape':
+            res_table = f'{settings.residential_address_source["schema"]}.' \
+                        f'{settings.residential_address_source["table"]}'
             input_tables += f"\n\t\t\t\t\t\tinner join {res_table} as r on r.gnaf_pid = f.gnaf_pid"""
             residential_filter = "and r.is_residential"
         elif from_source == "abs 2021":
@@ -174,7 +118,7 @@ def add_concordances(bdys, pg_cur):
         #     residential_filter = "and t.mb_category = 'RESIDENTIAL'"
 
         # build the query
-        query = f"""insert into {output_schema}.{output_table}
+        query = f"""insert into {settings.gnaf_schema}.{settings.output_table}
                     with agg as (
                         select {from_id_field}::text as from_id,
                                {from_name_field} as from_name,
@@ -224,15 +168,15 @@ def add_asgs_concordances(pg_cur):
     # add ABS Census concordances for ASGS boundaries, one census at a time
     source = "abs 2016"
 
-    for from_bdy in asgs_concordance_list:
-        from_index = asgs_concordance_list.index(from_bdy)
+    for from_bdy in settings.asgs_concordance_list:
+        from_index = settings.asgs_concordance_list.index(from_bdy)
 
-        for to_bdy in asgs_concordance_list:
+        for to_bdy in settings.asgs_concordance_list:
             start_time = datetime.now()
-            to_index = asgs_concordance_list.index(to_bdy)
+            to_index = settings.asgs_concordance_list.index(to_bdy)
 
             if to_index > from_index:
-                query = f"""insert into {output_schema}.{output_table}
+                query = f"""insert into {settings.gnaf_schema}.{settings.output_table}
                             select '{source}' as from_source,
                                    '{from_bdy}' as from_bdy,
                                    {from_bdy}_16code as from_id,
@@ -243,8 +187,8 @@ def add_asgs_concordances(pg_cur):
                                    {to_bdy}_16name as to_name,
                                    count(*) as address_count,
                                    100.0 as address_percent
-                            from admin_bdys_202202.abs_2016_mb as mb
-                            inner join gnaf_202202.address_principals as gnaf on gnaf.mb_2016_code = mb.mb_16code
+                            from admin_bdys_202205.abs_2016_mb as mb
+                            inner join gnaf_202205.address_principals as gnaf on gnaf.mb_2016_code = mb.mb_16code
                             group by from_id,
                                      from_name,
                                      to_id,
@@ -268,15 +212,15 @@ def add_asgs_concordances(pg_cur):
 
     source = "abs 2021"
 
-    for from_bdy in asgs_concordance_list:
-        from_index = asgs_concordance_list.index(from_bdy)
+    for from_bdy in settings.asgs_concordance_list:
+        from_index = settings.asgs_concordance_list.index(from_bdy)
 
-        for to_bdy in asgs_concordance_list:
+        for to_bdy in settings.asgs_concordance_list:
             start_time = datetime.now()
-            to_index = asgs_concordance_list.index(to_bdy)
+            to_index = settings.asgs_concordance_list.index(to_bdy)
 
             if to_index > from_index:
-                query = f"""insert into {output_schema}.{output_table}
+                query = f"""insert into {settings.gnaf_schema}.{settings.output_table}
                             select '{source}' as from_source,
                                    '{from_bdy}' as from_bdy,
                                    {from_bdy}_21code as from_id,
@@ -287,8 +231,9 @@ def add_asgs_concordances(pg_cur):
                                    {to_bdy}_21name as to_name,
                                    count(*) as address_count,
                                    100.0 as address_percent
-                            from admin_bdys_202202.abs_2021_mb as mb
-                                     inner join gnaf_202202.address_principals as gnaf on gnaf.mb_2021_code = mb.mb21_code
+                            from admin_bdys_202205.abs_2021_mb as mb
+                                     inner join gnaf_202205.address_principals as gnaf 
+                                         on gnaf.mb_2021_code = mb.mb21_code
                             group by from_id,
                                      from_name,
                                      to_id,
@@ -308,9 +253,9 @@ def add_asgs_concordances(pg_cur):
                 logger.info(f"\t - {source} {from_bdy} to {to_bdy} records added : {datetime.now() - start_time}")
 
 
-def get_field_names(bdy, source, type, sql):
+def get_field_names(bdy, source, to_from, sql):
     # determine which table alias to prefix fields with
-    if "inner join" in sql and type == "to":
+    if "inner join" in sql and to_from == "to":
         table = "t"
     else:
         table = "f"
@@ -333,7 +278,7 @@ def get_field_names(bdy, source, type, sql):
 
 
 def get_source_table(name):
-    for source_dict in source_list:
+    for source_dict in settings.source_list:
         if source_dict["name"] == name:
             return f'{source_dict["schema"]}.{source_dict["table"]}'
 
@@ -344,13 +289,15 @@ def index_table(pg_cur):
     start_time = datetime.now()
 
     # analyse table and add primary key & index
-    query = f"""analyse {output_schema}.{output_table};
-                alter table {output_schema}.{output_table} 
-                    add constraint {output_table}_pkey 
+    query = f"""analyse {settings.gnaf_schema}.{settings.output_table};
+                alter table {settings.gnaf_schema}.{settings.output_table} 
+                    add constraint {settings.output_table}_pkey 
                     primary key (from_source, from_bdy, from_id, to_source, to_bdy, to_id);
-                create index {output_table}_combo_idx on {output_schema}.{output_table}
+                create index {settings.output_table}_combo_idx 
+                    on {settings.gnaf_schema}.{settings.output_table}
                     using btree (from_source, from_bdy, to_source, to_bdy);
-                alter table {output_schema}.{output_table} cluster on {output_table}_combo_idx;"""
+                alter table {settings.gnaf_schema}.{settings.output_table} 
+                    cluster on {settings.output_table}_combo_idx;"""
     pg_cur.execute(query)
 
     logger.info(f"\t - table analysed, primary key & index added : {datetime.now() - start_time}")
@@ -360,8 +307,8 @@ def score_results(pg_cur):
     start_time = datetime.now()
 
     # calculate concordance score (weighted by address count)
-    query = f"""drop table if exists {output_schema}.{output_score_table};
-                create table {output_schema}.{output_score_table} as
+    query = f"""drop table if exists {settings.gnaf_schema}.{settings.output_score_table};
+                create table {settings.gnaf_schema}.{settings.output_score_table} as
                 with cnt as (
                     select from_source,
                            from_bdy,
@@ -370,7 +317,7 @@ def score_results(pg_cur):
                            to_bdy,
                            sum(address_count::float * address_percent) as weighted_address_count,
                            sum(address_count) as address_count
-                    from {output_schema}.{output_table}
+                    from {settings.gnaf_schema}.{settings.output_table}
                     group by from_source,
                              from_bdy,
                              from_id,
@@ -392,14 +339,16 @@ def score_results(pg_cur):
                          from_bdy,
                          to_source,
                          to_bdy;
-                analyse {output_schema}.{output_score_table};
-                alter table {output_schema}.{output_score_table} 
-                    add constraint {output_score_table}_pkey primary key (from_source, from_bdy, to_source, to_bdy);"""
+                analyse {settings.gnaf_schema}.{settings.output_score_table};
+                alter table {settings.gnaf_schema}.{settings.output_score_table} 
+                    add constraint {settings.output_score_table}_pkey 
+                        primary key (from_source, from_bdy, to_source, to_bdy);"""
 
     pg_cur.execute(query)
 
     # log results
-    pg_cur.execute(f"select * from {output_schema}.{output_score_table} order by from_source, from_bdy, to_source, to_bdy")
+    pg_cur.execute(f'select * from {settings.gnaf_schema}.{settings.output_score_table} '
+                   f'order by from_source, from_bdy, to_source, to_bdy')
     rows = pg_cur.fetchall()
 
     logger.info(f"\t - results scored : {datetime.now() - start_time}")
@@ -418,7 +367,7 @@ def score_results(pg_cur):
 
         # add average expected error using population data from the 2016 census
         if from_source == "abs 2016" and to_source == "abs 2016":
-            if from_bdy in asgs_concordance_list and to_bdy in asgs_concordance_list:
+            if from_bdy in settings.asgs_concordance_list and to_bdy in settings.asgs_concordance_list:
                 # don't calculate error - it's zero!
                 error_percent = 0.0
             else:
@@ -428,7 +377,8 @@ def score_results(pg_cur):
                                        con.to_source,
                                        sum(from_bdy.g3::float * con.address_percent / 100.0)::integer as population1
                                 from census_2016_data.{from_bdy}_g01 as from_bdy
-                                         inner join {output_schema}.{output_table} as con on from_bdy.region_id = con.from_id
+                                         inner join {settings.gnaf_schema}.{settings.output_table} as con 
+                                             on from_bdy.region_id = con.from_id
                                 where from_source = '{from_source}'
                                     and from_bdy = '{from_bdy}'
                                     and to_source = '{to_source}'
@@ -447,7 +397,8 @@ def score_results(pg_cur):
                                 from census_2016_data.{to_bdy}_g01 as to_bdy
                                 inner join pc on pc.to_id = to_bdy.region_id
                             )
-                            select (sum(abs(population2 - population1)) / sum(population2) * 100.0)::numeric(5, 1) as error_percent
+                            select (sum(abs(population2 - population1)) / sum(population2) * 100.0)::numeric(5, 1) 
+                                as error_percent
     --                                sum(population1) as population1,
     --                                sum(population2) as population2,
     --                                sum(abs(pop_difference)) as pop_difference,
@@ -460,7 +411,7 @@ def score_results(pg_cur):
             error_percent_str = str(error_percent) + "%"
 
             # update score table
-            query = f"""update {output_schema}.{output_score_table}
+            query = f"""update {settings.gnaf_schema}.{settings.output_score_table}
                             set error_percent = {error_percent}
                         where from_source = '{from_source}'
                             and from_bdy = '{from_bdy}'
@@ -469,7 +420,7 @@ def score_results(pg_cur):
             pg_cur.execute(query)
 
         else:
-            error_percent = None
+            # error_percent = None
             error_percent_str = "N/A"
 
         logger.info(f"\t\t| {from_source + ' ' + from_bdy:24} | {to_source + ' ' + to_bdy:24} "
@@ -479,7 +430,6 @@ def score_results(pg_cur):
 
 
 def export_to_csv(pg_cur, table, file_name):
-
     query = f"""COPY (
                     select * 
                     from {table} 
@@ -488,11 +438,11 @@ def export_to_csv(pg_cur, table, file_name):
                              to_source, 
                              to_bdy
                 ) TO STDOUT WITH CSV HEADER"""
-    with open(os.path.join(output_path, file_name), "w") as f:
+    with open(os.path.join(settings.output_path, file_name), "w") as f:
         pg_cur.copy_expert(query, f)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     full_start_time = datetime.now()
 
     # set logger
@@ -508,11 +458,11 @@ if __name__ == '__main__':
     console = logging.StreamHandler()
     console.setLevel(logging.INFO)
     # set a format which is simpler for console use
-    formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
+    formatter = logging.Formatter("%(name)-12s: %(levelname)-8s %(message)s")
     # tell the handler to use this format
     console.setFormatter(formatter)
     # add the handler to the root logger
-    logging.getLogger('').addHandler(console)
+    logging.getLogger("").addHandler(console)
 
     task_name = "Create boundary concordance table"
     system_name = "mobility.ai"
@@ -522,4 +472,3 @@ if __name__ == '__main__':
     main()
 
     logger.info("{} finished : {}".format(task_name, datetime.now() - full_start_time))
-
