@@ -81,8 +81,9 @@ BTW - if the boundary combination you want isn't in the default concordance file
     1. Use a more accurate list of residential addresses to determine the data apportionment percentages (see **note** below); or
     2. Use a different set of addresses to apportion your data; e.g. industrial or commercial addresses
 
-#### Note
-The benefit of using Geoscape planning zone data over the default residential address filter (ABS Census 2021 meshblock categories) is limited due to ~2.3m addresses not having a planning zone, The code as-is fills this missing data with ABS Census 2021 meshblock categories.
+**Note:** The benefit of using Geoscape planning zone data over the default residential address filter (ABS Census 2021 meshblock categories) is limited due to ~2.3m addresses not having a planning zone, The code as-is fills this missing data with ABS Census 2021 meshblock categories.
+
+#### Data Requirements
 
 Running the script requires the following open data, available as Postgres dump files, as well as the optional licensed Geoscape data mentioned above:
 1. ABS Census 2016 boundaries ([download](https://minus34.com/opendata/census-2016/census_2016_bdys.dmp))
@@ -102,27 +103,27 @@ Running the script requires the following open data, available as Postgres dump 
 4. Add `psycopg2` to your Python 3.x environment
 5. Run the script (takes ~30-45 mins on a 2017 MacBook Pro with 16Gb of RAM and 4 cores)
 
-### Command Line Options
+#### Command Line Options
 The behaviour of the Python script can be controlled by specifying various command line options to the script. Supported arguments are:
 
-#### Required Arguments
+##### Required Arguments
 * `--output-path` local path where the boundary concordance files will be output.
 
-#### Postgres Parameters
+##### Postgres Parameters
 * `--pghost` the host name for the Postgres server. This defaults to the `PGHOST` environment variable if set, otherwise defaults to `localhost`.
 * `--pgport` the port number for the Postgres server. This defaults to the `PGPORT` environment variable if set, otherwise `5432`.
 * `--pgdb` the database name for Postgres server. This defaults to the `PGDATABASE` environment variable if set, otherwise `geoscape`.
 * `--pguser` the username for accessing the Postgres server. This defaults to the `PGUSER` environment variable if set, otherwise `postgres`.
 * `--pgpassword` password for accessing the Postgres server. This defaults to the `PGPASSWORD` environment variable if set, otherwise `password`.
 
-#### Optional Arguments
+##### Optional Arguments
 * `--geoscape-version` Geoscape version number in YYYYMM format. Defaults to current year and last release month. e.g. `202205`.
 * `--gnaf-schema` input schema name to store final GNAF tables in. Also the **output schema** for the concordance table. Defaults to `gnaf_<geoscape_version>`.
 * `--admin-schema` input schema name to store final admin boundary tables in. Defaults to `admin_bdys_<geoscape_version>`.
 * `--output-table` name of both output concordance table and file. Defaults to `boundary_concordance`.
 * `--output-score_table` name of both output concordance QA table and file. Defaults to `<output_table>_score`.
 
-### Example Command Line Arguments
+#### Example Command Line Arguments
 * Use the default GNAF & Admin Bdy data: `python create_concordance_file.py --output-path=~/tmp`
 * Use a different version of GNAF & Admin Bdy data and a custom output table/file name: `python create_concordance_file.py --output-path=~/tmp --output-table="old_bdy_concordance" --admin-schema="admin_bdys_202111" --gnaf-schema="gnaf_202111"`
 
