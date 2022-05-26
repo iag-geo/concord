@@ -92,7 +92,7 @@ Running the script requires the following open data, available as Postgres dump 
 4. Geoscape Administrative Boundaries from gnaf-loader ([download](https://minus34.com/opendata/geoscape-202205/admin-bdys-202205.dmp))
 5. ABS Census 2016 data - used to generate error rates only ([download](https://minus34.com/opendata/census-2016/census_2016_data.dmp))
 
-##### Process
+#### Process
 
 1. Download the above dump files and import them using `pg_restore`
 2. OPTIONAL: If you have access to Geoscape Buildings or Land Parcels data:
