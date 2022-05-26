@@ -67,24 +67,25 @@ parser.add_argument(
     "--geoscape-version", default=geoscape_version,
     help="Geoscape release version number as YYYYMM. Defaults to latest release year and month \""
          + geoscape_version + "\".")
-parser.add_argument(
-    "--previous-geoscape-version", default=previous_geoscape_version,
-    help="Previous Geoscape release version number as YYYYMM; used for QA comparison. "
-         "Defaults to \"" + previous_geoscape_version + "\".")
+# parser.add_argument(
+#     "--previous-geoscape-version", default=previous_geoscape_version,
+#     help="Previous Geoscape release version number as YYYYMM; used for QA comparison. "
+#          "Defaults to \"" + previous_geoscape_version + "\".")
 parser.add_argument(
     "--gnaf-schema",
-    help="Destination schema name to store final GNAF tables in. Defaults to \"gnaf_" + geoscape_version + "\".")
+    help="Input schema name to store final GNAF tables in. Also the output schema for the concordance table."
+         "Defaults to \"gnaf_" + geoscape_version + "\".")
 parser.add_argument(
     "--admin-schema",
-    help="Destination schema name to store final admin boundary tables in. Defaults to \"admin_bdys_"
+    help="Input schema name to store final admin boundary tables in. Defaults to \"admin_bdys_"
          + geoscape_version + "\".")
-parser.add_argument(
-    "--previous-gnaf-schema",
-    help="Schema with previous version of GNAF tables in. Defaults to \"gnaf_" + previous_geoscape_version + "\".")
-parser.add_argument(
-    "--previous-admin-schema",
-    help="Schema with previous version of GNAF tables in. Defaults to \"admin_bdys_"
-         + previous_geoscape_version + "\".")
+# parser.add_argument(
+#     "--previous-gnaf-schema",
+#     help="Schema with previous version of GNAF tables in. Defaults to \"gnaf_" + previous_geoscape_version + "\".")
+# parser.add_argument(
+#     "--previous-admin-schema",
+#     help="Schema with previous version of GNAF tables in. Defaults to \"admin_bdys_"
+#          + previous_geoscape_version + "\".")
 
 # output file/table name & directory
 parser.add_argument(
@@ -92,10 +93,10 @@ parser.add_argument(
     help="Name of both output concordance table and file. Defaults to 'boundary_concordance'.")
 parser.add_argument(
     "--output-score_table",
-    help="Name of both output concordance QA table and file. Defaults to 'boundary_concordance_score'.")
+    help="Name of both output concordance QA table and file. Defaults to '<output_table>_score'.")
 parser.add_argument(
     "--output-path", required=True,
-    help="Local path where the Shapefile and GeoJSON files will be output.")
+    help="Local path where the boundary concordance files will be output.")
 
 # global var containing all input parameters
 args = parser.parse_args()
@@ -103,11 +104,11 @@ args = parser.parse_args()
 # assign parameters to global settings
 gnaf_schema = args.gnaf_schema or "gnaf_" + geoscape_version
 admin_bdys_schema = args.admin_schema or "admin_bdys_" + geoscape_version
-previous_gnaf_schema = args.previous_gnaf_schema or "gnaf_" + previous_geoscape_version
-previous_admin_bdys_schema = args.previous_admin_schema or "admin_bdys_" + previous_geoscape_version
+# previous_gnaf_schema = args.previous_gnaf_schema or "gnaf_" + previous_geoscape_version
+# previous_admin_bdys_schema = args.previous_admin_schema or "admin_bdys_" + previous_geoscape_version
 output_path = args.output_path
 output_table = args.output_table or "boundary_concordance"
-output_score_table = args.output_score_table or "boundary_concordance_score"
+output_score_table = args.output_score_table or f"{output_table}_score"
 
 # create postgres connect string
 pg_host = args.pghost or os.getenv("PGHOST", "localhost")
