@@ -13,6 +13,8 @@ select *
 from admin_bdys_202205.abs_2016_sa1;
 
 
+select *
+from gnaf_202205.address_principal_census_2016_boundaries;
 
 
 -- test getting centroids for bdy overlaps

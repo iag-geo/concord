@@ -205,6 +205,9 @@ def add_asgs_concordances(pg_cur):
                 if from_bdy == "sa2" or to_bdy == "sa2":
                     query = query.replace("sa2_16code", "sa2_16main")
 
+                if to_bdy == "state":
+                    query = query.replace("state_16code", "state").replace("state_16name", "state")
+
                 # print(query)
                 pg_cur.execute(query)
 
