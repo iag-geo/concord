@@ -7,6 +7,7 @@ OUTPUT_FOLDER="/Users/$(whoami)/tmp/geoscape_202205"
 OUTPUT_FOLDER_2020="/Users/$(whoami)/tmp/geoscape_202205_gda2020"
 
 mkdir -p "${OUTPUT_FOLDER}"
+mkdir -p "${OUTPUT_FOLDER_2020}"
 
 # Process using GDA94 boundaries
 python3 /Users/$(whoami)/git/iag_geo/concord/create_concordance_file.py --pgdb=geo --output-path=${OUTPUT_FOLDER}
