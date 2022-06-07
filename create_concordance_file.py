@@ -183,16 +183,16 @@ def add_asgs_concordances(pg_cur):
                 query = f"""insert into {settings.gnaf_schema}.{settings.output_table}
                             select '{source}' as from_source,
                                    '{from_bdy}' as from_bdy,
-                                   {from_bdy}_16code as from_id,
-                                   {from_bdy}_16name as from_name,
+                                   {from_bdy}_code16 as from_id,
+                                   {from_bdy}_name16 as from_name,
                                    '{source}' as to_source,
                                    '{to_bdy}' as to_bdy,
-                                   {to_bdy}_16code as to_id,
-                                   {to_bdy}_16name as to_name,
+                                   {to_bdy}_code16 as to_id,
+                                   {to_bdy}_name16 as to_name,
                                    count(*) as address_count,
                                    100.0 as address_percent
-                            from admin_bdys_202205.abs_2016_mb as mb
-                            inner join gnaf_202205.address_principals as gnaf on gnaf.mb_2016_code = mb.mb_16code
+                            from census_2016_bdys.mb_2016_aust as mb
+                            inner join gnaf_202205.address_principals as gnaf on gnaf.mb_2016_code::text = mb.mb_code16
                             group by from_id,
                                      from_name,
                                      to_id,
@@ -201,13 +201,13 @@ def add_asgs_concordances(pg_cur):
                 # hardcode fixes for inconsistent meshblock, sa1, sa2 and state field names
 
                 # if from_bdy == "mb":
-                #     query = query.replace("mb_16name", "mb_category")
+                #     query = query.replace("mb_name16", "mb_category")
 
                 if from_bdy == "sa1" or to_bdy == "sa1":
-                    query = query.replace("sa1_16code", "sa1_16main").replace("sa1_16name", "sa1_16_7cd")
+                    query = query.replace("sa1_code16", "sa1_main16").replace("sa1_name16", "sa1_7dig16")
 
                 if from_bdy == "sa2" or to_bdy == "sa2":
-                    query = query.replace("sa2_16code", "sa2_16main")
+                    query = query.replace("sa2_code16", "sa2_main16")
 
                 # print(query)
                 pg_cur.execute(query)
@@ -223,21 +223,25 @@ def add_asgs_concordances(pg_cur):
             start_time = datetime.now()
             to_index = settings.asgs_concordance_list.index(to_bdy)
 
+            # fix for fild name change between censuses
+            if to_bdy == "gcc":
+                to_bdy = to_bdy.replace("gcc", "gccsa")
+
             if to_index > from_index:
                 query = f"""insert into {settings.gnaf_schema}.{settings.output_table}
                             select '{source}' as from_source,
                                    '{from_bdy}' as from_bdy,
-                                   {from_bdy}_21code as from_id,
-                                   {from_bdy}_21name as from_name,
+                                   {from_bdy}_code_2021 as from_id,
+                                   {from_bdy}_name_2021 as from_name,
                                    '{source}' as to_source,
                                    '{to_bdy}' as to_bdy,
-                                   {to_bdy}_21code as to_id,
-                                   {to_bdy}_21name as to_name,
+                                   {to_bdy}_code_2021 as to_id,
+                                   {to_bdy}_name_2021 as to_name,
                                    count(*) as address_count,
                                    100.0 as address_percent
-                            from admin_bdys_202205.abs_2021_mb as mb
+                            from census_2021_bdys.mb_2021_aust_gda94 as mb
                                      inner join gnaf_202205.address_principals as gnaf 
-                                         on gnaf.mb_2021_code = mb.mb21_code
+                                         on gnaf.mb_2021_code::text = mb.mb_code_2021
                             group by from_id,
                                      from_name,
                                      to_id,
@@ -249,7 +253,7 @@ def add_asgs_concordances(pg_cur):
                 #     query = query.replace("mb_21name", "mb_cat")
 
                 if from_bdy == "sa1" or to_bdy == "sa1":
-                    query = query.replace("sa1_21name", "sa1_21pid")
+                    query = query.replace("sa1_name_2021", "sa1_code_2021")
 
                 # print(query)
                 pg_cur.execute(query)
@@ -265,21 +269,11 @@ def get_field_names(bdy, source, to_from, sql):
         table = "f"
 
     if source == "abs 2016":
-        id_field = f"{table}.{bdy}_16code"
-        name_field = f"{table}.{bdy}_16name"
-
-        if bdy == "state":
-            id_field = id_field.replace("state_16code", "state")
-            name_field = name_field.replace("state_16name", "state")
-
+        id_field = f"{table}.{bdy}_code16"
+        name_field = f"{table}.{bdy}_name16"
     elif source == "abs 2021":
         id_field = f"{table}.{bdy}_code_2021"
         name_field = f"{table}.{bdy}_name_2021"
-
-        if bdy == "state":
-            id_field = id_field.replace("state_code_2021", "state")
-            name_field = name_field.replace("state_name_2021", "state")
-
     else:
         if bdy == "postcode":
             id_field = f"{table}.postcode"

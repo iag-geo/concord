@@ -17,6 +17,10 @@ select *
 from gnaf_202205.address_principal_census_2016_boundaries;
 
 
+select *
+from census_2021_bdys.mb_2021_aust_gda94;
+
+
 -- test getting centroids for bdy overlaps
 select *,
        st_centroid(st_intersection(from_bdy.geom, to_bdy.geom)) as geom
@@ -25,6 +29,12 @@ from census_2016_bdys.sa2_2016_aust as from_bdy
 ;
 
 
-
 select *
 from gnaf_202205;
+
+
+select *
+from admin_bdys_202205.abs_2016_mb as adm
+full outer join census_2016_bdys.mb_2016_aust as abs on adm.mb_16code::text = abs.mb_code16
+where not st_equals(adm.geom, abs.geom)
+;
