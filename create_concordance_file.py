@@ -15,7 +15,7 @@ def main():
     pg_cur = pg_conn.cursor()
 
     # create Census bdy tag tables for all GNAF addresses
-    # create_bdy_tag_tables(pg_cur)
+    create_bdy_tag_tables(pg_cur)
 
     # create concordance table
     create_table(pg_cur)
