@@ -160,7 +160,7 @@ boundary_list = [
     # only 25% concordance with a ~14% error
     # {"from": "lga", "from_source": "abs 2016", "to": "poa", "to_source": "abs 2016"},
     {"from": "lga", "from_source": "abs 2016", "to": "sa3", "to_source": "abs 2016"},
-    {"from": "lga", "from_source": "abs 2016", "to": "ste", "to_source": "abs 2016"}
+    {"from": "lga", "from_source": "abs 2016", "to": "ste", "to_source": "abs 2016"},
 
     # Geoscape to ABS 2016 bdys
     {"from": "locality", "from_source": f"geoscape {geoscape_version}", "to": "sa2", "to_source": "abs 2016"},
