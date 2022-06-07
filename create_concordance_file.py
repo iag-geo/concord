@@ -15,16 +15,7 @@ def main():
     pg_cur = pg_conn.cursor()
 
     # create Census bdy tag tables for all GNAF addresses
-    start_time = datetime.now()
-
-    sql = geoscape.open_sql_file("data-prep/01a_create_gnaf_2016_census_bdy_table.sql")
-    pg_cur.execute(sql)
-    logger.info(f'\t - ABS 2016 boundary tag table created : {datetime.now() - start_time}')
-    start_time = datetime.now()
-
-    sql = geoscape.open_sql_file("data-prep/01b_create_gnaf_2021_census_bdy_table.sql")
-    pg_cur.execute(sql)
-    logger.info(f'\t - ABS 2021 boundary tag table created : {datetime.now() - start_time}')
+    # create_bdy_tag_tables(pg_cur)
 
     # create concordance table
     create_table(pg_cur)
@@ -51,6 +42,19 @@ def main():
     # cleanup
     pg_cur.close()
     pg_conn.close()
+
+
+def create_bdy_tag_tables(pg_cur):
+    start_time = datetime.now()
+
+    sql = geoscape.open_sql_file("data-prep/01a_create_gnaf_2016_census_bdy_table.sql")
+    pg_cur.execute(sql)
+    logger.info(f'\t - ABS 2016 boundary tag table created : {datetime.now() - start_time}')
+
+    start_time = datetime.now()
+    sql = geoscape.open_sql_file("data-prep/01b_create_gnaf_2021_census_bdy_table.sql")
+    pg_cur.execute(sql)
+    logger.info(f'\t - ABS 2021 boundary tag table created : {datetime.now() - start_time}')
 
 
 def create_table(pg_cur):
@@ -205,9 +209,6 @@ def add_asgs_concordances(pg_cur):
                 if from_bdy == "sa2" or to_bdy == "sa2":
                     query = query.replace("sa2_16code", "sa2_16main")
 
-                if to_bdy == "state":
-                    query = query.replace("state_16code", "state").replace("state_16name", "state")
-
                 # print(query)
                 pg_cur.execute(query)
 
@@ -266,9 +267,19 @@ def get_field_names(bdy, source, to_from, sql):
     if source == "abs 2016":
         id_field = f"{table}.{bdy}_16code"
         name_field = f"{table}.{bdy}_16name"
+
+        if bdy == "state":
+            id_field = id_field.replace("state_16code", "state")
+            name_field = name_field.replace("state_16name", "state")
+
     elif source == "abs 2021":
         id_field = f"{table}.{bdy}_code_2021"
         name_field = f"{table}.{bdy}_name_2021"
+
+        if bdy == "state":
+            id_field = id_field.replace("state_code_2021", "state")
+            name_field = name_field.replace("state_name_2021", "state")
+
     else:
         if bdy == "postcode":
             id_field = f"{table}.postcode"
