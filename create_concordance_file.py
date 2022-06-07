@@ -274,6 +274,9 @@ def get_field_names(bdy, source, to_from, sql):
     elif source == "abs 2021":
         id_field = f"{table}.{bdy}_code_2021"
         name_field = f"{table}.{bdy}_name_2021"
+
+        if bdy == "sa1":
+            name_field = name_field.replace("sa1_name_2021", "sa1_code_2021")
     else:
         if bdy == "postcode":
             id_field = f"{table}.postcode"
