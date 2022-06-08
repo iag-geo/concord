@@ -58,5 +58,11 @@ where from_bdy = 'postcode'
   and from_id in ('2050', '2042')
 ;
 
-
+-- test table for concordance preso
+drop table if exists testing.temp_mb;
+create table testing.temp_mb as
+select mb.*
+from admin_bdys_202205.abs_2021_mb as mb
+inner join admin_bdys_202205.postcode_bdys as pc on st_intersects(mb.geom, pc.geom)
+and postcode in ('2050', '2042');
 
