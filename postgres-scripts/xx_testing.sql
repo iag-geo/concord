@@ -38,3 +38,25 @@ from admin_bdys_202205.abs_2016_mb as adm
 full outer join census_2016_bdys.mb_2016_aust as abs on adm.mb_16code::text = abs.mb_code16
 where not st_equals(adm.geom, abs.geom)
 ;
+
+
+select *
+from census_2016_bdys.poa_2016_aust
+where poa_code16 in ('POA2050', 'POA2042')
+;
+
+
+select from_id as postcode,
+       to_id as lga_id,
+       to_name as lga_name,
+       address_count,
+       address_percent
+from gnaf_202205.boundary_concordance
+where from_bdy = 'postcode'
+  and to_source = 'abs 2016'
+  and to_bdy = 'lga'
+  and from_id in ('2050', '2042')
+;
+
+
+

@@ -87,6 +87,7 @@ with abs as (
            sed_name_2021,
 --            ucl_code_2021,
 --            ucl_name_2021,
+           mb.state_code_2021,
            mb.state_name_2021
     from census_2021_bdys.mb_2021_aust_gda94 as mb
     inner join temp_ced_mb as ced on ced.mb_code_2021 = mb.mb_code_2021
