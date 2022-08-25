@@ -1,24 +1,24 @@
 
 select count(*)
-from admin_bdys_202205.abs_2021_sa2;
+from admin_bdys_202208.abs_2021_sa2;
 
 
 select *
-from gnaf_202205.boundary_concordance
+from gnaf_202208.boundary_concordance
 where from_bdy = 'postcode'
 and to_bdy = 'poa';
 
 
 select *
-from admin_bdys_202205.abs_2016_sa1;
+from admin_bdys_202208.abs_2016_sa1;
 
 
 select *
-from gnaf_202205.address_principal_census_2016_boundaries;
+from gnaf_202208.address_principal_census_2016_boundaries;
 
 
 select *
-from census_2021_bdys.mb_2021_aust_gda94;
+from census_2021_bdys_gda94.mb_2021_aust_gda94;
 
 
 -- test getting centroids for bdy overlaps
@@ -30,11 +30,11 @@ from census_2016_bdys.sa2_2016_aust as from_bdy
 
 
 select *
-from gnaf_202205;
+from gnaf_202208;
 
 
 select *
-from admin_bdys_202205.abs_2016_mb as adm
+from admin_bdys_202208.abs_2016_mb as adm
 full outer join census_2016_bdys.mb_2016_aust as abs on adm.mb_16code::text = abs.mb_code16
 where not st_equals(adm.geom, abs.geom)
 ;
@@ -51,7 +51,7 @@ select from_id as postcode,
        to_name as lga_name,
        address_count,
        address_percent
-from gnaf_202205.boundary_concordance
+from gnaf_202208.boundary_concordance
 where from_bdy = 'postcode'
   and to_source = 'abs 2016'
   and to_bdy = 'lga'
@@ -63,8 +63,8 @@ where from_bdy = 'postcode'
 drop table if exists testing.temp_mb;
 create table testing.temp_mb as
 select mb.*
-from admin_bdys_202205.abs_2021_mb as mb
-inner join admin_bdys_202205.postcode_bdys as pc on st_intersects(mb.geom, pc.geom)
--- inner join admin_bdys_202205.postcode_bdys as pc on st_intersects(st_centroid(mb.geom), pc.geom)
+from admin_bdys_202208.abs_2021_mb as mb
+inner join admin_bdys_202208.postcode_bdys as pc on st_intersects(mb.geom, pc.geom)
+-- inner join admin_bdys_202208.postcode_bdys as pc on st_intersects(st_centroid(mb.geom), pc.geom)
     and postcode in ('2050', '2042');
 
