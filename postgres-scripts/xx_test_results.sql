@@ -2,7 +2,7 @@
 
 -- 592552 rows
 select count(*)
-from gnaf_202205.boundary_concordance;
+from gnaf_202208.boundary_concordance;
 
 
 
@@ -13,8 +13,8 @@ select count(*) as bdy_pair_count,
        min(cor.ratio_from_to * 100.0 - bdy.address_percent)::smallint as min_delta,
        max(cor.ratio_from_to * 100.0 - bdy.address_percent)::smallint as max_delta,
        (sum(abs(cor.ratio_from_to * 100.0 - bdy.address_percent) * address_count) / 100.0)::integer as address_count
-from census_2021_bdys.correspondences_sa2 as cor
-         inner join gnaf_202205.boundary_concordance as bdy on bdy.from_id = cor.sa2_maincode_2016
+from census_2021_bdys_gda94.correspondences_sa2 as cor
+         inner join gnaf_202208.boundary_concordance as bdy on bdy.from_id = cor.sa2_maincode_2016
     and bdy.to_id = cor.sa2_code_2021
 where abs(cor.ratio_from_to * 100.0 - bdy.address_percent) > 5.0
 ;
@@ -99,8 +99,8 @@ with agg as (
            sa2_code_2021::text as to_id,
            sa2_name_2021 as to_name,
            count(*) as address_count
-    from gnaf_202205.address_principal_census_2016_boundaries as f
-        inner join gnaf_202205.address_principal_census_2021_boundaries as t on t.gnaf_pid = f.gnaf_pid
+    from gnaf_202208.address_principal_census_2016_boundaries as f
+        inner join gnaf_202208.address_principal_census_2021_boundaries as t on t.gnaf_pid = f.gnaf_pid
     where sa2_16main = '101021011'
       and mb_category = 'RESIDENTIAL'
       and mb_category_2021 = 'Residential'
@@ -126,7 +126,7 @@ select final.*
 --        (st_area(st_intersection(st_transform(old.geom, 3577), st_transform(new.geom, 3577))) / 1000000.0) / old.areasqkm16 * 100.0 as percent_area
 from final
 -- inner join census_2016_bdys.sa2_2016_aust as old on old.sa2_main16 = final.from_id
--- inner join census_2021_bdys.sa2_2021_aust_gda94 as new on new.sa2_code_2021 = final.to_id
+-- inner join census_2021_bdys_gda94.sa2_2021_aust_gda94 as new on new.sa2_code_2021 = final.to_id
 -- where percent > 0.0
 ;
 

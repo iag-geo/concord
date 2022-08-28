@@ -192,7 +192,7 @@ def add_asgs_concordances(pg_cur):
                                    count(*) as address_count,
                                    100.0 as address_percent
                             from census_2016_bdys.mb_2016_aust as mb
-                            inner join gnaf_202205.address_principals as gnaf on gnaf.mb_2016_code::text = mb.mb_code16
+                            inner join gnaf_202208.address_principals as gnaf on gnaf.mb_2016_code::text = mb.mb_code16
                             group by from_id,
                                      from_name,
                                      to_id,
@@ -239,8 +239,8 @@ def add_asgs_concordances(pg_cur):
                                    {to_bdy}_name_2021 as to_name,
                                    count(*) as address_count,
                                    100.0 as address_percent
-                            from census_2021_bdys.mb_2021_aust_gda94 as mb
-                                     inner join gnaf_202205.address_principals as gnaf 
+                            from census_2021_bdys_gda94.mb_2021_aust_gda94 as mb
+                                     inner join gnaf_202208.address_principals as gnaf 
                                          on gnaf.mb_2021_code::text = mb.mb_code_2021
                             group by from_id,
                                      from_name,

@@ -13,7 +13,7 @@ drop table if exists temp_mb;
 create temporary table temp_mb as
 select mb_code_2021,
        ST_Transform(ST_PointOnSurface(geom), 4283) as geom
-from census_2021_bdys.mb_2021_aust_gda94
+from census_2021_bdys_gda94.mb_2021_aust_gda94
 ;
 analyse temp_mb;
 create index temp_mb_geom_idx on temp_mb using gist (geom);
@@ -24,37 +24,37 @@ alter table temp_mb cluster on temp_mb_geom_idx;
 drop table if exists temp_ced_mb;
 create temporary table temp_ced_mb as
 select distinct temp_mb.mb_code_2021, bdy.ced_code_2021 as ced_code_2021, bdy.ced_name_2021 as ced_name_2021 from temp_mb
-inner join census_2021_bdys.ced_2021_aust_gda94 as bdy on st_intersects(temp_mb.geom, bdy.geom);
+inner join census_2021_bdys_gda94.ced_2021_aust_gda94 as bdy on st_intersects(temp_mb.geom, bdy.geom);
 analyse temp_ced_mb;
 
 drop table if exists temp_lga_mb;
 create temporary table temp_lga_mb as
 select distinct temp_mb.mb_code_2021, bdy.lga_code_2021 as lga_code_2021, bdy.lga_name_2021 as lga_name_2021 from temp_mb
-inner join census_2021_bdys.lga_2021_aust_gda94 as bdy on st_intersects(temp_mb.geom, bdy.geom);
+inner join census_2021_bdys_gda94.lga_2021_aust_gda94 as bdy on st_intersects(temp_mb.geom, bdy.geom);
 analyse temp_lga_mb;
 
 drop table if exists temp_poa_mb;
 create temporary table temp_poa_mb as
 select distinct temp_mb.mb_code_2021, bdy.poa_code_2021 as poa_code_2021, bdy.poa_name_2021 as poa_name_2021 from temp_mb
-inner join census_2021_bdys.poa_2021_aust_gda94 as bdy on st_intersects(temp_mb.geom, bdy.geom);
+inner join census_2021_bdys_gda94.poa_2021_aust_gda94 as bdy on st_intersects(temp_mb.geom, bdy.geom);
 analyse temp_poa_mb;
 
 -- drop table if exists temp_ra_mb;
 -- create temporary table temp_ra_mb as
 -- select distinct temp_mb.mb_code_2021, bdy.ra_code_2021 as ra_code_2021, bdy.ra_name_2021 as ra_name_2021 from temp_mb
--- inner join census_2021_bdys.ra_2021_aust_gda94 as bdy on st_intersects(temp_mb.geom, bdy.geom);
+-- inner join census_2021_bdys_gda94.ra_2021_aust_gda94 as bdy on st_intersects(temp_mb.geom, bdy.geom);
 -- analyse temp_ra_mb;
 
 drop table if exists temp_sed_mb;
 create temporary table temp_sed_mb as
 select distinct temp_mb.mb_code_2021, bdy.sed_code_2021 as sed_code_2021, bdy.sed_name_2021 as sed_name_2021 from temp_mb
-inner join census_2021_bdys.sed_2021_aust_gda94 as bdy on st_intersects(temp_mb.geom, bdy.geom);
+inner join census_2021_bdys_gda94.sed_2021_aust_gda94 as bdy on st_intersects(temp_mb.geom, bdy.geom);
 analyse temp_sed_mb;
 
 -- drop table if exists temp_ucl_mb;
 -- create temporary table temp_ucl_mb as
 -- select distinct temp_mb.mb_code_2021, bdy.ucl_code_2021 as ucl_code_2021, bdy.ucl_name_2021 as ucl_name_2021 from temp_mb
--- inner join census_2021_bdys.ucl_2021_aust_gda94 as bdy on st_intersects(temp_mb.geom, bdy.geom);
+-- inner join census_2021_bdys_gda94.ucl_2021_aust_gda94 as bdy on st_intersects(temp_mb.geom, bdy.geom);
 -- analyse temp_ucl_mb;
 
 drop table temp_mb;
@@ -89,7 +89,7 @@ with abs as (
 --            ucl_name_2021,
            mb.state_code_2021,
            mb.state_name_2021
-    from census_2021_bdys.mb_2021_aust_gda94 as mb
+    from census_2021_bdys_gda94.mb_2021_aust_gda94 as mb
     inner join temp_ced_mb as ced on ced.mb_code_2021 = mb.mb_code_2021
     inner join temp_lga_mb as lga on lga.mb_code_2021 = mb.mb_code_2021
     inner join temp_poa_mb as poa on poa.mb_code_2021 = mb.mb_code_2021
