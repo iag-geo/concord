@@ -16,12 +16,12 @@ abs 2016,sa2,abs 2016,sa3,100,0.0
 abs 2016,sa2,abs 2016,sa4,100,0.0
 abs 2016,sa2,abs 2021,sa2,92,
 abs 2016,sa3,abs 2016,gcc,100,0.0
-abs 2016,sa3,abs 2016,lga,83,2.9
+abs 2016,sa3,abs 2016,lga,83,3.0
 abs 2016,sa3,abs 2016,sa4,100,0.0
 abs 2016,sa3,abs 2021,sa3,100,
 abs 2016,sa4,abs 2016,gcc,100,0.0
 abs 2016,sa4,abs 2021,sa4,100,
-abs 2021,lga,abs 2021,sa3,73,
+abs 2021,lga,abs 2021,sa3,72,
 abs 2021,lga,abs 2021,state,100,
 abs 2021,poa,abs 2021,lga,94,
 abs 2021,poa,abs 2021,sa2,59,
