@@ -172,6 +172,9 @@ boundary_list = [
     {"from": "lga", "from_source": "abs 2021", "to": "sa3", "to_source": "abs 2021"},
     {"from": "lga", "from_source": "abs 2021", "to": "state", "to_source": "abs 2021"},  # note bdy name change
 
+    # ABS 2016 to Geoscape bdys
+    {"from": "sa2", "from_source": "abs 2021", "to": "postcode", "to_source": f"geoscape {geoscape_version}"},
+
     # Geoscape to ABS 2016 bdys
     {"from": "locality", "from_source": f"geoscape {geoscape_version}", "to": "sa2", "to_source": "abs 2016"},
     {"from": "locality", "from_source": f"geoscape {geoscape_version}", "to": "sa3", "to_source": "abs 2016"},
