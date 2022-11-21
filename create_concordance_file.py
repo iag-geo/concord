@@ -2,7 +2,7 @@
 import geoscape
 import logging
 import os
-import psycopg2  # need to install package
+import psycopg  # need to install package
 import settings  # gets global vars and runtime arguments
 
 from datetime import datetime
@@ -10,7 +10,7 @@ from datetime import datetime
 
 def main():
     # connect to Postgres database
-    pg_conn = psycopg2.connect(settings.pg_connect_string)
+    pg_conn = psycopg.connect(settings.pg_connect_string)
     pg_conn.autocommit = True
     pg_cur = pg_conn.cursor()
 
@@ -450,7 +450,9 @@ def export_to_csv(pg_cur, table, file_name):
                              to_bdy
                 ) TO STDOUT WITH CSV HEADER"""
     with open(os.path.join(settings.output_path, file_name), "w") as f:
-        pg_cur.copy_expert(query, f)
+        with pg_cur.copy(query) as copy:
+            while data := f.read():
+                copy.write(data)
 
 
 if __name__ == "__main__":

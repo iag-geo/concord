@@ -100,7 +100,7 @@ Running the script requires the following open data, available as Postgres dump 
     2. Edit the `02_create_residential_address_table.sql` in the [postgres-scripts](/postgres-scripts/data-prep) folder to suit your dataset and schema name
     3. Run the above SQL script
 3. Review & edit the boundaries to process in `settings.py` as required - make any required changes in the sections near the bottom marked for editing. If optionally using Geoscape Buildings data for residential address - change the `residential_address_source` to use it.
-4. Add `psycopg2` to your Python 3.x environment
+4. Add `psycopg` to your Python 3.x environment
 5. Run the script (takes ~30-45 mins on a 2017 MacBook Pro with 16Gb of RAM and 4 cores)
 
 #### Command Line Options
