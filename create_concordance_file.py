@@ -449,10 +449,11 @@ def export_to_csv(pg_cur, table, file_name):
                              to_source, 
                              to_bdy
                 ) TO STDOUT WITH CSV HEADER"""
-    with open(os.path.join(settings.output_path, file_name), "w") as f:
+
+    with open(os.path.join(settings.output_path, file_name), "wb") as f:
         with pg_cur.copy(query) as copy:
-            while data := f.read():
-                copy.write(data)
+            while data := copy.read():
+                f.write(data)
 
 
 if __name__ == "__main__":
