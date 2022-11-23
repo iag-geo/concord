@@ -4,6 +4,7 @@ import logging
 import os
 import psycopg  # need to install package
 import settings  # gets global vars and runtime arguments
+import zipfile
 
 from datetime import datetime
 
@@ -35,9 +36,9 @@ def main():
 
     # # export results to csv
     export_to_csv(pg_cur, f'{settings.gnaf_schema}.{settings.output_table}',
-                  settings.output_table + ".csv")
+                  settings.output_table + ".csv", True)
     export_to_csv(pg_cur, f'{settings.gnaf_schema}.{settings.output_score_table}',
-                  settings.output_score_table + ".csv")
+                  settings.output_score_table + ".csv", False)
 
     # cleanup
     pg_cur.close()
@@ -440,7 +441,7 @@ def score_results(pg_cur):
     logger.info("\t\t---------------------------------------------------------------------------------")
 
 
-def export_to_csv(pg_cur, table, file_name):
+def export_to_csv(pg_cur, table, file_name, compress_file):
     query = f"""COPY (
                     select * 
                     from {table} 
@@ -450,10 +451,18 @@ def export_to_csv(pg_cur, table, file_name):
                              to_bdy
                 ) TO STDOUT WITH CSV HEADER"""
 
-    with open(os.path.join(settings.output_path, file_name), "wb") as f:
+    file_path = os.path.join(settings.output_path, file_name)
+
+    # export to CSV
+    with open(file_path, "wb") as f:
         with pg_cur.copy(query) as copy:
             while data := copy.read():
                 f.write(data)
+
+    # compress CSV (if required)
+    if compress_file:
+        zip_path = file_path.replace(".csv", ".zip")
+        zipfile.ZipFile(zip_path, mode="w").write(file_path, compress_type=zipfile.ZIP_DEFLATED)
 
 
 if __name__ == "__main__":
