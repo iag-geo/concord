@@ -3,7 +3,7 @@
 import os
 import argparse
 import platform
-import psycopg2
+import psycopg
 import sys
 
 from datetime import datetime
@@ -33,9 +33,9 @@ def get_geoscape_version(date):
     return gs_version, previous_gs_version
 
 
-# get python, psycopg2 and OS versions
+# get python, psycopg and OS versions
 python_version = sys.version.split("(")[0].strip()
-psycopg2_version = psycopg2.__version__.split("(")[0].strip()
+psycopg_version = psycopg.__version__.split("(")[0].strip()
 os_version = platform.system() + " " + platform.version().strip()
 
 # get the command line arguments for the script

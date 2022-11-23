@@ -2,7 +2,7 @@
 import geoscape
 import logging
 import os
-import psycopg2  # need to install package
+import psycopg  # need to install package
 import settings  # gets global vars and runtime arguments
 
 from datetime import datetime
@@ -10,7 +10,7 @@ from datetime import datetime
 
 def main():
     # connect to Postgres database
-    pg_conn = psycopg2.connect(settings.pg_connect_string)
+    pg_conn = psycopg.connect(settings.pg_connect_string)
     pg_conn.autocommit = True
     pg_cur = pg_conn.cursor()
 
@@ -192,7 +192,7 @@ def add_asgs_concordances(pg_cur):
                                    count(*) as address_count,
                                    100.0 as address_percent
                             from census_2016_bdys.mb_2016_aust as mb
-                            inner join gnaf_202208.address_principals as gnaf on gnaf.mb_2016_code::text = mb.mb_code16
+                            inner join gnaf_202211.address_principals as gnaf on gnaf.mb_2016_code::text = mb.mb_code16
                             group by from_id,
                                      from_name,
                                      to_id,
@@ -240,7 +240,7 @@ def add_asgs_concordances(pg_cur):
                                    count(*) as address_count,
                                    100.0 as address_percent
                             from census_2021_bdys_gda94.mb_2021_aust_gda94 as mb
-                                     inner join gnaf_202208.address_principals as gnaf 
+                                     inner join gnaf_202211.address_principals as gnaf 
                                          on gnaf.mb_2021_code::text = mb.mb_code_2021
                             group by from_id,
                                      from_name,
@@ -449,8 +449,11 @@ def export_to_csv(pg_cur, table, file_name):
                              to_source, 
                              to_bdy
                 ) TO STDOUT WITH CSV HEADER"""
-    with open(os.path.join(settings.output_path, file_name), "w") as f:
-        pg_cur.copy_expert(query, f)
+
+    with open(os.path.join(settings.output_path, file_name), "wb") as f:
+        with pg_cur.copy(query) as copy:
+            while data := copy.read():
+                f.write(data)
 
 
 if __name__ == "__main__":
