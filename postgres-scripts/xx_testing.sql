@@ -1,20 +1,20 @@
 
 select count(*)
-from admin_bdys_202302.abs_2021_sa2;
+from admin_bdys_202305.abs_2021_sa2;
 
 
 select *
-from gnaf_202302.boundary_concordance
+from gnaf_202305.boundary_concordance
 where from_bdy = 'postcode'
 and to_bdy = 'poa';
 
 
 select *
-from admin_bdys_202302.abs_2016_sa1;
+from admin_bdys_202305.abs_2016_sa1;
 
 
 select *
-from gnaf_202302.address_principal_census_2016_boundaries;
+from gnaf_202305.address_principal_census_2016_boundaries;
 
 
 select *
@@ -30,11 +30,11 @@ from census_2016_bdys.sa2_2016_aust as from_bdy
 
 
 select *
-from gnaf_202302;
+from gnaf_202305;
 
 
 select *
-from admin_bdys_202302.abs_2016_mb as adm
+from admin_bdys_202305.abs_2016_mb as adm
 full outer join census_2016_bdys.mb_2016_aust as abs on adm.mb_16code::text = abs.mb_code16
 where not st_equals(adm.geom, abs.geom)
 ;
@@ -51,7 +51,7 @@ select from_id as postcode,
        to_name as lga_name,
        address_count,
        address_percent
-from gnaf_202302.boundary_concordance
+from gnaf_202305.boundary_concordance
 where from_bdy = 'postcode'
   and to_source = 'abs 2016'
   and to_bdy = 'lga'
@@ -63,8 +63,8 @@ where from_bdy = 'postcode'
 drop table if exists testing.temp_mb;
 create table testing.temp_mb as
 select mb.*
-from admin_bdys_202302.abs_2021_mb as mb
-inner join admin_bdys_202302.postcode_bdys as pc on st_intersects(mb.geom, pc.geom)
--- inner join admin_bdys_202302.postcode_bdys as pc on st_intersects(st_centroid(mb.geom), pc.geom)
+from admin_bdys_202305.abs_2021_mb as mb
+inner join admin_bdys_202305.postcode_bdys as pc on st_intersects(mb.geom, pc.geom)
+-- inner join admin_bdys_202305.postcode_bdys as pc on st_intersects(st_centroid(mb.geom), pc.geom)
     and postcode in ('2050', '2042');
 
