@@ -29,7 +29,7 @@
 -- ), gnaf_2022 as (
 --     select mb_2016_code,
 --            count(*) as address_count
---     from gnaf_202305.address_principals
+--     from gnaf_202308.address_principals
 --     group by mb_2016_code
 -- )
 -- select mb.mb_2016_code,
@@ -103,7 +103,7 @@ with psma_lga as (
     select lga_pid,
            name as psma_name,
            st_collect(geom) as geom
-    from admin_bdys_202305.local_government_areas
+    from admin_bdys_202308.local_government_areas
     group by lga_pid,
              name
 ), psma_lga_pnt as (
@@ -181,7 +181,7 @@ with psma_lga as (
     select lga_pid,
            name as psma_name,
            sum(st_area(st_transform(geom, 3577))) as area_m2
-    from admin_bdys_202305.local_government_areas
+    from admin_bdys_202308.local_government_areas
     group by lga_pid,
              name
 ), psma_lga_pnt as (
