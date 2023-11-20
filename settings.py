@@ -158,6 +158,7 @@ boundary_list = [
     {"from": "poa", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
     {"from": "sa3", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
     {"from": "lga", "from_source": "abs 2016", "to": "sa3", "to_source": "abs 2016"},
+    {"from": "lga", "from_source": "abs 2016", "to": "gccsa", "to_source": "abs 2016"},
     {"from": "lga", "from_source": "abs 2016", "to": "ste", "to_source": "abs 2016"},
 
     # only 25% concordance with a ~14% error - don't do it!
@@ -170,6 +171,7 @@ boundary_list = [
     {"from": "poa", "from_source": "abs 2021", "to": "lga", "to_source": "abs 2021"},
     {"from": "sa3", "from_source": "abs 2021", "to": "lga", "to_source": "abs 2021"},
     {"from": "lga", "from_source": "abs 2021", "to": "sa3", "to_source": "abs 2021"},
+    {"from": "lga", "from_source": "abs 2021", "to": "gccsa", "to_source": "abs 2021"},
     {"from": "lga", "from_source": "abs 2021", "to": "state", "to_source": "abs 2021"},  # note bdy name change
 
     # ABS 2016 & 2021 to Geoscape bdys
@@ -185,6 +187,7 @@ boundary_list = [
     # {"from": "postcode", "from_source": f"geoscape {geoscape_version}", "to": "poa", "to_source": "abs 2016"},
     {"from": "postcode", "from_source": f"geoscape {geoscape_version}", "to": "lga", "to_source": "abs 2016"},
     {"from": "lga", "from_source": f"geoscape {geoscape_version}", "to": "lga", "to_source": "abs 2016"},
+    {"from": "lga", "from_source": f"geoscape {geoscape_version}", "to": "gccsa", "to_source": "abs 2016"},
 
     # Geoscape to ABS 2021 bdys
     {"from": "locality", "from_source": f"geoscape {geoscape_version}", "to": "sa2", "to_source": "abs 2021"},
@@ -195,6 +198,7 @@ boundary_list = [
     # {"from": "postcode", "from_source": f"geoscape {geoscape_version}", "to": "poa", "to_source": "abs 2021"},
     {"from": "postcode", "from_source": f"geoscape {geoscape_version}", "to": "lga", "to_source": "abs 2021"},
     {"from": "lga", "from_source": f"geoscape {geoscape_version}", "to": "lga", "to_source": "abs 2021"},
+    {"from": "lga", "from_source": f"geoscape {geoscape_version}", "to": "gccsa", "to_source": "abs 2021"},
 
     # Geoscape to Geoscape bdys
     {"from": "locality", "from_source": f"geoscape {geoscape_version}",
