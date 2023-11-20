@@ -40,6 +40,12 @@ def main():
     export_to_csv(pg_cur, f'{settings.gnaf_schema}.{settings.output_score_table}',
                   settings.output_score_table + ".csv", False)
 
+    # copy to GDA2020 schema
+    sql = geoscape.open_sql_file("data-prep/03_copy_to_gda2020_schema.sql")
+    pg_cur.execute(sql)
+
+    logger.info('\t - tables copied to GDA2020 schema')
+
     # cleanup
     pg_cur.close()
     pg_conn.close()
@@ -180,6 +186,9 @@ def add_asgs_concordances(pg_cur):
             start_time = datetime.now()
             to_index = settings.asgs_concordance_list.index(to_bdy)
 
+            if to_bdy == "gccsa":
+                to_bdy = "gcc"
+
             if to_index > from_index:
                 query = f"""insert into {settings.gnaf_schema}.{settings.output_table}
                             select '{source}' as from_source,
@@ -224,7 +233,7 @@ def add_asgs_concordances(pg_cur):
             start_time = datetime.now()
             to_index = settings.asgs_concordance_list.index(to_bdy)
 
-            # fix for fild name change between censuses
+            # fix for field name change between censuses
             if to_bdy == "gcc":
                 to_bdy = to_bdy.replace("gcc", "gccsa")
 
@@ -274,7 +283,7 @@ def get_field_names(bdy, source, to_from, sql):
         name_field = f"{table}.{bdy}_name16"
 
         if bdy == "gccsa":
-            id_field = name_field.replace("gccsa_code16", "gcc_code16")
+            id_field = id_field.replace("gccsa_code16", "gcc_code16")
             name_field = name_field.replace("gccsa_name16", "gcc_name16")
 
     elif source == "abs 2021":

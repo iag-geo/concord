@@ -39,11 +39,11 @@ select distinct temp_mb.mb_code_2021, bdy.poa_code_2021 as poa_code_2021, bdy.po
 inner join census_2021_bdys_gda94.poa_2021_aust_gda94 as bdy on st_intersects(temp_mb.geom, bdy.geom);
 analyse temp_poa_mb;
 
--- drop table if exists temp_ra_mb;
--- create temporary table temp_ra_mb as
--- select distinct temp_mb.mb_code_2021, bdy.ra_code_2021 as ra_code_2021, bdy.ra_name_2021 as ra_name_2021 from temp_mb
--- inner join census_2021_bdys_gda94.ra_2021_aust_gda94 as bdy on st_intersects(temp_mb.geom, bdy.geom);
--- analyse temp_ra_mb;
+drop table if exists temp_ra_mb;
+create temporary table temp_ra_mb as
+select distinct temp_mb.mb_code_2021, bdy.ra_code_2021 as ra_code_2021, bdy.ra_name_2021 as ra_name_2021 from temp_mb
+inner join census_2021_bdys_gda94.ra_2021_aust_gda94 as bdy on st_intersects(temp_mb.geom, bdy.geom);
+analyse temp_ra_mb;
 
 drop table if exists temp_sed_mb;
 create temporary table temp_sed_mb as
@@ -51,11 +51,11 @@ select distinct temp_mb.mb_code_2021, bdy.sed_code_2021 as sed_code_2021, bdy.se
 inner join census_2021_bdys_gda94.sed_2021_aust_gda94 as bdy on st_intersects(temp_mb.geom, bdy.geom);
 analyse temp_sed_mb;
 
--- drop table if exists temp_ucl_mb;
--- create temporary table temp_ucl_mb as
--- select distinct temp_mb.mb_code_2021, bdy.ucl_code_2021 as ucl_code_2021, bdy.ucl_name_2021 as ucl_name_2021 from temp_mb
--- inner join census_2021_bdys_gda94.ucl_2021_aust_gda94 as bdy on st_intersects(temp_mb.geom, bdy.geom);
--- analyse temp_ucl_mb;
+drop table if exists temp_ucl_mb;
+create temporary table temp_ucl_mb as
+select distinct temp_mb.mb_code_2021, bdy.ucl_code_2021 as ucl_code_2021, bdy.ucl_name_2021 as ucl_name_2021 from temp_mb
+inner join census_2021_bdys_gda94.ucl_2021_aust_gda94 as bdy on st_intersects(temp_mb.geom, bdy.geom);
+analyse temp_ucl_mb;
 
 drop table temp_mb;
 
@@ -81,20 +81,20 @@ with abs as (
            lga_name_2021,
            poa_code_2021,
            poa_name_2021,
---            ra_code_2021,
---            ra_name_2021,
+           ra_code_2021,
+           ra_name_2021,
            sed_code_2021,
            sed_name_2021,
---            ucl_code_2021,
---            ucl_name_2021,
+           ucl_code_2021,
+           ucl_name_2021,
            mb.state_code_2021,
            mb.state_name_2021
     from census_2021_bdys_gda94.mb_2021_aust_gda94 as mb
     inner join temp_ced_mb as ced on ced.mb_code_2021 = mb.mb_code_2021
     inner join temp_lga_mb as lga on lga.mb_code_2021 = mb.mb_code_2021
     inner join temp_poa_mb as poa on poa.mb_code_2021 = mb.mb_code_2021
---     inner join temp_ra_mb as ra on ra.mb_code_2021 = mb.mb_code_2021
---     inner join temp_ucl_mb as ucl on ucl.mb_code_2021 = mb.mb_code_2021
+    inner join temp_ra_mb as ra on ra.mb_code_2021 = mb.mb_code_2021
+    inner join temp_ucl_mb as ucl on ucl.mb_code_2021 = mb.mb_code_2021
     left outer join temp_sed_mb as sed on sed.mb_code_2021 = mb.mb_code_2021
 )
 select gid,

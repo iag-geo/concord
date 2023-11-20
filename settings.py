@@ -160,6 +160,7 @@ boundary_list = [
     {"from": "lga", "from_source": "abs 2016", "to": "sa3", "to_source": "abs 2016"},
     {"from": "lga", "from_source": "abs 2016", "to": "gccsa", "to_source": "abs 2016"},
     {"from": "lga", "from_source": "abs 2016", "to": "ste", "to_source": "abs 2016"},
+    {"from": "lga", "from_source": "abs 2016", "to": "ra", "to_source": "abs 2016"},
 
     # only 25% concordance with a ~14% error - don't do it!
     # {"from": "lga", "from_source": "abs 2016", "to": "poa", "to_source": "abs 2016"},
@@ -173,6 +174,7 @@ boundary_list = [
     {"from": "lga", "from_source": "abs 2021", "to": "sa3", "to_source": "abs 2021"},
     {"from": "lga", "from_source": "abs 2021", "to": "gccsa", "to_source": "abs 2021"},
     {"from": "lga", "from_source": "abs 2021", "to": "state", "to_source": "abs 2021"},  # note bdy name change
+    {"from": "lga", "from_source": "abs 2021", "to": "ra", "to_source": "abs 2021"},
 
     # ABS 2016 & 2021 to Geoscape bdys
     {"from": "sa2", "from_source": "abs 2016", "to": "postcode", "to_source": f"geoscape {geoscape_version}"},
