@@ -34,7 +34,7 @@ def main():
     # get weighted scores as % concordance
     score_results(pg_cur)
 
-    # # export results to csv
+    # export results to csv
     export_to_csv(pg_cur, f'{settings.gnaf_schema}.{settings.output_table}',
                   settings.output_table + ".csv", True)
     export_to_csv(pg_cur, f'{settings.gnaf_schema}.{settings.output_score_table}',
@@ -272,6 +272,11 @@ def get_field_names(bdy, source, to_from, sql):
     if source == "abs 2016":
         id_field = f"{table}.{bdy}_code16"
         name_field = f"{table}.{bdy}_name16"
+
+        if bdy == "gccsa":
+            id_field = name_field.replace("gccsa_code16", "gcc_code16")
+            name_field = name_field.replace("gccsa_name16", "gcc_name16")
+
     elif source == "abs 2021":
         id_field = f"{table}.{bdy}_code_2021"
         name_field = f"{table}.{bdy}_name_2021"
