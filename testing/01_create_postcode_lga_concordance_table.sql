@@ -13,8 +13,8 @@ select source.gnaf_pid,
        target.lga_pid as target_id,
        target.lga_name as target_name,
        target.state as target_state
-from gnaf_202311.address_principal_admin_boundaries as target
-inner join gnaf_202311.address_principals as source on source.gnaf_pid = target.gnaf_pid
+from gnaf_202402.address_principal_admin_boundaries as target
+inner join gnaf_202402.address_principals as source on source.gnaf_pid = target.gnaf_pid
 ;
 analyse temp_bdy_concordance;
 
@@ -31,7 +31,7 @@ where target_state = 'ACT'
 update temp_bdy_concordance as tmp
 set target_id = 'lgaot9999991',
     target_name = 'Unincorporated - Norfolk Island'
-from gnaf_202311.address_principal_admin_boundaries as psma
+from gnaf_202402.address_principal_admin_boundaries as psma
 where psma.gnaf_pid = tmp.gnaf_pid
   and locality_pid = 'locc15e0d2d6f2a'
   and target_id is null;
@@ -39,7 +39,7 @@ where psma.gnaf_pid = tmp.gnaf_pid
 update temp_bdy_concordance as tmp
 set target_id = 'lgaot9999992',
     target_name = 'Unincorporated - Jervis Bay'
-from gnaf_202311.address_principal_admin_boundaries as psma
+from gnaf_202402.address_principal_admin_boundaries as psma
 where psma.gnaf_pid = tmp.gnaf_pid
   and locality_pid = 'loced195c315de9'
   and target_id is null;
@@ -47,7 +47,7 @@ where psma.gnaf_pid = tmp.gnaf_pid
 update temp_bdy_concordance as tmp
 set target_id = 'lgasa9999991',
     target_name = 'Unincorporated - Thistle Island'
-from gnaf_202311.address_principal_admin_boundaries as psma
+from gnaf_202402.address_principal_admin_boundaries as psma
 where psma.gnaf_pid = tmp.gnaf_pid
   and locality_pid = '250190776'
   and target_id is null;
@@ -56,7 +56,7 @@ where psma.gnaf_pid = tmp.gnaf_pid
 update temp_bdy_concordance as tmp
 set target_id = 'lgacbffb11990f2',
     target_name = 'Hobart City'
-from gnaf_202311.address_principal_admin_boundaries as psma
+from gnaf_202402.address_principal_admin_boundaries as psma
 where psma.gnaf_pid = tmp.gnaf_pid
   and locality_pid = 'loc0f7a581b85b7'
   and target_id is null;
@@ -65,7 +65,7 @@ where psma.gnaf_pid = tmp.gnaf_pid
 update temp_bdy_concordance as tmp
 set target_id = 'lgaa8d127fa14e7',
     target_name = 'Ceduna'
-from gnaf_202311.address_principal_admin_boundaries as psma
+from gnaf_202402.address_principal_admin_boundaries as psma
 where psma.gnaf_pid = tmp.gnaf_pid
   and locality_pid = 'loccf8be9dcdacd'
   and target_id is null;
@@ -74,7 +74,7 @@ where psma.gnaf_pid = tmp.gnaf_pid
 update temp_bdy_concordance as tmp
 set target_id = 'lga7872e04f6637',
     target_name = 'Tenterfield'
-from gnaf_202311.address_principal_admin_boundaries as psma
+from gnaf_202402.address_principal_admin_boundaries as psma
 where psma.gnaf_pid = tmp.gnaf_pid
   and locality_pid = 'loc552bd3aef1b8'
   and target_id is null;
@@ -90,7 +90,7 @@ analyse temp_bdy_concordance;
 --        locality_name,
 --        postcode,
 --        state
--- from temp_bdy_concordance as tmp, gnaf_202311.address_principal_admin_boundaries as psma
+-- from temp_bdy_concordance as tmp, gnaf_202402.address_principal_admin_boundaries as psma
 -- where psma.gnaf_pid = tmp.gnaf_pid
 --     and target_id is null
 -- group by locality_name,

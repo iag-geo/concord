@@ -16,7 +16,7 @@ with mb as (
            state                           as source_state
     from mb
     inner join census_2016_bdys.lga_2016_aust as abs_lga on st_intersects(mb.geom, abs_lga.geom)
-    inner join gnaf_202311.address_principals as gnaf on gnaf.mb_2016_code = mb.mb_2016_code
+    inner join gnaf_202402.address_principals as gnaf on gnaf.mb_2016_code = mb.mb_2016_code
 )
 select source.gnaf_pid,
        source_id,
@@ -25,7 +25,7 @@ select source.gnaf_pid,
        lga_pid as target_id,
        lga_name as target_name,
        state as target_state
-from gnaf_202311.address_principal_admin_boundaries as psma
+from gnaf_202402.address_principal_admin_boundaries as psma
          inner join source on source.gnaf_pid = psma.gnaf_pid
 ;
 analyse temp_bdy_concordance;
@@ -81,7 +81,7 @@ with source_counts as (
 ), target as (
     select lga_pid,
            st_collect(geom) as geom
-    from admin_bdys_202311.local_government_areas
+    from admin_bdys_202402.local_government_areas
     group by lga_pid
 )
 select final.*,
