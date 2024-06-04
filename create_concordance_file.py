@@ -120,9 +120,9 @@ def add_concordances(bdys, pg_cur):
             input_tables += f"\n\t\t\t\t\t\tinner join {res_table} as r on r.gnaf_pid = f.gnaf_pid"""
             residential_filter = "and r.is_residential"
         elif from_source == "abs 2021":
-            residential_filter = "and f.mb_category_2021 = 'Residential'"
+            residential_filter = "and f.mb_category_2021 in ('Residential', 'Primary Production')"
         elif to_source == "abs 2021":
-            residential_filter = "and t.mb_category_2021 = 'Residential'"
+            residential_filter = "and t.mb_category_2021 in ('Residential', 'Primary Production')"
         # elif from_source == "abs 2016":
         #     residential_filter = "and f.mb_category = 'RESIDENTIAL'"
         # elif to_source == "abs 2016":
