@@ -154,6 +154,7 @@ boundary_list = [
     # ABS 2016 to ABS 2016 bdys
     {"from": "sa2", "from_source": "abs 2016", "to": "poa", "to_source": "abs 2016"},
     {"from": "sa2", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
+    {"from": "poa", "from_source": "abs 2016", "to": "sa3", "to_source": "abs 2016"},
     {"from": "poa", "from_source": "abs 2016", "to": "sa2", "to_source": "abs 2016"},
     {"from": "poa", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
     {"from": "sa3", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
@@ -168,6 +169,7 @@ boundary_list = [
     # ABS 2021 to ABS 2021 bdys
     {"from": "sa2", "from_source": "abs 2021", "to": "poa", "to_source": "abs 2021"},
     {"from": "sa2", "from_source": "abs 2021", "to": "lga", "to_source": "abs 2021"},
+    {"from": "poa", "from_source": "abs 2021", "to": "sa3", "to_source": "abs 2021"},
     {"from": "poa", "from_source": "abs 2021", "to": "sa2", "to_source": "abs 2021"},
     {"from": "poa", "from_source": "abs 2021", "to": "lga", "to_source": "abs 2021"},
     {"from": "sa3", "from_source": "abs 2021", "to": "lga", "to_source": "abs 2021"},
