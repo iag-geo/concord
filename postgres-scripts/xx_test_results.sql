@@ -2,7 +2,7 @@
 
 -- 592552 rows
 select count(*)
-from gnaf_202405.boundary_concordance;
+from gnaf_202408.boundary_concordance;
 
 
 
@@ -14,7 +14,7 @@ select count(*) as bdy_pair_count,
        max(cor.ratio_from_to * 100.0 - bdy.address_percent)::smallint as max_delta,
        (sum(abs(cor.ratio_from_to * 100.0 - bdy.address_percent) * address_count) / 100.0)::integer as address_count
 from census_2021_bdys_gda94.correspondences_sa2 as cor
-         inner join gnaf_202405.boundary_concordance as bdy on bdy.from_id = cor.sa2_maincode_2016
+         inner join gnaf_202408.boundary_concordance as bdy on bdy.from_id = cor.sa2_maincode_2016
     and bdy.to_id = cor.sa2_code_2021
 where abs(cor.ratio_from_to * 100.0 - bdy.address_percent) > 5.0
 ;
@@ -99,8 +99,8 @@ with agg as (
            sa2_code_2021::text as to_id,
            sa2_name_2021 as to_name,
            count(*) as address_count
-    from gnaf_202405.address_principal_census_2016_boundaries as f
-        inner join gnaf_202405.address_principal_census_2021_boundaries as t on t.gnaf_pid = f.gnaf_pid
+    from gnaf_202408.address_principal_census_2016_boundaries as f
+        inner join gnaf_202408.address_principal_census_2021_boundaries as t on t.gnaf_pid = f.gnaf_pid
     where sa2_16main = '101021011'
       and mb_category = 'RESIDENTIAL'
       and mb_category_2021 = 'Residential'
