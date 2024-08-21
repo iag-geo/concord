@@ -12,7 +12,7 @@ with blg as (
            blg.gnaf_pid as blg_gnaf_pid,
            is_residential,
            building_count
-    from gnaf_202405.address_principals as gnaf
+    from gnaf_202408.address_principals as gnaf
     full outer join blg on blg.gnaf_pid = gnaf.gnaf_pid
 )
 select is_residential,
