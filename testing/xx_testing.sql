@@ -55,8 +55,8 @@ select bdy.state,
        bdy.postcode,
        bdy.locality_name,
        count(bdy.gnaf_pid) as addr_count
-from gnaf_202408.address_principal_admin_boundaries as bdy
-         inner join gnaf_202408.address_principals as gnaf on gnaf.gnaf_pid = bdy.gnaf_pid
+from gnaf_202411.address_principal_admin_boundaries as bdy
+         inner join gnaf_202411.address_principals as gnaf on gnaf.gnaf_pid = bdy.gnaf_pid
 group by bdy.state,
          bdy.lga_name,
          bdy.postcode,
@@ -82,9 +82,9 @@ select bdy.state,
        bdy.postcode,
        bdy.locality_name,
        count(bdy.gnaf_pid) as addr_count
-from gnaf_202408.address_principal_admin_boundaries as bdy
-inner join gnaf_202408.address_principals as gnaf on gnaf.gnaf_pid = bdy.gnaf_pid
-inner join admin_bdys_202408.abs_2016_mb as mb on mb.mb_16code = gnaf.mb_2016_code
+from gnaf_202411.address_principal_admin_boundaries as bdy
+inner join gnaf_202411.address_principals as gnaf on gnaf.gnaf_pid = bdy.gnaf_pid
+inner join admin_bdys_202411.abs_2016_mb as mb on mb.mb_16code = gnaf.mb_2016_code
 where mb.mb_category = 'RESIDENTIAL'
 group by bdy.state,
          bdy.lga_name,
@@ -101,18 +101,18 @@ LIMIT 50
 
 
 select *
-from gnaf_202408.address_principals
+from gnaf_202411.address_principals
 ;
 
 select *
-from gnaf_202408.address_alias_admin_boundaries
+from gnaf_202411.address_alias_admin_boundaries
 ;
 
 select *
-from admin_bdys_202408.abs_2016_mb
+from admin_bdys_202411.abs_2016_mb
 ;
 
-select * from admin_bdys_202408.local_government_areas
+select * from admin_bdys_202411.local_government_areas
 order by name, state;
 
 
