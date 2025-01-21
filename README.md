@@ -21,8 +21,8 @@ Using this file comes with the following caveats:
 - It only works with data related to residents, citizens & consumers. In other words - industrial, commercial & special use data isn't suited to conversion using the concordance file provided
 - The data represents % overlaps between boundaries that are a _best estimate_ of how data should be apportioned between 2 boundary sets based on residential address counts. Your data may have biases in it that mean this approach doesn't return the best result. _e.g. looking at the image below - if your postcode 3127 customers were mostly on the Boroondara Council side - the boundary concordance file would incorrectly put 54% of them in Whitehorse Council_
 - The code has been tested against the official ABS Census 2016 to 2021 boundary correspondences and the difference is: ~1% of addresses are in another boundary
-    - **Note**: ABS Census 2016 to 2021 boundary conversions aren't in the initial version of the concordance file. Plan is to include these when the ABS Census 2021 data is released in June 2022
-- ABS Census meshblock boundary concordances haven't been included as they blow the file out to over 200Mb (there are over 300,000 meshblock bdys). Plan is to provide these as a separate concordance file in the future.
+    - **Note**: ABS Census 2016 to 2021 boundary conversions aren't in the concordance file yet.
+- ABS Census meshblock boundary concordances haven't been included as they increase the output file size to over 200Mb (there are over 300,000 meshblock bdys). Plan is to provide these as a separate concordance file in the future.
 
 ![pc_vs_lga.png](pc_vs_lga.png "ABS 2016 Postcodes (red) vs LGAs (blue)")
 
