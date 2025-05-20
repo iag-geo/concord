@@ -19,7 +19,7 @@
 -- select * from testing.nsw_covid_tests_20220503_lga;
 --
 -- -- concordance table
--- select * from gnaf_202502.boundary_concordance;
+-- select * from gnaf_202505.boundary_concordance;
 
 WITH pc_data AS (
     SELECT con.to_id AS lga_id,
@@ -28,8 +28,8 @@ WITH pc_data AS (
            sum(pc.cases) as qa_count,
            count(*) as postcode_count
     FROM testing.nsw_covid_cases_20220503_postcode AS pc
-    INNER JOIN gnaf_202502.boundary_concordance AS con ON pc.postcode = con.from_id
-    WHERE con.from_source = 'geoscape 202502'
+    INNER JOIN gnaf_202505.boundary_concordance AS con ON pc.postcode = con.from_id
+    WHERE con.from_source = 'geoscape 202505'
       AND con.from_bdy = 'postcode'
       AND con.to_source = 'abs 2016'
       AND con.to_bdy = 'lga'
@@ -49,8 +49,8 @@ INNER JOIN pc_data on pc_data.lga_id = lga.lga_code19;
 
 -- example of poor concordance due to number of partial postcodes that intersect with one LGA
 select *
-from gnaf_202502.boundary_concordance
-WHERE from_source = 'geoscape 202502'
+from gnaf_202505.boundary_concordance
+WHERE from_source = 'geoscape 202505'
   AND from_bdy = 'postcode'
   AND to_source = 'abs 2016'
   AND to_bdy = 'lga'
