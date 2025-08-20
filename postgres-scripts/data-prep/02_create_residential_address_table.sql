@@ -27,9 +27,9 @@ select gnaf.gnaf_pid,
        gnaf.mb_2021_code,
        lower(mb21.mb_cat) as mb_category_2021,
        gnaf.geom
-from gnaf_202505.address_principals as gnaf
-     inner join admin_bdys_202505.abs_2016_mb as mb16 on mb16.mb_16code = gnaf.mb_2016_code
-     inner join admin_bdys_202505.abs_2021_mb as mb21 on mb21.mb21_code = gnaf.mb_2021_code
+from gnaf_202508.address_principals as gnaf
+     inner join admin_bdys_202508.abs_2016_mb as mb16 on mb16.mb_16code = gnaf.mb_2016_code
+     inner join admin_bdys_202508.abs_2021_mb as mb21 on mb21.mb21_code = gnaf.mb_2021_code
     left outer join blg on blg.gnaf_pid = gnaf.gnaf_pid
 ;
 analyse geoscape_202203.address_principals_buildings;
