@@ -43,7 +43,7 @@ def main():
 
     # copy to GDA2020 schema
     sql = geoscape.open_sql_file("data-prep/03_copy_to_gda2020_schema.sql")
-    pg_cur.execute(sql)
+    pg_cur.execute(sql) # type: ignore
 
     logger.info('\t - tables copied to GDA2020 schema')
 
@@ -56,12 +56,12 @@ def create_bdy_tag_tables(pg_cur: psycopg.Cursor):
     start_time = datetime.now().astimezone()
 
     sql = geoscape.open_sql_file("data-prep/01a_create_gnaf_2016_census_bdy_table.sql")
-    pg_cur.execute(sql)
+    pg_cur.execute(sql) # type: ignore
     logger.info(f'\t - ABS 2016 boundary tag table created : {datetime.now().astimezone() - start_time}')
 
     start_time = datetime.now().astimezone()
     sql = geoscape.open_sql_file("data-prep/01b_create_gnaf_2021_census_bdy_table.sql")
-    pg_cur.execute(sql)
+    pg_cur.execute(sql) # type: ignore
     logger.info(f'\t - ABS 2021 boundary tag table created : {datetime.now().astimezone() - start_time}')
 
 
@@ -84,7 +84,7 @@ def create_table(pg_cur: psycopg.Cursor):
                 );
                 alter table {settings.gnaf_schema}.{settings.output_table} owner to postgres;"""
 
-    pg_cur.execute(query)
+    pg_cur.execute(query) # type: ignore
 
     logger.info(f'\t - {settings.gnaf_schema}.{settings.output_table} table created : '
                 f'{datetime.now().astimezone() - start_time}')
@@ -162,13 +162,13 @@ def add_concordances(bdy: dict[str, str], pg_cur: psycopg.Cursor):
                     select * from final where percent > 0.0;"""
 
         # print(query)
-        pg_cur.execute(query)
+        pg_cur.execute(query) # type: ignore
 
         if from_source == to_source:
-            logger.info(f"\t - {from_source} {from_bdy} to {to_bdy} records added : {datetime.now() - start_time}")
+            logger.info(f"\t - {from_source} {from_bdy} to {to_bdy} records added : {datetime.now().astimezone() - start_time}")
         else:
             logger.info(f"\t - {from_source} {from_bdy} to {to_source} {to_bdy} records added : "
-                        f"{datetime.now() - start_time}")
+                        f"{datetime.now().astimezone() - start_time}")
 
     else:
         logger.fatal(f"\t - {from_source} not in sources!")
@@ -221,7 +221,7 @@ def add_asgs_concordances(pg_cur: psycopg.Cursor):
                     query = query.replace("sa2_code16", "sa2_main16")
 
                 # print(query)
-                pg_cur.execute(query)
+                pg_cur.execute(query) # type: ignore
 
                 logger.info(f"\t - {source} {from_bdy} to {to_bdy} records added : {datetime.now().astimezone() - start_time}")
 
@@ -267,7 +267,7 @@ def add_asgs_concordances(pg_cur: psycopg.Cursor):
                     query = query.replace("sa1_name_2021", "sa1_code_2021")
 
                 # print(query)
-                pg_cur.execute(query)
+                pg_cur.execute(query) # type: ignore
 
                 logger.info(f"\t - {source} {from_bdy} to {to_bdy} records added : {datetime.now().astimezone() - start_time}")
 
@@ -325,7 +325,7 @@ def index_table(pg_cur: psycopg.Cursor):
                     using btree (from_source, from_bdy, to_source, to_bdy);
                 alter table {settings.gnaf_schema}.{settings.output_table} 
                     cluster on {settings.output_table}_combo_idx;"""
-    pg_cur.execute(query)
+    pg_cur.execute(query) # type: ignore
 
     logger.info(f"\t - table analysed, primary key & index added : {datetime.now().astimezone() - start_time}")
 
@@ -371,11 +371,11 @@ def score_results(pg_cur: psycopg.Cursor):
                     add constraint {settings.output_score_table}_pkey 
                         primary key (from_source, from_bdy, to_source, to_bdy);"""
 
-    pg_cur.execute(query)
+    pg_cur.execute(query) # type: ignore
 
     # log results
     pg_cur.execute(f'select * from {settings.gnaf_schema}.{settings.output_score_table} '
-                   f'order by from_source, from_bdy, to_source, to_bdy')
+                   f'order by from_source, from_bdy, to_source, to_bdy') # type: ignore
     rows = pg_cur.fetchall()
 
     logger.info(f"\t - results scored : {datetime.now().astimezone() - start_time}")
@@ -432,8 +432,8 @@ def score_results(pg_cur: psycopg.Cursor):
     --                                sqrt(avg(power(population2 - population1, 2)))::smallint as rmse
                             from merge"""
 
-                pg_cur.execute(query)
-                error_percent = pg_cur.fetchone()[0]
+                pg_cur.execute(query) # type: ignore
+                error_percent = float(pg_cur.fetchone()[0]) # type: ignore
 
             error_percent_str = str(error_percent) + "%"
 
@@ -444,7 +444,7 @@ def score_results(pg_cur: psycopg.Cursor):
                             and from_bdy = '{from_bdy}'
                             and to_source = '{to_source}'
                             and to_bdy = '{to_bdy}'"""
-            pg_cur.execute(query)
+            pg_cur.execute(query) # type: ignore
 
         else:
             # error_percent = None
@@ -456,7 +456,7 @@ def score_results(pg_cur: psycopg.Cursor):
     logger.info("\t\t---------------------------------------------------------------------------------")
 
 
-def export_to_csv(pg_cur, table, file_name, compress_file):
+def export_to_csv(pg_cur: psycopg.Cursor, table: str, file_name: str, compress_file: bool):
     query = f"""COPY (
                     select * 
                     from {table} 
@@ -469,10 +469,9 @@ def export_to_csv(pg_cur, table, file_name, compress_file):
     file_path = os.path.join(settings.output_path, file_name)
 
     # export to CSV
-    with open(file_path, "wb") as f:
-        with pg_cur.copy(query) as copy:
-            while data := copy.read():
-                f.write(data)
+    with open(file_path, "wb") as f, pg_cur.copy(query) as copy: # type: ignore
+        while data := copy.read():
+            f.write(data)
 
     # compress CSV (if required)
     if compress_file:
@@ -481,7 +480,7 @@ def export_to_csv(pg_cur, table, file_name, compress_file):
 
 
 if __name__ == "__main__":
-    full_start_time = datetime.now()
+    full_start_time = datetime.now().astimezone()
 
     # set logger
     log_file = os.path.abspath(__file__).replace(".py", ".log")
@@ -505,8 +504,8 @@ if __name__ == "__main__":
     task_name = "Create boundary concordance table"
     system_name = "mobility.ai"
 
-    logger.info("{} started".format(task_name))
+    logger.info(f"{task_name} started")
 
     main()
 
-    logger.info("{} finished : {}".format(task_name, datetime.now() - full_start_time))
+    logger.info(f"{task_name} finished : {datetime.now().astimezone() - full_start_time}")
