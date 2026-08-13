@@ -62,7 +62,7 @@ parser.add_argument(
          "otherwise \"password\".")
 
 # schema names for the raw gnaf, flattened reference and admin boundary tables
-geoscape_version, previous_geoscape_version = get_geoscape_version(date.today())
+geoscape_version, previous_geoscape_version = get_geoscape_version(date.today())  # noqa: DTZ011
 parser.add_argument(
     "--geoscape-version", default=geoscape_version,
     help="Geoscape release version number as YYYYMM. Defaults to latest release year and month \""
@@ -112,7 +112,7 @@ output_score_table = args.output_score_table or f"{output_table}_score"
 
 # create postgres connect string
 pg_host = args.pghost or os.getenv("PGHOST", "localhost")
-pg_port = args.pgport or os.getenv("PGPORT", 5432)
+pg_port = int(args.pgport or os.getenv("PGPORT", "5432"))
 pg_db = args.pgdb or os.getenv("PGDATABASE", "geoscape")
 pg_user = args.pguser or os.getenv("PGUSER", "postgres")
 pg_password = args.pgpassword or os.getenv("PGPASSWORD", "password")

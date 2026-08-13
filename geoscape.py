@@ -5,7 +5,8 @@ import settings
 
 
 def open_sql_file(file_name: str):
-    sql = open(os.path.join(settings.sql_dir, file_name), "r").read()
+    with open(os.path.join(settings.sql_dir, file_name), "rt") as f:
+        sql = f.read()
     return prep_sql(sql)
 
 
