@@ -1,14 +1,15 @@
 
 import os
+
 import settings
 
 
-def open_sql_file(file_name):
+def open_sql_file(file_name: str):
     sql = open(os.path.join(settings.sql_dir, file_name), "r").read()
     return prep_sql(sql)
 
 
-def prep_sql(sql):
+def prep_sql(sql: str):
     if settings.gnaf_schema is not None:
         sql = sql.replace(" gnaf.", f" {settings.gnaf_schema}.")
     if settings.admin_bdys_schema is not None:

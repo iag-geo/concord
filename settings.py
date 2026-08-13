@@ -1,16 +1,16 @@
 # takes the command line parameters and creates a dictionary of setting_dict
 
-import os
 import argparse
+import os
 import platform
-import psycopg
 import sys
+from datetime import date
 
-from datetime import datetime
+import psycopg
 
 
 # get latest Geoscape release version as YYYYMM, as of the date provided, as well as the prev. version 3 months prior
-def get_geoscape_version(date):
+def get_geoscape_version(date: date):
     month = date.month
     year = date.year
 
@@ -62,7 +62,7 @@ parser.add_argument(
          "otherwise \"password\".")
 
 # schema names for the raw gnaf, flattened reference and admin boundary tables
-geoscape_version, previous_geoscape_version = get_geoscape_version(datetime.today())
+geoscape_version, previous_geoscape_version = get_geoscape_version(date.today())
 parser.add_argument(
     "--geoscape-version", default=geoscape_version,
     help="Geoscape release version number as YYYYMM. Defaults to latest release year and month \""
@@ -131,7 +131,7 @@ asgs_concordance_list = ["sa1", "sa2", "sa3", "sa4", "gcc"]
 # ---------------------------------------------------------------------------------------
 
 # sources of address level data with boundary tags - names are hardcoded, don't edit them!
-source_list = [
+source_list: list[dict[str, str]] = [
     {"name": "abs 2016", "schema": gnaf_schema, "table": "address_principal_census_2016_boundaries"},
     {"name": "abs 2021", "schema": gnaf_schema, "table": "address_principal_census_2021_boundaries"},
     {"name": f"geoscape {geoscape_version}", "schema": gnaf_schema, "table": "address_principal_admin_boundaries"}
@@ -144,8 +144,7 @@ source_list = [
 #                               "table": "address_principals_buildings"}
 # residential_address_source = {"name": "abs 2016", "schema": gnaf_schema,
 #                               "table": "address_principal_census_2016_boundaries"}
-residential_address_source = {"name": "abs 2021", "schema": gnaf_schema,
-                              "table": "address_principal_census_2021_boundaries"}
+residential_address_source: dict[str, str] = {"name": "abs 2021", "schema": gnaf_schema, "table": "address_principal_census_2021_boundaries"}
 
 # the list of boundary pairs to create concordances - from and to sources must match the names of the above sources
 # don't include ASGS ABS boundary pairs that are nested (e.g. SA2 > SA3);
