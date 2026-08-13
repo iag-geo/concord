@@ -149,7 +149,7 @@ residential_address_source: dict[str, str] = {"name": "abs 2021", "schema": gnaf
 # the list of boundary pairs to create concordances - from and to sources must match the names of the above sources
 # don't include ASGS ABS boundary pairs that are nested (e.g. SA2 > SA3);
 # they have their own lookup table and are added automatically
-boundary_list = [
+boundary_list: list[dict[str, str]] = [
     # ABS 2016 to ABS 2016 bdys
     {"from": "sa2", "from_source": "abs 2016", "to": "poa", "to_source": "abs 2016"},
     {"from": "sa2", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},

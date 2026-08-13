@@ -1,12 +1,13 @@
 
-import geoscape
 import logging
 import os
-import psycopg  # need to install package
-import settings  # gets global vars and runtime arguments
 import zipfile
-
 from datetime import datetime
+
+import psycopg  # need to install package
+
+import geoscape
+import settings  # gets global vars and runtime arguments
 
 
 def main():
@@ -22,8 +23,8 @@ def main():
     create_table(pg_cur)
 
     # add requested concordances
-    for bdys in settings.boundary_list:
-        add_concordances(bdys, pg_cur)
+    for bdy in settings.boundary_list:
+        add_concordances(bdy, pg_cur)
 
     # add all ASGS concordances
     add_asgs_concordances(pg_cur)
@@ -51,21 +52,21 @@ def main():
     pg_conn.close()
 
 
-def create_bdy_tag_tables(pg_cur):
-    start_time = datetime.now()
+def create_bdy_tag_tables(pg_cur: psycopg.Cursor):
+    start_time = datetime.now().astimezone()
 
     sql = geoscape.open_sql_file("data-prep/01a_create_gnaf_2016_census_bdy_table.sql")
     pg_cur.execute(sql)
-    logger.info(f'\t - ABS 2016 boundary tag table created : {datetime.now() - start_time}')
+    logger.info(f'\t - ABS 2016 boundary tag table created : {datetime.now().astimezone() - start_time}')
 
-    start_time = datetime.now()
+    start_time = datetime.now().astimezone()
     sql = geoscape.open_sql_file("data-prep/01b_create_gnaf_2021_census_bdy_table.sql")
     pg_cur.execute(sql)
-    logger.info(f'\t - ABS 2021 boundary tag table created : {datetime.now() - start_time}')
+    logger.info(f'\t - ABS 2021 boundary tag table created : {datetime.now().astimezone() - start_time}')
 
 
-def create_table(pg_cur):
-    start_time = datetime.now()
+def create_table(pg_cur: psycopg.Cursor):
+    start_time = datetime.now().astimezone()
 
     query = f"""drop table if exists {settings.gnaf_schema}.{settings.output_table};
                 create table {settings.gnaf_schema}.{settings.output_table}
@@ -86,17 +87,17 @@ def create_table(pg_cur):
     pg_cur.execute(query)
 
     logger.info(f'\t - {settings.gnaf_schema}.{settings.output_table} table created : '
-                f'{datetime.now() - start_time}')
+                f'{datetime.now().astimezone() - start_time}')
 
 
-def add_concordances(bdys, pg_cur):
-    start_time = datetime.now()
+def add_concordances(bdy: dict[str, str], pg_cur: psycopg.Cursor):
+    start_time = datetime.now().astimezone()
 
-    from_source = bdys["from_source"]
-    from_bdy = bdys["from"].lower()
+    from_source = bdy["from_source"]
+    from_bdy = bdy["from"].lower()
 
-    to_source = bdys["to_source"]
-    to_bdy = bdys["to"].lower()
+    to_source = bdy["to_source"]
+    to_bdy = bdy["to"].lower()
 
     # get input table(s)
     from_table = get_source_table(from_source)
@@ -106,7 +107,7 @@ def add_concordances(bdys, pg_cur):
         # if more than one table being used - add a join statement
         if from_source != to_source:
             to_table = get_source_table(to_source)
-            input_tables += f"\n\t\t\t\t\t\tinner join {to_table} as t on t.gnaf_pid = f.gnaf_pid"""
+            input_tables += f"\n\t\t\t\t\t\tinner join {to_table} as t on t.gnaf_pid = f.gnaf_pid"
 
         # set the code and name field names
         from_id_field, from_name_field = get_field_names(from_bdy, from_source, "from", input_tables)
@@ -173,7 +174,7 @@ def add_concordances(bdys, pg_cur):
         logger.fatal(f"\t - {from_source} not in sources!")
 
 
-def add_asgs_concordances(pg_cur):
+def add_asgs_concordances(pg_cur: psycopg.Cursor):
     # adds ABS Census concordances for ASGS boundaries (ordered by increasing size)
 
     # add ABS Census concordances for ASGS boundaries, one census at a time
@@ -183,7 +184,7 @@ def add_asgs_concordances(pg_cur):
         from_index = settings.asgs_concordance_list.index(from_bdy)
 
         for to_bdy in settings.asgs_concordance_list:
-            start_time = datetime.now()
+            start_time = datetime.now().astimezone()
             to_index = settings.asgs_concordance_list.index(to_bdy)
 
             if to_bdy == "gccsa":
@@ -222,7 +223,7 @@ def add_asgs_concordances(pg_cur):
                 # print(query)
                 pg_cur.execute(query)
 
-                logger.info(f"\t - {source} {from_bdy} to {to_bdy} records added : {datetime.now() - start_time}")
+                logger.info(f"\t - {source} {from_bdy} to {to_bdy} records added : {datetime.now().astimezone() - start_time}")
 
     source = "abs 2021"
 
@@ -230,7 +231,7 @@ def add_asgs_concordances(pg_cur):
         from_index = settings.asgs_concordance_list.index(from_bdy)
 
         for to_bdy in settings.asgs_concordance_list:
-            start_time = datetime.now()
+            start_time = datetime.now().astimezone()
             to_index = settings.asgs_concordance_list.index(to_bdy)
 
             # fix for field name change between censuses
@@ -268,10 +269,10 @@ def add_asgs_concordances(pg_cur):
                 # print(query)
                 pg_cur.execute(query)
 
-                logger.info(f"\t - {source} {from_bdy} to {to_bdy} records added : {datetime.now() - start_time}")
+                logger.info(f"\t - {source} {from_bdy} to {to_bdy} records added : {datetime.now().astimezone() - start_time}")
 
 
-def get_field_names(bdy, source, to_from, sql):
+def get_field_names(bdy: str, source: str, to_from: str, sql: str):
     # determine which table alias to prefix fields with
     if "inner join" in sql and to_from == "to":
         table = "t"
@@ -303,7 +304,7 @@ def get_field_names(bdy, source, to_from, sql):
     return id_field, name_field
 
 
-def get_source_table(name):
+def get_source_table(name: str):
     for source_dict in settings.source_list:
         if source_dict["name"] == name:
             return f'{source_dict["schema"]}.{source_dict["table"]}'
@@ -311,8 +312,8 @@ def get_source_table(name):
     return None
 
 
-def index_table(pg_cur):
-    start_time = datetime.now()
+def index_table(pg_cur: psycopg.Cursor):
+    start_time = datetime.now().astimezone()
 
     # analyse table and add primary key & index
     query = f"""analyse {settings.gnaf_schema}.{settings.output_table};
@@ -326,11 +327,11 @@ def index_table(pg_cur):
                     cluster on {settings.output_table}_combo_idx;"""
     pg_cur.execute(query)
 
-    logger.info(f"\t - table analysed, primary key & index added : {datetime.now() - start_time}")
+    logger.info(f"\t - table analysed, primary key & index added : {datetime.now().astimezone() - start_time}")
 
 
-def score_results(pg_cur):
-    start_time = datetime.now()
+def score_results(pg_cur: psycopg.Cursor):
+    start_time = datetime.now().astimezone()
 
     # calculate concordance score (weighted by address count)
     query = f"""drop table if exists {settings.gnaf_schema}.{settings.output_score_table};
@@ -377,7 +378,7 @@ def score_results(pg_cur):
                    f'order by from_source, from_bdy, to_source, to_bdy')
     rows = pg_cur.fetchall()
 
-    logger.info(f"\t - results scored : {datetime.now() - start_time}")
+    logger.info(f"\t - results scored : {datetime.now().astimezone() - start_time}")
     logger.info("\t\t---------------------------------------------------------------------------------")
     logger.info("\t\t| {:24} | {:24} | {:11} | {:9} |".format("from", "to", "concordance", "avg error"))
     logger.info("\t\t---------------------------------------------------------------------------------")
