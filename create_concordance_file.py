@@ -482,13 +482,19 @@ def export_to_csv(pg_cur: psycopg.Cursor, table: str, file_name: str, compress_f
 if __name__ == "__main__":
     full_start_time = datetime.now().astimezone()
 
+    logger = logging.getLogger()
+
+    file_time = datetime.now().astimezone()
+    file_time_str = file_time.strftime("%Y-%m-%d-%H-%M-%S")
+
     # set logger
-    log_file = os.path.abspath(__file__).replace(".py", ".log")
+    if settings.log_path:
+        os.makedirs(settings.log_path, exist_ok=True)
+        log_file = os.path.join(settings.log_path, f"locality-clean-{file_time_str}.log")
+    else:
+        log_file = os.path.abspath(__file__).replace(".py", f"-{file_time_str}.log")
     logging.basicConfig(filename=log_file, level=logging.DEBUG, format="%(asctime)s %(message)s",
                         datefmt="%m/%d/%Y %I:%M:%S %p")
-
-    logger = logging.getLogger()
-    logger.setLevel(logging.INFO)
 
     # setup logger to write to screen as well as writing to log file
     # define a Handler which writes INFO messages or higher to the sys.stderr
@@ -500,6 +506,8 @@ if __name__ == "__main__":
     console.setFormatter(formatter)
     # add the handler to the root logger
     logging.getLogger("").addHandler(console)
+
+    logger.info("")
 
     task_name = "Create boundary concordance table"
     system_name = "mobility.ai"

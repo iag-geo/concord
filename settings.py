@@ -69,10 +69,6 @@ parser.add_argument(
     "--geoscape-version", default=geoscape_version,
     help="Geoscape release version number as YYYYMM. Defaults to latest release year and month \""
          + geoscape_version + "\".")
-# parser.add_argument(
-#     "--previous-geoscape-version", default=previous_geoscape_version,
-#     help="Previous Geoscape release version number as YYYYMM; used for QA comparison. "
-#          "Defaults to \"" + previous_geoscape_version + "\".")
 parser.add_argument(
     "--gnaf-schema",
     help="Input schema name to store final GNAF tables in. Also the output schema for the concordance table."
@@ -81,13 +77,6 @@ parser.add_argument(
     "--admin-schema",
     help="Input schema name to store final admin boundary tables in. Defaults to \"admin_bdys_"
          + geoscape_version + "\".")
-# parser.add_argument(
-#     "--previous-gnaf-schema",
-#     help="Schema with previous version of GNAF tables in. Defaults to \"gnaf_" + previous_geoscape_version + "\".")
-# parser.add_argument(
-#     "--previous-admin-schema",
-#     help="Schema with previous version of GNAF tables in. Defaults to \"admin_bdys_"
-#          + previous_geoscape_version + "\".")
 
 # output file/table name & directory
 parser.add_argument(
@@ -99,6 +88,9 @@ parser.add_argument(
 parser.add_argument(
     "--output-path", required=True,
     help="Local path where the boundary concordance files will be output.")
+parser.add_argument(
+    "--log-path",
+    help="Optional directory for the loader log file. Defaults to a log file beside load-gnaf.py.")
 
 # global var containing all input parameters
 args = parser.parse_args()
@@ -106,9 +98,8 @@ args = parser.parse_args()
 # assign parameters to global settings
 gnaf_schema = sql.Identifier(args.gnaf_schema or "gnaf_" + geoscape_version)
 admin_bdys_schema = sql.Identifier(args.admin_schema or "admin_bdys_" + geoscape_version)
-# previous_gnaf_schema = sql.Identifier(args.previous_gnaf_schema or "gnaf_" + previous_geoscape_version)
-# previous_admin_bdys_schema = sql.Identifier(args.previous_admin_schema or "admin_bdys_" + previous_geoscape_version)
 output_path = args.output_path
+log_path = args.log_path
 output_table = args.output_table or "boundary_concordance"
 output_score_table = args.output_score_table or f"{output_table}_score"
 
