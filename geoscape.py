@@ -1,8 +1,6 @@
 
 import os
 
-from psycopg import sql
-
 import settings
 
 
@@ -20,6 +18,6 @@ def prep_sql(sql_string: str):
 
     if settings.pg_user != "postgres":
         # alter create table script to run with correct Postgres username
-        sql_string = sql_string.replace(" postgres;", f" {sql.Identifier(settings.pg_user)};")
+        sql_string = sql_string.replace(" postgres;", f" {settings.pg_user};")
 
     return sql_string
