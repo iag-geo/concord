@@ -96,8 +96,9 @@ parser.add_argument(
 args = parser.parse_args()
 
 # assign parameters to global settings
-gnaf_schema = sql.Identifier(args.gnaf_schema or "gnaf_" + geoscape_version)
-admin_bdys_schema = sql.Identifier(args.admin_schema or "admin_bdys_" + geoscape_version)
+gnaf_schema = sql.Identifier(args.gnaf_schema or f"gnaf_{geoscape_version}")
+admin_bdys_schema = sql.Identifier(args.admin_schema or f"admin_bdys_{geoscape_version}")
+
 output_path = args.output_path
 log_path = args.log_path
 output_table = args.output_table or "boundary_concordance"
@@ -105,12 +106,12 @@ output_score_table = args.output_score_table or f"{output_table}_score"
 
 # create postgres connect string
 pg_host = args.pghost or os.getenv("PGHOST", "localhost")
-pg_port = int(args.pgport or os.getenv("PGPORT", "5432"))
+pg_port = int(args.pgport or os.getenv("PGPORT", '5432'))
 pg_db = args.pgdb or os.getenv("PGDATABASE", "geoscape")
-pg_user = args.pguser or os.getenv("PGUSER", "postgres")
+pg_user = sql.Identifier(args.pguser or os.getenv("PGUSER", "postgres"))
 pg_password = args.pgpassword or os.getenv("PGPASSWORD", "password")
 
-pg_connect_string = f"dbname='{pg_db}' host='{pg_host}' port='{pg_port}' user='{pg_user}' password='{pg_password}'"
+pg_connect_string = f"dbname='{pg_db}' host='{pg_host}' port='{pg_port}' user='{pg_user!s}' password='{pg_password}'"
 
 # set postgres script directory
 sql_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "postgres-scripts")
