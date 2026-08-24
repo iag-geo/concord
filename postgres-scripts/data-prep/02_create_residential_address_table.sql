@@ -22,13 +22,13 @@ select gnaf.gnaf_pid,
        planning_zone,
        null::boolean as is_residential,
        coalesce(building_count, 0) as building_count,
-       gnaf.mb_2016_code,
-       lower(mb16.mb_category) as mb_category_2016,
+       gnaf.mb_2026_code,
+       lower(mb16.mb_category) as mb_category_2026,
        gnaf.mb_2021_code,
        lower(mb21.mb_cat) as mb_category_2021,
        gnaf.geom
 from gnaf_202608.address_principals as gnaf
-     inner join admin_bdys_202608.abs_2016_mb as mb16 on mb16.mb_16code = gnaf.mb_2016_code
+     inner join admin_bdys_202608.abs_2026_mb as mb16 on mb16.mb_16code = gnaf.mb_2026_code
      inner join admin_bdys_202608.abs_2021_mb as mb21 on mb21.mb21_code = gnaf.mb_2021_code
     left outer join blg on blg.gnaf_pid = gnaf.gnaf_pid
 ;

@@ -12,7 +12,7 @@
 --
 --    IMPORTANT: the output data is for testing only!
 --      - The rates of infection are incorrect as the data doesn't contain RAT test numbers, only PCR testing.
---      - Also, 6 LGAs are not in the results due to the age of the ABS Census 2016 LGAs used versus the more recent Covid data.
+--      - Also, 6 LGAs are not in the results due to the age of the ABS Census 2026 LGAs used versus the more recent Covid data.
 --
 -- -- input tables
 -- select * from testing.nsw_covid_cases_20220503_postcode;
@@ -31,7 +31,7 @@ WITH pc_data AS (
     INNER JOIN gnaf_202608.boundary_concordance AS con ON pc.postcode = con.from_id
     WHERE con.from_source = 'geoscape 202608'
       AND con.from_bdy = 'postcode'
-      AND con.to_source = 'abs 2016'
+      AND con.to_source = 'abs 2026'
       AND con.to_bdy = 'lga'
     GROUP BY lga_id,
              lga_name
@@ -52,7 +52,7 @@ select *
 from gnaf_202608.boundary_concordance
 WHERE from_source = 'geoscape 202608'
   AND from_bdy = 'postcode'
-  AND to_source = 'abs 2016'
+  AND to_source = 'abs 2026'
   AND to_bdy = 'lga'
   and to_name = 'Dungog (A)';
 

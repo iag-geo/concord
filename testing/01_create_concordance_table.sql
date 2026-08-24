@@ -6,17 +6,17 @@
 drop table if exists temp_bdy_concordance;
 create temporary table temp_bdy_concordance as
 with mb as (
-    select mb_2016_code,
+    select mb_2026_code,
            ST_PointOnSurface(geom) as geom
-    from testing.mb_2016_counts_2022
+    from testing.mb_2026_counts_2022
 ), source as (
     select gnaf_pid,
            lga_code16                      as source_id,
            split_part(lga_name16, ' (', 1) as source_name,
            state                           as source_state
     from mb
-    inner join census_2016_bdys.lga_2016_aust as abs_lga on st_intersects(mb.geom, abs_lga.geom)
-    inner join gnaf_202608.address_principals as gnaf on gnaf.mb_2016_code = mb.mb_2016_code
+    inner join census_2026_bdys.lga_2026_aust as abs_lga on st_intersects(mb.geom, abs_lga.geom)
+    inner join gnaf_202608.address_principals as gnaf on gnaf.mb_2026_code = mb.mb_2026_code
 )
 select source.gnaf_pid,
        source_id,
@@ -87,7 +87,7 @@ with source_counts as (
 select final.*,
        st_intersection(source.geom, target.geom) as geom
 from final
-         inner join census_2016_bdys.lga_2016_aust as source on final.source_id = source.lga_code16
+         inner join census_2026_bdys.lga_2026_aust as source on final.source_id = source.lga_code16
          inner join target on final.target_id = target.lga_pid
 where percent_source_addresses > 0
 --    or percent_target_addresses > 0
