@@ -139,21 +139,21 @@ residential_address_source: dict[str, Any] = {"name": "abs 2021", "schema": gnaf
 # don't include ASGS ABS boundary pairs that are nested (e.g. SA2 > SA3);
 # they have their own lookup table and are added automatically
 boundary_list: list[dict[str, str]] = [
-    # ABS 2026 to ABS 2026 bdys
-    {"from": "sa2", "from_source": "abs 2026", "to": "poa", "to_source": "abs 2026"},
-    {"from": "sa2", "from_source": "abs 2026", "to": "lga", "to_source": "abs 2026"},
-    {"from": "poa", "from_source": "abs 2026", "to": "sa4", "to_source": "abs 2026"},
-    {"from": "poa", "from_source": "abs 2026", "to": "sa3", "to_source": "abs 2026"},
-    {"from": "poa", "from_source": "abs 2026", "to": "sa2", "to_source": "abs 2026"},
-    {"from": "poa", "from_source": "abs 2026", "to": "lga", "to_source": "abs 2026"},
-    {"from": "sa3", "from_source": "abs 2026", "to": "lga", "to_source": "abs 2026"},
-    {"from": "lga", "from_source": "abs 2026", "to": "sa3", "to_source": "abs 2026"},
-    {"from": "lga", "from_source": "abs 2026", "to": "gccsa", "to_source": "abs 2026"},
-    {"from": "lga", "from_source": "abs 2026", "to": "state", "to_source": "abs 2026"},
-    {"from": "lga", "from_source": "abs 2026", "to": "ra", "to_source": "abs 2026"},
+    # ABS 2016 to ABS 2016 bdys
+    {"from": "sa2", "from_source": "abs 2016", "to": "poa", "to_source": "abs 2016"},
+    {"from": "sa2", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
+    {"from": "poa", "from_source": "abs 2016", "to": "sa4", "to_source": "abs 2016"},
+    {"from": "poa", "from_source": "abs 2016", "to": "sa3", "to_source": "abs 2016"},
+    {"from": "poa", "from_source": "abs 2016", "to": "sa2", "to_source": "abs 2016"},
+    {"from": "poa", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
+    {"from": "sa3", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
+    {"from": "lga", "from_source": "abs 2016", "to": "sa3", "to_source": "abs 2016"},
+    {"from": "lga", "from_source": "abs 2016", "to": "gccsa", "to_source": "abs 2016"},
+    {"from": "lga", "from_source": "abs 2016", "to": "state", "to_source": "abs 2016"},
+    {"from": "lga", "from_source": "abs 2016", "to": "ra", "to_source": "abs 2016"},
 
     # only 25% concordance with a ~14% error - don't do it!
-    # {"from": "lga", "from_source": "abs 2026", "to": "poa", "to_source": "abs 2026"},
+    # {"from": "lga", "from_source": "abs 2016", "to": "poa", "to_source": "abs 2016"},
 
     # ABS 2021 to ABS 2021 bdys
     {"from": "sa2", "from_source": "abs 2021", "to": "poa", "to_source": "abs 2021"},
@@ -168,20 +168,37 @@ boundary_list: list[dict[str, str]] = [
     {"from": "lga", "from_source": "abs 2021", "to": "state", "to_source": "abs 2021"},  # note bdy name change
     {"from": "lga", "from_source": "abs 2021", "to": "ra", "to_source": "abs 2021"},
 
-    # ABS 2026 & 2021 to Geoscape bdys
+    # ABS 2026 to ABS 2026 bdys
+    # {"from": "sa2", "from_source": "abs 2026", "to": "poa", "to_source": "abs 2026"},
+    # {"from": "sa2", "from_source": "abs 2026", "to": "lga", "to_source": "abs 2026"},
+    # {"from": "poa", "from_source": "abs 2026", "to": "sa4", "to_source": "abs 2026"},
+    # {"from": "poa", "from_source": "abs 2026", "to": "sa3", "to_source": "abs 2026"},
+    # {"from": "poa", "from_source": "abs 2026", "to": "sa2", "to_source": "abs 2026"},
+    # {"from": "poa", "from_source": "abs 2026", "to": "lga", "to_source": "abs 2026"},
+    # {"from": "sa3", "from_source": "abs 2026", "to": "lga", "to_source": "abs 2026"},
+    # {"from": "lga", "from_source": "abs 2026", "to": "sa3", "to_source": "abs 2026"},
+    # {"from": "lga", "from_source": "abs 2026", "to": "gccsa", "to_source": "abs 2026"},
+    # {"from": "lga", "from_source": "abs 2026", "to": "state", "to_source": "abs 2026"},
+    # {"from": "lga", "from_source": "abs 2026", "to": "ra", "to_source": "abs 2026"},
+
+    # ABS 2016 & 2021 to Geoscape bdys
+    {"from": "sa2", "from_source": "abs 2016", "to": "postcode", "to_source": f"geoscape {geoscape_version}"},
+    {"from": "sa2", "from_source": "abs 2021", "to": "postcode", "to_source": f"geoscape {geoscape_version}"},
+    
+    # ABS 2021 & 2026 to Geoscape bdys
     {"from": "sa2", "from_source": "abs 2026", "to": "postcode", "to_source": f"geoscape {geoscape_version}"},
     {"from": "sa2", "from_source": "abs 2021", "to": "postcode", "to_source": f"geoscape {geoscape_version}"},
 
-    # Geoscape to ABS 2026 bdys
-    {"from": "locality", "from_source": f"geoscape {geoscape_version}", "to": "sa2", "to_source": "abs 2026"},
-    {"from": "locality", "from_source": f"geoscape {geoscape_version}", "to": "sa3", "to_source": "abs 2026"},
-    {"from": "locality", "from_source": f"geoscape {geoscape_version}", "to": "lga", "to_source": "abs 2026"},
-    {"from": "postcode", "from_source": f"geoscape {geoscape_version}", "to": "sa3", "to_source": "abs 2026"},
+    # Geoscape to ABS 2016 bdys
+    {"from": "locality", "from_source": f"geoscape {geoscape_version}", "to": "sa2", "to_source": "abs 2016"},
+    {"from": "locality", "from_source": f"geoscape {geoscape_version}", "to": "sa3", "to_source": "abs 2016"},
+    {"from": "locality", "from_source": f"geoscape {geoscape_version}", "to": "lga", "to_source": "abs 2016"},
+    {"from": "postcode", "from_source": f"geoscape {geoscape_version}", "to": "sa3", "to_source": "abs 2016"},
     # TODO: handle the postcodes that go over state borders
-    # {"from": "postcode", "from_source": f"geoscape {geoscape_version}", "to": "poa", "to_source": "abs 2026"},
-    {"from": "postcode", "from_source": f"geoscape {geoscape_version}", "to": "lga", "to_source": "abs 2026"},
-    {"from": "lga", "from_source": f"geoscape {geoscape_version}", "to": "lga", "to_source": "abs 2026"},
-    {"from": "lga", "from_source": f"geoscape {geoscape_version}", "to": "gccsa", "to_source": "abs 2026"},
+    # {"from": "postcode", "from_source": f"geoscape {geoscape_version}", "to": "poa", "to_source": "abs 2016"},
+    {"from": "postcode", "from_source": f"geoscape {geoscape_version}", "to": "lga", "to_source": "abs 2016"},
+    {"from": "lga", "from_source": f"geoscape {geoscape_version}", "to": "lga", "to_source": "abs 2016"},
+    {"from": "lga", "from_source": f"geoscape {geoscape_version}", "to": "gccsa", "to_source": "abs 2016"},
 
     # Geoscape to ABS 2021 bdys
     {"from": "locality", "from_source": f"geoscape {geoscape_version}", "to": "sa2", "to_source": "abs 2021"},
@@ -194,19 +211,38 @@ boundary_list: list[dict[str, str]] = [
     {"from": "lga", "from_source": f"geoscape {geoscape_version}", "to": "lga", "to_source": "abs 2021"},
     {"from": "lga", "from_source": f"geoscape {geoscape_version}", "to": "gccsa", "to_source": "abs 2021"},
 
+   # Geoscape to ABS 2026 bdys
+    {"from": "locality", "from_source": f"geoscape {geoscape_version}", "to": "sa2", "to_source": "abs 2026"},
+    {"from": "locality", "from_source": f"geoscape {geoscape_version}", "to": "sa3", "to_source": "abs 2026"},
+    {"from": "locality", "from_source": f"geoscape {geoscape_version}", "to": "lga", "to_source": "abs 2026"},
+    {"from": "postcode", "from_source": f"geoscape {geoscape_version}", "to": "sa3", "to_source": "abs 2026"},
+    # TODO: handle the postcodes that go over state borders
+    # {"from": "postcode", "from_source": f"geoscape {geoscape_version}", "to": "poa", "to_source": "abs 2026"},
+    {"from": "postcode", "from_source": f"geoscape {geoscape_version}", "to": "lga", "to_source": "abs 2026"},
+    {"from": "lga", "from_source": f"geoscape {geoscape_version}", "to": "lga", "to_source": "abs 2026"},
+    {"from": "lga", "from_source": f"geoscape {geoscape_version}", "to": "gccsa", "to_source": "abs 2026"},
+
     # Geoscape to Geoscape bdys
     {"from": "locality", "from_source": f"geoscape {geoscape_version}",
      "to": "lga", "to_source": f"geoscape {geoscape_version}"},
     {"from": "postcode", "from_source": f"geoscape {geoscape_version}",
      "to": "lga", "to_source": f"geoscape {geoscape_version}"},
 
+    # ABS 2021 to 2016 concordances
+    # TODO: Use official ABS correspondence files
+    {"from": "sa1", "from_source": "abs 2021", "to": "sa1", "to_source": "abs 2016"},
+    {"from": "sa2", "from_source": "abs 2021", "to": "sa2", "to_source": "abs 2016"},
+    {"from": "sa3", "from_source": "abs 2021", "to": "sa3", "to_source": "abs 2016"},
+    {"from": "sa4", "from_source": "abs 2021", "to": "sa4", "to_source": "abs 2016"},
+    {"from": "gcc", "from_source": "abs 2021", "to": "gccsa", "to_source": "abs 2016"},
+
     # ABS 2021 to 2026 concordances
     # TODO: Use official ABS correspondence files
-    {"from": "sa1", "from_source": "abs 2021", "to": "sa1", "to_source": "abs 2026"},
-    {"from": "sa2", "from_source": "abs 2021", "to": "sa2", "to_source": "abs 2026"},
-    {"from": "sa3", "from_source": "abs 2021", "to": "sa3", "to_source": "abs 2026"},
-    {"from": "sa4", "from_source": "abs 2021", "to": "sa4", "to_source": "abs 2026"},
-    {"from": "gcc", "from_source": "abs 2021", "to": "gccsa", "to_source": "abs 2026"}
+    {"from": "sa1", "from_source": "abs 2026", "to": "sa1", "to_source": "abs 2021"},
+    {"from": "sa2", "from_source": "abs 2026", "to": "sa2", "to_source": "abs 2021"},
+    {"from": "sa3", "from_source": "abs 2026", "to": "sa3", "to_source": "abs 2021"},
+    {"from": "sa4", "from_source": "abs 2026", "to": "sa4", "to_source": "abs 2021"},
+    {"from": "gcc", "from_source": "abs 2026", "to": "gccsa", "to_source": "abs 2021"}
 ]
 
 # ---------------------------------------------------------------------------------------
