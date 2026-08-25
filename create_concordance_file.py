@@ -1,4 +1,3 @@
-
 import logging
 import os
 import zipfile
@@ -55,14 +54,19 @@ def main():
 def create_bdy_tag_tables(pg_cur: psycopg.Cursor):
     start_time = datetime.now().astimezone()
 
-    sql = geoscape.open_sql_file("data-prep/01a_create_gnaf_2026_census_bdy_table.sql")
+    sql = geoscape.open_sql_file("data-prep/01a_create_gnaf_2016_census_bdy_table.sql")
     pg_cur.execute(sql) # type: ignore
-    logger.info(f'\t - ABS 2026 boundary tag table created : {datetime.now().astimezone() - start_time}')
+    logger.info(f'\t - ABS 2016 boundary tag table created : {datetime.now().astimezone() - start_time}')
 
     start_time = datetime.now().astimezone()
     sql = geoscape.open_sql_file("data-prep/01b_create_gnaf_2021_census_bdy_table.sql")
     pg_cur.execute(sql) # type: ignore
     logger.info(f'\t - ABS 2021 boundary tag table created : {datetime.now().astimezone() - start_time}')
+
+    # start_time = datetime.now().astimezone()
+    # sql = geoscape.open_sql_file("data-prep/01c_create_gnaf_2026_census_bdy_table.sql")
+    # pg_cur.execute(sql) # type: ignore
+    # logger.info(f'\t - ABS 2026 boundary tag table created : {datetime.now().astimezone() - start_time}')
 
 
 def create_table(pg_cur: psycopg.Cursor):
@@ -124,9 +128,9 @@ def add_concordances(bdy: dict[str, str], pg_cur: psycopg.Cursor):
             residential_filter = "and f.mb_category_2021 in ('Residential', 'Primary Production', 'Other')"
         elif to_source == "abs 2021":
             residential_filter = "and t.mb_category_2021 in ('Residential', 'Primary Production', 'Other')"
-        # elif from_source == "abs 2026":
+        # elif from_source == "abs 2016":
         #     residential_filter = "and f.mb_category = 'RESIDENTIAL'"
-        # elif to_source == "abs 2026":
+        # elif to_source == "abs 2016":
         #     residential_filter = "and t.mb_category = 'RESIDENTIAL'"
 
         # build the query
@@ -178,7 +182,7 @@ def add_asgs_concordances(pg_cur: psycopg.Cursor):
     # adds ABS Census concordances for ASGS boundaries (ordered by increasing size)
 
     # add ABS Census concordances for ASGS boundaries, one census at a time
-    source = "abs 2026"
+    source = "abs 2016"
 
     for from_bdy in settings.asgs_concordance_list:
         from_index = settings.asgs_concordance_list.index(from_bdy)
@@ -202,8 +206,8 @@ def add_asgs_concordances(pg_cur: psycopg.Cursor):
                                    {to_bdy}_name16 as to_name,
                                    count(*) as address_count,
                                    100.0 as address_percent
-                            from census_2026_bdys.mb_2026_aust as mb
-                            inner join gnaf_202608.address_principals as gnaf on gnaf.mb_2026_code::text = mb.mb_code16
+                            from census_2016_bdys.mb_2016_aust as mb
+                            inner join gnaf_201608.address_principals as gnaf on gnaf.mb_2016_code::text = mb.mb_code16
                             group by from_id,
                                      from_name,
                                      to_id,
@@ -251,7 +255,7 @@ def add_asgs_concordances(pg_cur: psycopg.Cursor):
                                    count(*) as address_count,
                                    100.0 as address_percent
                             from census_2021_bdys_gda94.mb_2021_aust_gda94 as mb
-                                     inner join gnaf_202608.address_principals as gnaf 
+                                     inner join gnaf_201608.address_principals as gnaf 
                                          on gnaf.mb_2021_code::text = mb.mb_code_2021
                             group by from_id,
                                      from_name,
@@ -279,7 +283,7 @@ def get_field_names(bdy: str, source: str, to_from: str, sql: str):
     else:
         table = "f"
 
-    if source == "abs 2026":
+    if source == "abs 2016":
         id_field = f"{table}.{bdy}_code16"
         name_field = f"{table}.{bdy}_name16"
 
@@ -383,7 +387,7 @@ def score_results(pg_cur: psycopg.Cursor):
     logger.info("\t\t| {:24} | {:24} | {:11} | {:9} |".format("from", "to", "concordance", "avg error"))
     logger.info("\t\t---------------------------------------------------------------------------------")
 
-    # add average errors for ABS 2026 bdys and log QA metrics
+    # add average errors for ABS 2016 bdys and log QA metrics
     for row in rows:
         from_source = row[0]
         from_bdy = row[1]
@@ -392,8 +396,8 @@ def score_results(pg_cur: psycopg.Cursor):
 
         concordance = row[4]
 
-        # add average expected error using population data from the 2026 census
-        if from_source == "abs 2026" and to_source == "abs 2026":
+        # add average expected error using population data from the 2016 census
+        if from_source == "abs 2016" and to_source == "abs 2016":
             if from_bdy in settings.asgs_concordance_list and to_bdy in settings.asgs_concordance_list:
                 # don't calculate error - it's zero!
                 error_percent = 0.0
@@ -403,7 +407,7 @@ def score_results(pg_cur: psycopg.Cursor):
                                        con.to_name,
                                        con.to_source,
                                        sum(from_bdy.g3::float * con.address_percent / 100.0)::integer as population1
-                                from census_2026_data.{from_bdy}_g01 as from_bdy
+                                from census_2016_data.{from_bdy}_g01 as from_bdy
                                          inner join {settings.gnaf_schema}.{settings.output_table} as con 
                                              on from_bdy.region_id = con.from_id
                                 where from_source = '{from_source}'
@@ -421,7 +425,7 @@ def score_results(pg_cur: psycopg.Cursor):
                                        g3 as population2
         --                                g3 - population1 as pop_difference,
         --                                (abs((g3 - population1) / g3) * 100.0)::smallint as pop_diff_percent
-                                from census_2026_data.{to_bdy}_g01 as to_bdy
+                                from census_2016_data.{to_bdy}_g01 as to_bdy
                                 inner join pc on pc.to_id = to_bdy.region_id
                             )
                             select (sum(abs(population2 - population1)) / sum(population2) * 100.0)::numeric(5, 1) 
