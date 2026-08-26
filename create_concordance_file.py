@@ -168,10 +168,21 @@ def add_concordances(bdy: dict[str, str], pg_cur: psycopg.Cursor):
         # print(query)
         pg_cur.execute(query) # type: ignore
 
+        # get row count
+        query = f"""select count(*) as row_count
+                         from {settings.gnaf_schema}.{settings.output_table}
+                         where from_source = '{from_source}'
+                             and from_bdy = '{from_bdy}'
+                             and to_source = '{to_source}'
+                             and to_bdy = '{to_bdy}'
+                         """
+        pg_cur.execute(query) # type: ignore
+        row_count = int(pg_cur.fetchall()[0][0])
+
         if from_source == to_source:
-            logger.info(f"\t - {from_source} {from_bdy} to {to_bdy} records added : {datetime.now().astimezone() - start_time}")
+            logger.info(f"\t - {from_source} {from_bdy} to {to_bdy} : {row_count:,} records added : {datetime.now().astimezone() - start_time}")
         else:
-            logger.info(f"\t - {from_source} {from_bdy} to {to_source} {to_bdy} records added : "
+            logger.info(f"\t - {from_source} {from_bdy} to {to_source} {to_bdy} : {row_count:,} records added : "
                         f"{datetime.now().astimezone() - start_time}")
 
     else:
