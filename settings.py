@@ -148,7 +148,7 @@ boundary_list: list[dict[str, str]] = [
     {"from": "sa3", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
     {"from": "lga", "from_source": "abs 2016", "to": "sa3", "to_source": "abs 2016"},
     {"from": "lga", "from_source": "abs 2016", "to": "gccsa", "to_source": "abs 2016"},
-    {"from": "lga", "from_source": "abs 2016", "to": "state", "to_source": "abs 2016"},
+    {"from": "lga", "from_source": "abs 2016", "to": "ste", "to_source": "abs 2016"},
     {"from": "lga", "from_source": "abs 2016", "to": "ra", "to_source": "abs 2016"},
 
     # only 25% concordance with a ~14% error - don't do it!
@@ -233,7 +233,7 @@ boundary_list: list[dict[str, str]] = [
     {"from": "sa2", "from_source": "abs 2021", "to": "sa2", "to_source": "abs 2016"},
     {"from": "sa3", "from_source": "abs 2021", "to": "sa3", "to_source": "abs 2016"},
     {"from": "sa4", "from_source": "abs 2021", "to": "sa4", "to_source": "abs 2016"},
-    {"from": "gcc", "from_source": "abs 2021", "to": "gccsa", "to_source": "abs 2016"},
+    {"from": "gccsa", "from_source": "abs 2021", "to": "gccsa", "to_source": "abs 2016"},
 
     # ABS 2021 to 2026 concordances
     # TODO: Use official ABS correspondence files
@@ -241,7 +241,7 @@ boundary_list: list[dict[str, str]] = [
     # {"from": "sa2", "from_source": "abs 2026", "to": "sa2", "to_source": "abs 2021"},
     # {"from": "sa3", "from_source": "abs 2026", "to": "sa3", "to_source": "abs 2021"},
     # {"from": "sa4", "from_source": "abs 2026", "to": "sa4", "to_source": "abs 2021"},
-    # {"from": "gcc", "from_source": "abs 2026", "to": "gccsa", "to_source": "abs 2021"}
+    # {"from": "gccsa", "from_source": "abs 2026", "to": "gccsa", "to_source": "abs 2021"}
 ]
 
 # ---------------------------------------------------------------------------------------
