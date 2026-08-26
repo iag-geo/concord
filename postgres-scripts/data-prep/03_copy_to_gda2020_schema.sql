@@ -2,15 +2,20 @@
 CREATE SCHEMA IF NOT EXISTS gnaf_202608_gda2020 AUTHORIZATION postgres;
 
 -- create tables
-drop table if exists gnaf_202608_gda2020.address_principal_census_2026_boundaries;
-create table gnaf_202608_gda2020.address_principal_census_2026_boundaries as
-select * from gnaf_202608.address_principal_census_2026_boundaries;
-analyse gnaf_202608_gda2020.address_principal_census_2026_boundaries;
+drop table if exists gnaf_202608_gda2020.address_principal_census_2016_boundaries;
+create table gnaf_202608_gda2020.address_principal_census_2016_boundaries as
+select * from gnaf_202608.address_principal_census_2016_boundaries;
+analyse gnaf_202608_gda2020.address_principal_census_2016_boundaries;
 
 drop table if exists gnaf_202608_gda2020.address_principal_census_2021_boundaries;
 create table gnaf_202608_gda2020.address_principal_census_2021_boundaries as
 select * from gnaf_202608.address_principal_census_2021_boundaries;
 analyse gnaf_202608_gda2020.address_principal_census_2021_boundaries;
+
+drop table if exists gnaf_202608_gda2020.address_principal_census_2026_boundaries;
+create table gnaf_202608_gda2020.address_principal_census_2026_boundaries as
+select * from gnaf_202608.address_principal_census_2026_boundaries;
+analyse gnaf_202608_gda2020.address_principal_census_2026_boundaries;
 
 drop table if exists gnaf_202608_gda2020.boundary_concordance_score;
 create table gnaf_202608_gda2020.boundary_concordance_score as

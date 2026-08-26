@@ -207,7 +207,7 @@ def add_asgs_concordances(pg_cur: psycopg.Cursor):
                                    count(*) as address_count,
                                    100.0 as address_percent
                             from census_2016_bdys.mb_2016_aust as mb
-                            inner join gnaf_201608.address_principals as gnaf on gnaf.mb_2016_code::text = mb.mb_code16
+                            inner join gnaf_202608.address_principals as gnaf on gnaf.mb_2016_code::text = mb.mb_code16
                             group by from_id,
                                      from_name,
                                      to_id,
@@ -255,7 +255,7 @@ def add_asgs_concordances(pg_cur: psycopg.Cursor):
                                    count(*) as address_count,
                                    100.0 as address_percent
                             from census_2021_bdys_gda94.mb_2021_aust_gda94 as mb
-                                     inner join gnaf_202108.address_principals as gnaf 
+                                     inner join gnaf_202608.address_principals as gnaf 
                                          on gnaf.mb_2021_code::text = mb.mb_code_2021
                             group by from_id,
                                      from_name,
