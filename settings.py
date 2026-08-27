@@ -1,36 +1,32 @@
 # takes the command line parameters and creates a dictionary of setting_dict
 
-import os
 import argparse
+import os
 import platform
-import psycopg
 import sys
+from datetime import date
+from typing import Any
 
-from datetime import datetime
+import psycopg
 
 
-# get latest Geoscape release version as YYYYMM, as of the date provided, as well as the prev. version 3 months prior
-def get_geoscape_version(date):
+# get latest Geoscape release version as YYYYMM, as of the date provided
+def get_geoscape_version(date: date) -> str:
     month = date.month
     year = date.year
 
     if month == 1:
         gs_version = str(year - 1) + "11"
-        previous_gs_version = str(year - 1) + "08"
     elif 2 <= month < 5:
         gs_version = str(year) + "02"
-        previous_gs_version = str(year - 1) + "11"
     elif 5 <= month < 8:
         gs_version = str(year) + "05"
-        previous_gs_version = str(year) + "02"
     elif 8 <= month < 11:
         gs_version = str(year) + "08"
-        previous_gs_version = str(year) + "05"
     else:
         gs_version = str(year) + "11"
-        previous_gs_version = str(year) + "08"
 
-    return gs_version, previous_gs_version
+    return gs_version
 
 
 # get python, psycopg and OS versions
@@ -62,15 +58,12 @@ parser.add_argument(
          "otherwise \"password\".")
 
 # schema names for the raw gnaf, flattened reference and admin boundary tables
-geoscape_version, previous_geoscape_version = get_geoscape_version(datetime.today())
+geoscape_version = get_geoscape_version(date.today())  # noqa: DTZ011
+
 parser.add_argument(
     "--geoscape-version", default=geoscape_version,
     help="Geoscape release version number as YYYYMM. Defaults to latest release year and month \""
          + geoscape_version + "\".")
-# parser.add_argument(
-#     "--previous-geoscape-version", default=previous_geoscape_version,
-#     help="Previous Geoscape release version number as YYYYMM; used for QA comparison. "
-#          "Defaults to \"" + previous_geoscape_version + "\".")
 parser.add_argument(
     "--gnaf-schema",
     help="Input schema name to store final GNAF tables in. Also the output schema for the concordance table."
@@ -79,13 +72,6 @@ parser.add_argument(
     "--admin-schema",
     help="Input schema name to store final admin boundary tables in. Defaults to \"admin_bdys_"
          + geoscape_version + "\".")
-# parser.add_argument(
-#     "--previous-gnaf-schema",
-#     help="Schema with previous version of GNAF tables in. Defaults to \"gnaf_" + previous_geoscape_version + "\".")
-# parser.add_argument(
-#     "--previous-admin-schema",
-#     help="Schema with previous version of GNAF tables in. Defaults to \"admin_bdys_"
-#          + previous_geoscape_version + "\".")
 
 # output file/table name & directory
 parser.add_argument(
@@ -97,22 +83,25 @@ parser.add_argument(
 parser.add_argument(
     "--output-path", required=True,
     help="Local path where the boundary concordance files will be output.")
+parser.add_argument(
+    "--log-path",
+    help="Optional directory for the loader log file. Defaults to a log file beside load-gnaf.py.")
 
 # global var containing all input parameters
 args = parser.parse_args()
 
 # assign parameters to global settings
-gnaf_schema = args.gnaf_schema or "gnaf_" + geoscape_version
-admin_bdys_schema = args.admin_schema or "admin_bdys_" + geoscape_version
-# previous_gnaf_schema = args.previous_gnaf_schema or "gnaf_" + previous_geoscape_version
-# previous_admin_bdys_schema = args.previous_admin_schema or "admin_bdys_" + previous_geoscape_version
+gnaf_schema = args.gnaf_schema or f"gnaf_{geoscape_version}"
+admin_bdys_schema = args.admin_schema or f"admin_bdys_{geoscape_version}"
+
 output_path = args.output_path
+log_path = args.log_path
 output_table = args.output_table or "boundary_concordance"
 output_score_table = args.output_score_table or f"{output_table}_score"
 
 # create postgres connect string
 pg_host = args.pghost or os.getenv("PGHOST", "localhost")
-pg_port = args.pgport or os.getenv("PGPORT", 5432)
+pg_port = int(args.pgport or os.getenv("PGPORT", '5432'))
 pg_db = args.pgdb or os.getenv("PGDATABASE", "geoscape")
 pg_user = args.pguser or os.getenv("PGUSER", "postgres")
 pg_password = args.pgpassword or os.getenv("PGPASSWORD", "password")
@@ -131,9 +120,10 @@ asgs_concordance_list = ["sa1", "sa2", "sa3", "sa4", "gcc"]
 # ---------------------------------------------------------------------------------------
 
 # sources of address level data with boundary tags - names are hardcoded, don't edit them!
-source_list = [
+source_list: list[dict[str, Any]] = [
     {"name": "abs 2016", "schema": gnaf_schema, "table": "address_principal_census_2016_boundaries"},
     {"name": "abs 2021", "schema": gnaf_schema, "table": "address_principal_census_2021_boundaries"},
+    # {"name": "abs 2026", "schema": gnaf_schema, "table": "address_principal_census_2026_boundaries"},
     {"name": f"geoscape {geoscape_version}", "schema": gnaf_schema, "table": "address_principal_admin_boundaries"}
 ]
 
@@ -142,15 +132,12 @@ source_list = [
 
 # residential_address_source = {"name": "geoscape", "schema": "geoscape_202203",
 #                               "table": "address_principals_buildings"}
-# residential_address_source = {"name": "abs 2016", "schema": gnaf_schema,
-#                               "table": "address_principal_census_2016_boundaries"}
-residential_address_source = {"name": "abs 2021", "schema": gnaf_schema,
-                              "table": "address_principal_census_2021_boundaries"}
+residential_address_source: dict[str, Any] = {"name": "abs 2021", "schema": gnaf_schema, "table": "address_principal_census_2021_boundaries"}
 
 # the list of boundary pairs to create concordances - from and to sources must match the names of the above sources
 # don't include ASGS ABS boundary pairs that are nested (e.g. SA2 > SA3);
 # they have their own lookup table and are added automatically
-boundary_list = [
+boundary_list: list[dict[str, str]] = [
     # ABS 2016 to ABS 2016 bdys
     {"from": "sa2", "from_source": "abs 2016", "to": "poa", "to_source": "abs 2016"},
     {"from": "sa2", "from_source": "abs 2016", "to": "lga", "to_source": "abs 2016"},
@@ -180,9 +167,26 @@ boundary_list = [
     {"from": "lga", "from_source": "abs 2021", "to": "state", "to_source": "abs 2021"},  # note bdy name change
     {"from": "lga", "from_source": "abs 2021", "to": "ra", "to_source": "abs 2021"},
 
+    # ABS 2026 to ABS 2026 bdys
+    # {"from": "sa2", "from_source": "abs 2026", "to": "poa", "to_source": "abs 2026"},
+    # {"from": "sa2", "from_source": "abs 2026", "to": "lga", "to_source": "abs 2026"},
+    # {"from": "poa", "from_source": "abs 2026", "to": "sa4", "to_source": "abs 2026"},
+    # {"from": "poa", "from_source": "abs 2026", "to": "sa3", "to_source": "abs 2026"},
+    # {"from": "poa", "from_source": "abs 2026", "to": "sa2", "to_source": "abs 2026"},
+    # {"from": "poa", "from_source": "abs 2026", "to": "lga", "to_source": "abs 2026"},
+    # {"from": "sa3", "from_source": "abs 2026", "to": "lga", "to_source": "abs 2026"},
+    # {"from": "lga", "from_source": "abs 2026", "to": "sa3", "to_source": "abs 2026"},
+    # {"from": "lga", "from_source": "abs 2026", "to": "gccsa", "to_source": "abs 2026"},
+    # {"from": "lga", "from_source": "abs 2026", "to": "state", "to_source": "abs 2026"},
+    # {"from": "lga", "from_source": "abs 2026", "to": "ra", "to_source": "abs 2026"},
+
     # ABS 2016 & 2021 to Geoscape bdys
     {"from": "sa2", "from_source": "abs 2016", "to": "postcode", "to_source": f"geoscape {geoscape_version}"},
     {"from": "sa2", "from_source": "abs 2021", "to": "postcode", "to_source": f"geoscape {geoscape_version}"},
+    
+    # ABS 2021 & 2026 to Geoscape bdys
+    # {"from": "sa2", "from_source": "abs 2026", "to": "postcode", "to_source": f"geoscape {geoscape_version}"},
+    # {"from": "sa2", "from_source": "abs 2021", "to": "postcode", "to_source": f"geoscape {geoscape_version}"},
 
     # Geoscape to ABS 2016 bdys
     {"from": "locality", "from_source": f"geoscape {geoscape_version}", "to": "sa2", "to_source": "abs 2016"},
@@ -206,19 +210,38 @@ boundary_list = [
     {"from": "lga", "from_source": f"geoscape {geoscape_version}", "to": "lga", "to_source": "abs 2021"},
     {"from": "lga", "from_source": f"geoscape {geoscape_version}", "to": "gccsa", "to_source": "abs 2021"},
 
+   # Geoscape to ABS 2026 bdys
+    # {"from": "locality", "from_source": f"geoscape {geoscape_version}", "to": "sa2", "to_source": "abs 2026"},
+    # {"from": "locality", "from_source": f"geoscape {geoscape_version}", "to": "sa3", "to_source": "abs 2026"},
+    # {"from": "locality", "from_source": f"geoscape {geoscape_version}", "to": "lga", "to_source": "abs 2026"},
+    # {"from": "postcode", "from_source": f"geoscape {geoscape_version}", "to": "sa3", "to_source": "abs 2026"},
+    # # TODO: handle the postcodes that go over state borders
+    # # {"from": "postcode", "from_source": f"geoscape {geoscape_version}", "to": "poa", "to_source": "abs 2026"},
+    # {"from": "postcode", "from_source": f"geoscape {geoscape_version}", "to": "lga", "to_source": "abs 2026"},
+    # {"from": "lga", "from_source": f"geoscape {geoscape_version}", "to": "lga", "to_source": "abs 2026"},
+    # {"from": "lga", "from_source": f"geoscape {geoscape_version}", "to": "gccsa", "to_source": "abs 2026"},
+
     # Geoscape to Geoscape bdys
     {"from": "locality", "from_source": f"geoscape {geoscape_version}",
      "to": "lga", "to_source": f"geoscape {geoscape_version}"},
     {"from": "postcode", "from_source": f"geoscape {geoscape_version}",
      "to": "lga", "to_source": f"geoscape {geoscape_version}"},
 
-    # ABS 2016 to 2021 concordances
+    # ABS 2021 to 2016 concordances
     # TODO: Use official ABS correspondence files
-    {"from": "sa1", "from_source": "abs 2016", "to": "sa1", "to_source": "abs 2021"},
-    {"from": "sa2", "from_source": "abs 2016", "to": "sa2", "to_source": "abs 2021"},
-    {"from": "sa3", "from_source": "abs 2016", "to": "sa3", "to_source": "abs 2021"},
-    {"from": "sa4", "from_source": "abs 2016", "to": "sa4", "to_source": "abs 2021"},
-    {"from": "gcc", "from_source": "abs 2016", "to": "gccsa", "to_source": "abs 2021"}  # note bdy name change
+    {"from": "sa1", "from_source": "abs 2021", "to": "sa1", "to_source": "abs 2016"},
+    {"from": "sa2", "from_source": "abs 2021", "to": "sa2", "to_source": "abs 2016"},
+    {"from": "sa3", "from_source": "abs 2021", "to": "sa3", "to_source": "abs 2016"},
+    {"from": "sa4", "from_source": "abs 2021", "to": "sa4", "to_source": "abs 2016"},
+    {"from": "gccsa", "from_source": "abs 2021", "to": "gccsa", "to_source": "abs 2016"},
+
+    # ABS 2021 to 2026 concordances
+    # TODO: Use official ABS correspondence files
+    # {"from": "sa1", "from_source": "abs 2026", "to": "sa1", "to_source": "abs 2021"},
+    # {"from": "sa2", "from_source": "abs 2026", "to": "sa2", "to_source": "abs 2021"},
+    # {"from": "sa3", "from_source": "abs 2026", "to": "sa3", "to_source": "abs 2021"},
+    # {"from": "sa4", "from_source": "abs 2026", "to": "sa4", "to_source": "abs 2021"},
+    # {"from": "gccsa", "from_source": "abs 2026", "to": "gccsa", "to_source": "abs 2021"}
 ]
 
 # ---------------------------------------------------------------------------------------
