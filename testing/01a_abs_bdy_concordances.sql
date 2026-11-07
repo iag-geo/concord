@@ -28,7 +28,7 @@ with agg as (
            lga_16name as to_name,
 --            state as to_state,
            count(*) as address_count
-    from gnaf_202608.address_principal_census_2026_boundaries
+    from gnaf_202611.address_principal_census_2026_boundaries
     group by from_id,
              from_name,
 --              from_state,
