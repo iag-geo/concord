@@ -55,6 +55,7 @@ def create_bdy_tag_tables(pg_cur: psycopg.Cursor):
     start_time = datetime.now().astimezone()
 
     sql = geoscape.open_sql_file("data-prep/01a_create_gnaf_2016_census_bdy_table.sql")
+    print(sql)
     pg_cur.execute(sql) # type: ignore
     logger.info(f'\t - ABS 2016 boundary tag table created : {datetime.now().astimezone() - start_time}')
 
@@ -167,17 +168,7 @@ def add_concordances(bdy: dict[str, str], pg_cur: psycopg.Cursor):
 
         # print(query)
         pg_cur.execute(query) # type: ignore
-
-        # get row count
-        query = f"""select count(*) as row_count
-                         from {settings.gnaf_schema}.{settings.output_table}
-                         where from_source = '{from_source}'
-                             and from_bdy = '{from_bdy}'
-                             and to_source = '{to_source}'
-                             and to_bdy = '{to_bdy}'
-                         """
-        pg_cur.execute(query) # type: ignore
-        row_count = int(pg_cur.fetchall()[0][0])
+        row_count = int(pg_cur.rowcount) if pg_cur.rowcount is not None else 0 # type: ignore
 
         if from_source == to_source:
             logger.info(f"\t - {from_source} {from_bdy} to {to_bdy} : {row_count:,} records added : {datetime.now().astimezone() - start_time}")
