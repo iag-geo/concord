@@ -184,53 +184,6 @@ def add_asgs_concordances(pg_cur: psycopg.Cursor):
             start_time = datetime.now().astimezone()
             to_index = settings.asgs_concordance_list.index(to_bdy)
 
-            if to_bdy == "gccsa":
-                to_bdy = "gcc"
-
-            if to_index > from_index:
-                query = f"""insert into {settings.gnaf_schema}.{settings.output_table}
-                            select '{source}' as from_source,
-                                   '{from_bdy}' as from_bdy,
-                                   {from_bdy}_code16 as from_id,
-                                   {from_bdy}_name16 as from_name,
-                                   '{source}' as to_source,
-                                   '{to_bdy}' as to_bdy,
-                                   {to_bdy}_code16 as to_id,
-                                   {to_bdy}_name16 as to_name,
-                                   count(*) as address_count,
-                                   100.0 as address_percent
-                            from census_2021_bdys.mb_2021_aust as mb
-                            inner join gnaf_202611.address_principals as gnaf on gnaf.mb_2021_code::text = mb.mb_code16
-                            group by from_id,
-                                     from_name,
-                                     to_id,
-                                     to_name"""
-
-                # hardcode fixes for inconsistent meshblock, sa1, sa2 and state field names
-
-                # if from_bdy == "mb":
-                #     query = query.replace("mb_name16", "mb_category")
-
-                if from_bdy == "sa1" or to_bdy == "sa1":
-                    query = query.replace("sa1_code16", "sa1_main16").replace("sa1_name16", "sa1_7dig16")
-
-                if from_bdy == "sa2" or to_bdy == "sa2":
-                    query = query.replace("sa2_code16", "sa2_main16")
-
-                # print(query)
-                pg_cur.execute(query) # type: ignore
-
-                logger.info(f"\t - {source} {from_bdy} to {to_bdy} records added : {datetime.now().astimezone() - start_time}")
-
-    source = "abs 2021"
-
-    for from_bdy in settings.asgs_concordance_list:
-        from_index = settings.asgs_concordance_list.index(from_bdy)
-
-        for to_bdy in settings.asgs_concordance_list:
-            start_time = datetime.now().astimezone()
-            to_index = settings.asgs_concordance_list.index(to_bdy)
-
             # fix for field name change between censuses
             if to_bdy == "gcc":
                 to_bdy = to_bdy.replace("gcc", "gccsa")
@@ -256,9 +209,6 @@ def add_asgs_concordances(pg_cur: psycopg.Cursor):
                                      to_name"""
 
                 # hardcode fixes for inconsistent meshblock, sa1, sa2 and state field names
-
-                # if from_bdy == "mb":
-                #     query = query.replace("mb_21name", "mb_cat")
 
                 if from_bdy == "sa1" or to_bdy == "sa1":
                     query = query.replace("sa1_name_2021", "sa1_code_2021")
