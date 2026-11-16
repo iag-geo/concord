@@ -58,7 +58,7 @@ parser.add_argument(
          "otherwise \"password\".")
 
 # schema names for the raw gnaf, flattened reference and admin boundary tables
-geoscape_version = get_geoscape_version(date.today())  # noqa: DTZ011
+geoscape_version = get_geoscape_version(date.today())
 
 parser.add_argument(
     "--geoscape-version", default=geoscape_version,
