@@ -2,11 +2,6 @@
 CREATE SCHEMA IF NOT EXISTS gnaf_202611_gda2020 AUTHORIZATION postgres;
 
 -- create tables
-drop table if exists gnaf_202611_gda2020.address_principal_census_2016_boundaries;
-create table gnaf_202611_gda2020.address_principal_census_2016_boundaries as
-select * from gnaf_202611.address_principal_census_2016_boundaries;
-analyse gnaf_202611_gda2020.address_principal_census_2016_boundaries;
-
 drop table if exists gnaf_202611_gda2020.address_principal_census_2021_boundaries;
 create table gnaf_202611_gda2020.address_principal_census_2021_boundaries as
 select * from gnaf_202611.address_principal_census_2021_boundaries;
