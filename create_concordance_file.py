@@ -358,19 +358,14 @@ def score_results(pg_cur: psycopg.Cursor):
                                        to_source,
                                        population1,
                                        g3 as population2
-        --                                g3 - population1 as pop_difference,
-        --                                (abs((g3 - population1) / g3) * 100.0)::smallint as pop_diff_percent
                                 from census_2021_data.{to_bdy}_g01 as to_bdy
                                 inner join pc on pc.to_id = to_bdy.region_id
                             )
                             select (sum(abs(population2 - population1)) / sum(population2) * 100.0)::numeric(5, 1) 
                                 as error_percent
-    --                                sum(population1) as population1,
-    --                                sum(population2) as population2,
-    --                                sum(abs(pop_difference)) as pop_difference,
-    --                                sqrt(avg(power(population2 - population1, 2)))::smallint as rmse
                             from merge"""
 
+                print(query)
                 pg_cur.execute(query) # type: ignore
                 error_percent = float(pg_cur.fetchone()[0]) # type: ignore
 
