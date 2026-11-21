@@ -330,13 +330,25 @@ def score_results(pg_cur: psycopg.Cursor):
         to_bdy = row[3]
 
         concordance = row[4]
-
+        
         # add average expected error using population data from the 2021 census
         if from_source == "abs 2021" and to_source == "abs 2021":
             if from_bdy in settings.asgs_concordance_list and to_bdy in settings.asgs_concordance_list:
                 # don't calculate error - it's zero!
                 error_percent = 0.0
             else:
+                # fix difference in state table naming
+                to_bdy_value = to_bdy
+                
+                if to_bdy == "state":
+                    to_bdy = "ste"
+                
+                # fix difference in RA IDs
+                if to_bdy == "ra":
+                    region_id = "concat('RA', pc.to_id)"
+                else:
+                    region_id = "pc.to_id"
+                
                 query = f"""with pc as (
                                 select con.to_id,
                                        con.to_name,
@@ -348,7 +360,7 @@ def score_results(pg_cur: psycopg.Cursor):
                                 where from_source = '{from_source}'
                                     and from_bdy = '{from_bdy}'
                                     and to_source = '{to_source}'
-                                    and to_bdy = '{to_bdy}'
+                                    and to_bdy = '{to_bdy_value}'
                                 group by con.to_id,
                                          con.to_name,
                                          con.to_source
@@ -359,15 +371,21 @@ def score_results(pg_cur: psycopg.Cursor):
                                        population1,
                                        g3 as population2
                                 from census_2021_data.{to_bdy}_g01 as to_bdy
-                                inner join pc on pc.to_id = to_bdy.region_id
+                                inner join pc on {region_id} = to_bdy.region_id
                             )
                             select (sum(abs(population2 - population1)) / sum(population2) * 100.0)::numeric(5, 1) 
                                 as error_percent
                             from merge"""
 
-                print(query)
-                pg_cur.execute(query) # type: ignore
-                error_percent = float(pg_cur.fetchone()[0]) # type: ignore
+                try:
+                    pg_cur.execute(query) # type: ignore
+                    error_percent = float(pg_cur.fetchone()[0]) # type: ignore
+                except Exception as e:  # noqa: BLE001
+                    print("--------------------------------------------------------------------------------------------------------------------")
+                    print(query)                   
+                    print("--------------------------------------------------------------------------------------------------------------------")
+                    logger.error(f"Error occurred while executing query for {from_bdy} to {to_bdy}: {e}")
+                    error_percent = 0.0
 
             error_percent_str = str(error_percent) + "%"
 
